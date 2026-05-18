@@ -1,0 +1,536 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 56;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		A00000000000000000000101 /* GaokaoCockpitApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000201 /* GaokaoCockpitApp.swift */; };
+		A00000000000000000000102 /* AppRootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000202 /* AppRootView.swift */; };
+		A00000000000000000000103 /* TodayCockpitPlaceholderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000203 /* TodayCockpitPlaceholderView.swift */; };
+		A00000000000000000000104 /* TaskListPlaceholderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000204 /* TaskListPlaceholderView.swift */; };
+		A00000000000000000000105 /* FocusSessionPlaceholderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000205 /* FocusSessionPlaceholderView.swift */; };
+		A00000000000000000000106 /* MistakeSurgeryPlaceholderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000206 /* MistakeSurgeryPlaceholderView.swift */; };
+		A00000000000000000000107 /* PromptLibraryPlaceholderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000207 /* PromptLibraryPlaceholderView.swift */; };
+		A00000000000000000000108 /* ReviewPlaceholderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000208 /* ReviewPlaceholderView.swift */; };
+		A00000000000000000000109 /* ModelDefaults.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000240 /* ModelDefaults.swift */; };
+		A00000000000000000000110 /* DayPlan.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000241 /* DayPlan.swift */; };
+		A00000000000000000000111 /* StudyTask.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000242 /* StudyTask.swift */; };
+		A00000000000000000000112 /* FocusSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000243 /* FocusSession.swift */; };
+		A00000000000000000000113 /* MistakeRecord.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000244 /* MistakeRecord.swift */; };
+		A00000000000000000000114 /* PromptTemplate.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000245 /* PromptTemplate.swift */; };
+		A00000000000000000000115 /* ResourceItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000246 /* ResourceItem.swift */; };
+		A00000000000000000000116 /* DailyReview.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000247 /* DailyReview.swift */; };
+		A00000000000000000000117 /* WeeklyReview.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000248 /* WeeklyReview.swift */; };
+		A00000000000000000000118 /* DateKey.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000249 /* DateKey.swift */; };
+		A00000000000000000000119 /* AppModelContainerFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000250 /* AppModelContainerFactory.swift */; };
+		A00000000000000000000120 /* PromptTemplateSeeder.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000251 /* PromptTemplateSeeder.swift */; };
+		A00000000000000000000121 /* Stage2DebugPersistenceView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000252 /* Stage2DebugPersistenceView.swift */; };
+		A00000000000000000000122 /* DayPlanStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000253 /* DayPlanStore.swift */; };
+		A00000000000000000000123 /* StudyTaskStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000254 /* StudyTaskStore.swift */; };
+		A00000000000000000000124 /* PromptTemplateStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000255 /* PromptTemplateStore.swift */; };
+		A00000000000000000000125 /* DailyReviewStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000256 /* DailyReviewStore.swift */; };
+		A00000000000000000000126 /* TodayCockpitView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000257 /* TodayCockpitView.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		A00000000000000000000201 /* GaokaoCockpitApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GaokaoCockpitApp.swift; sourceTree = "<group>"; };
+		A00000000000000000000202 /* AppRootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppRootView.swift; sourceTree = "<group>"; };
+		A00000000000000000000203 /* TodayCockpitPlaceholderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodayCockpitPlaceholderView.swift; sourceTree = "<group>"; };
+		A00000000000000000000204 /* TaskListPlaceholderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskListPlaceholderView.swift; sourceTree = "<group>"; };
+		A00000000000000000000205 /* FocusSessionPlaceholderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FocusSessionPlaceholderView.swift; sourceTree = "<group>"; };
+		A00000000000000000000206 /* MistakeSurgeryPlaceholderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MistakeSurgeryPlaceholderView.swift; sourceTree = "<group>"; };
+		A00000000000000000000207 /* PromptLibraryPlaceholderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PromptLibraryPlaceholderView.swift; sourceTree = "<group>"; };
+		A00000000000000000000208 /* ReviewPlaceholderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReviewPlaceholderView.swift; sourceTree = "<group>"; };
+		A00000000000000000000209 /* Models README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; name = README.md; path = Models/README.md; sourceTree = "<group>"; };
+		A00000000000000000000210 /* Stores README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; name = README.md; path = Stores/README.md; sourceTree = "<group>"; };
+		A00000000000000000000211 /* Resources README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; name = README.md; path = Resources/README.md; sourceTree = "<group>"; };
+		A00000000000000000000240 /* ModelDefaults.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModelDefaults.swift; sourceTree = "<group>"; };
+		A00000000000000000000241 /* DayPlan.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DayPlan.swift; sourceTree = "<group>"; };
+		A00000000000000000000242 /* StudyTask.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StudyTask.swift; sourceTree = "<group>"; };
+		A00000000000000000000243 /* FocusSession.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FocusSession.swift; sourceTree = "<group>"; };
+		A00000000000000000000244 /* MistakeRecord.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MistakeRecord.swift; sourceTree = "<group>"; };
+		A00000000000000000000245 /* PromptTemplate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PromptTemplate.swift; sourceTree = "<group>"; };
+		A00000000000000000000246 /* ResourceItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResourceItem.swift; sourceTree = "<group>"; };
+		A00000000000000000000247 /* DailyReview.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DailyReview.swift; sourceTree = "<group>"; };
+		A00000000000000000000248 /* WeeklyReview.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeeklyReview.swift; sourceTree = "<group>"; };
+		A00000000000000000000249 /* DateKey.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DateKey.swift; sourceTree = "<group>"; };
+		A00000000000000000000250 /* AppModelContainerFactory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppModelContainerFactory.swift; sourceTree = "<group>"; };
+		A00000000000000000000251 /* PromptTemplateSeeder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PromptTemplateSeeder.swift; sourceTree = "<group>"; };
+		A00000000000000000000252 /* Stage2DebugPersistenceView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Stage2DebugPersistenceView.swift; sourceTree = "<group>"; };
+		A00000000000000000000253 /* DayPlanStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DayPlanStore.swift; sourceTree = "<group>"; };
+		A00000000000000000000254 /* StudyTaskStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StudyTaskStore.swift; sourceTree = "<group>"; };
+		A00000000000000000000255 /* PromptTemplateStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PromptTemplateStore.swift; sourceTree = "<group>"; };
+		A00000000000000000000256 /* DailyReviewStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DailyReviewStore.swift; sourceTree = "<group>"; };
+		A00000000000000000000257 /* TodayCockpitView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodayCockpitView.swift; sourceTree = "<group>"; };
+		A00000000000000000000220 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
+		A00000000000000000000221 /* PRODUCT_SPEC.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = PRODUCT_SPEC.md; sourceTree = "<group>"; };
+		A00000000000000000000222 /* DATA_MODEL.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = DATA_MODEL.md; sourceTree = "<group>"; };
+		A00000000000000000000223 /* UX_FLOW.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = UX_FLOW.md; sourceTree = "<group>"; };
+		A00000000000000000000224 /* ROADMAP.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = ROADMAP.md; sourceTree = "<group>"; };
+		A00000000000000000000225 /* PROMPT_TEMPLATES.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = PROMPT_TEMPLATES.md; sourceTree = "<group>"; };
+		A00000000000000000000230 /* GaokaoCockpit.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = GaokaoCockpit.app; sourceTree = BUILT_PRODUCTS_DIR; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		A00000000000000000000301 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		A00000000000000000000401 = {
+			isa = PBXGroup;
+			children = (
+				A00000000000000000000402 /* GaokaoCockpit */,
+				A00000000000000000000420 /* docs */,
+				A00000000000000000000220 /* README.md */,
+				A00000000000000000000430 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		A00000000000000000000402 /* GaokaoCockpit */ = {
+			isa = PBXGroup;
+			children = (
+				A00000000000000000000201 /* GaokaoCockpitApp.swift */,
+				A00000000000000000000202 /* AppRootView.swift */,
+				A00000000000000000000403 /* Views */,
+				A00000000000000000000410 /* Models */,
+				A00000000000000000000411 /* Stores */,
+				A00000000000000000000412 /* Resources */,
+			);
+			path = GaokaoCockpit;
+			sourceTree = "<group>";
+		};
+		A00000000000000000000403 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				A00000000000000000000404 /* Today */,
+				A00000000000000000000405 /* Tasks */,
+				A00000000000000000000406 /* Focus */,
+				A00000000000000000000407 /* Mistakes */,
+				A00000000000000000000408 /* Prompts */,
+				A00000000000000000000409 /* Reviews */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		A00000000000000000000404 /* Today */ = {
+			isa = PBXGroup;
+			children = (
+				A00000000000000000000257 /* TodayCockpitView.swift */,
+				A00000000000000000000203 /* TodayCockpitPlaceholderView.swift */,
+				A00000000000000000000252 /* Stage2DebugPersistenceView.swift */,
+			);
+			path = Today;
+			sourceTree = "<group>";
+		};
+		A00000000000000000000405 /* Tasks */ = {
+			isa = PBXGroup;
+			children = (
+				A00000000000000000000204 /* TaskListPlaceholderView.swift */,
+			);
+			path = Tasks;
+			sourceTree = "<group>";
+		};
+		A00000000000000000000406 /* Focus */ = {
+			isa = PBXGroup;
+			children = (
+				A00000000000000000000205 /* FocusSessionPlaceholderView.swift */,
+			);
+			path = Focus;
+			sourceTree = "<group>";
+		};
+		A00000000000000000000407 /* Mistakes */ = {
+			isa = PBXGroup;
+			children = (
+				A00000000000000000000206 /* MistakeSurgeryPlaceholderView.swift */,
+			);
+			path = Mistakes;
+			sourceTree = "<group>";
+		};
+		A00000000000000000000408 /* Prompts */ = {
+			isa = PBXGroup;
+			children = (
+				A00000000000000000000207 /* PromptLibraryPlaceholderView.swift */,
+			);
+			path = Prompts;
+			sourceTree = "<group>";
+		};
+		A00000000000000000000409 /* Reviews */ = {
+			isa = PBXGroup;
+			children = (
+				A00000000000000000000208 /* ReviewPlaceholderView.swift */,
+			);
+			path = Reviews;
+			sourceTree = "<group>";
+		};
+		A00000000000000000000410 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				A00000000000000000000240 /* ModelDefaults.swift */,
+				A00000000000000000000241 /* DayPlan.swift */,
+				A00000000000000000000242 /* StudyTask.swift */,
+				A00000000000000000000243 /* FocusSession.swift */,
+				A00000000000000000000244 /* MistakeRecord.swift */,
+				A00000000000000000000245 /* PromptTemplate.swift */,
+				A00000000000000000000246 /* ResourceItem.swift */,
+				A00000000000000000000247 /* DailyReview.swift */,
+				A00000000000000000000248 /* WeeklyReview.swift */,
+				A00000000000000000000209 /* Models README.md */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		A00000000000000000000411 /* Stores */ = {
+			isa = PBXGroup;
+			children = (
+				A00000000000000000000249 /* DateKey.swift */,
+				A00000000000000000000250 /* AppModelContainerFactory.swift */,
+				A00000000000000000000251 /* PromptTemplateSeeder.swift */,
+				A00000000000000000000253 /* DayPlanStore.swift */,
+				A00000000000000000000254 /* StudyTaskStore.swift */,
+				A00000000000000000000255 /* PromptTemplateStore.swift */,
+				A00000000000000000000256 /* DailyReviewStore.swift */,
+				A00000000000000000000210 /* Stores README.md */,
+			);
+			path = Stores;
+			sourceTree = "<group>";
+		};
+		A00000000000000000000412 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				A00000000000000000000211 /* Resources README.md */,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
+		A00000000000000000000420 /* docs */ = {
+			isa = PBXGroup;
+			children = (
+				A00000000000000000000221 /* PRODUCT_SPEC.md */,
+				A00000000000000000000222 /* DATA_MODEL.md */,
+				A00000000000000000000223 /* UX_FLOW.md */,
+				A00000000000000000000224 /* ROADMAP.md */,
+				A00000000000000000000225 /* PROMPT_TEMPLATES.md */,
+			);
+			path = docs;
+			sourceTree = "<group>";
+		};
+		A00000000000000000000430 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				A00000000000000000000230 /* GaokaoCockpit.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		A00000000000000000000501 /* GaokaoCockpit */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = A00000000000000000000610 /* Build configuration list for PBXNativeTarget "GaokaoCockpit" */;
+			buildPhases = (
+				A00000000000000000000310 /* Sources */,
+				A00000000000000000000301 /* Frameworks */,
+				A00000000000000000000320 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = GaokaoCockpit;
+			productName = GaokaoCockpit;
+			productReference = A00000000000000000000230 /* GaokaoCockpit.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		A00000000000000000000500 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 2630;
+				LastUpgradeCheck = 2630;
+				TargetAttributes = {
+					A00000000000000000000501 = {
+						CreatedOnToolsVersion = 26.3;
+					};
+				};
+			};
+			buildConfigurationList = A00000000000000000000600 /* Build configuration list for PBXProject "GaokaoCockpit" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = A00000000000000000000401;
+			productRefGroup = A00000000000000000000430 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				A00000000000000000000501 /* GaokaoCockpit */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		A00000000000000000000320 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		A00000000000000000000310 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A00000000000000000000101 /* GaokaoCockpitApp.swift in Sources */,
+				A00000000000000000000102 /* AppRootView.swift in Sources */,
+				A00000000000000000000126 /* TodayCockpitView.swift in Sources */,
+				A00000000000000000000103 /* TodayCockpitPlaceholderView.swift in Sources */,
+				A00000000000000000000104 /* TaskListPlaceholderView.swift in Sources */,
+				A00000000000000000000105 /* FocusSessionPlaceholderView.swift in Sources */,
+				A00000000000000000000106 /* MistakeSurgeryPlaceholderView.swift in Sources */,
+				A00000000000000000000107 /* PromptLibraryPlaceholderView.swift in Sources */,
+				A00000000000000000000108 /* ReviewPlaceholderView.swift in Sources */,
+				A00000000000000000000109 /* ModelDefaults.swift in Sources */,
+				A00000000000000000000110 /* DayPlan.swift in Sources */,
+				A00000000000000000000111 /* StudyTask.swift in Sources */,
+				A00000000000000000000112 /* FocusSession.swift in Sources */,
+				A00000000000000000000113 /* MistakeRecord.swift in Sources */,
+				A00000000000000000000114 /* PromptTemplate.swift in Sources */,
+				A00000000000000000000115 /* ResourceItem.swift in Sources */,
+				A00000000000000000000116 /* DailyReview.swift in Sources */,
+				A00000000000000000000117 /* WeeklyReview.swift in Sources */,
+				A00000000000000000000118 /* DateKey.swift in Sources */,
+				A00000000000000000000119 /* AppModelContainerFactory.swift in Sources */,
+				A00000000000000000000120 /* PromptTemplateSeeder.swift in Sources */,
+				A00000000000000000000121 /* Stage2DebugPersistenceView.swift in Sources */,
+				A00000000000000000000122 /* DayPlanStore.swift in Sources */,
+				A00000000000000000000123 /* StudyTaskStore.swift in Sources */,
+				A00000000000000000000124 /* PromptTemplateStore.swift in Sources */,
+				A00000000000000000000125 /* DailyReviewStore.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		A00000000000000000000601 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		A00000000000000000000602 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		A00000000000000000000611 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "";
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = "高考驾驶舱";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.education";
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.shennaitong.GaokaoCockpit;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		A00000000000000000000612 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "";
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = "高考驾驶舱";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.education";
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.shennaitong.GaokaoCockpit;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		A00000000000000000000600 /* Build configuration list for PBXProject "GaokaoCockpit" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A00000000000000000000601 /* Debug */,
+				A00000000000000000000602 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		A00000000000000000000610 /* Build configuration list for PBXNativeTarget "GaokaoCockpit" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A00000000000000000000611 /* Debug */,
+				A00000000000000000000612 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = A00000000000000000000500 /* Project object */;
+}
