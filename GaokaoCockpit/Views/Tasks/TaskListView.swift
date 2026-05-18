@@ -65,6 +65,10 @@ struct TaskListView: View {
                                 onTap: {
                                     activeEditor = .edit(task)
                                 },
+                                onFocusFinished: {
+                                    refreshTaskData()
+                                    statusMessage = "已保存专注记录。"
+                                },
                                 onChangeStatus: { status in
                                     updateTaskStatus(task, to: status)
                                 }
@@ -349,66 +353,91 @@ private struct SummaryValue: View {
 private struct TaskRowView: View {
     let task: StudyTask
     let onTap: () -> Void
+    let onFocusFinished: () -> Void
     let onChangeStatus: (String) -> Void
 
     var body: some View {
-        HStack(alignment: .top, spacing: 12) {
-            Image(systemName: task.taskListStatusIconName)
-                .font(.title3)
-                .foregroundStyle(task.taskListStatusIconColor)
-                .frame(width: 28, height: 28)
-                .accessibilityHidden(true)
+        VStack(alignment: .leading, spacing: 12) {
+            HStack(alignment: .top, spacing: 12) {
+                Button {
+                    onTap()
+                } label: {
+                    HStack(alignment: .top, spacing: 12) {
+                        Image(systemName: task.taskListStatusIconName)
+                            .font(.title3)
+                            .foregroundStyle(task.taskListStatusIconColor)
+                            .frame(width: 28, height: 28)
+                            .accessibilityHidden(true)
 
-            VStack(alignment: .leading, spacing: 8) {
-                Text(task.title.isEmpty ? "未命名任务" : task.title)
-                    .font(.headline)
-                    .foregroundStyle(task.status == ModelDefaults.StudyTaskStatus.done ? .secondary : .primary)
-                    .strikethrough(task.status == ModelDefaults.StudyTaskStatus.done)
-                    .lineLimit(2)
+                        VStack(alignment: .leading, spacing: 8) {
+                            Text(task.title.isEmpty ? "未命名任务" : task.title)
+                                .font(.headline)
+                                .foregroundStyle(task.status == ModelDefaults.StudyTaskStatus.done ? .secondary : .primary)
+                                .strikethrough(task.status == ModelDefaults.StudyTaskStatus.done)
+                                .lineLimit(2)
 
-                HStack(spacing: 8) {
-                    TaskTag(text: task.subject.isEmpty ? "未设科目" : task.subject)
-                    TaskTag(text: task.category.isEmpty ? "未分类" : task.category)
-                }
+                            HStack(spacing: 8) {
+                                TaskTag(text: task.subject.isEmpty ? "未设科目" : task.subject)
+                                TaskTag(text: task.category.isEmpty ? "未分类" : task.category)
+                            }
 
-                Text(task.taskListMinutesText)
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
+                            Text(task.taskListMinutesText)
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
 
-                if !task.outputNote.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-                    Text(task.outputNote)
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                        .lineLimit(2)
-                }
-            }
-            .frame(maxWidth: .infinity, alignment: .leading)
-
-            Menu {
-                ForEach(TaskStatusOption.all) { option in
-                    Button {
-                        onChangeStatus(option.status)
-                    } label: {
-                        Label(option.title, systemImage: option.systemImage)
+                            if !task.outputNote.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                                Text(task.outputNote)
+                                    .font(.caption)
+                                    .foregroundStyle(.secondary)
+                                    .lineLimit(2)
+                            }
+                        }
                     }
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .contentShape(Rectangle())
                 }
-            } label: {
-                Label(task.taskListStatusTitle, systemImage: "chevron.down.circle")
-                    .labelStyle(.iconOnly)
-                    .font(.title3)
-                    .foregroundStyle(.secondary)
-                    .frame(width: 32, height: 32)
+                .buttonStyle(.plain)
+                .accessibilityLabel("编辑任务")
+
+                Menu {
+                    ForEach(TaskStatusOption.all) { option in
+                        Button {
+                            onChangeStatus(option.status)
+                        } label: {
+                            Label(option.title, systemImage: option.systemImage)
+                        }
+                    }
+                } label: {
+                    Label(task.taskListStatusTitle, systemImage: "chevron.down.circle")
+                        .labelStyle(.iconOnly)
+                        .font(.title3)
+                        .foregroundStyle(.secondary)
+                        .frame(width: 32, height: 32)
+                }
+                .accessibilityLabel("切换任务状态")
             }
-            .accessibilityLabel("切换任务状态")
+
+            HStack(spacing: 10) {
+                NavigationLink {
+                    FocusSessionView(task: task, onFinished: onFocusFinished)
+                } label: {
+                    Label("开始专注", systemImage: "timer")
+                        .frame(maxWidth: .infinity)
+                }
+                .buttonStyle(.borderedProminent)
+
+                Button {
+                    onTap()
+                } label: {
+                    Label("编辑", systemImage: "pencil")
+                        .frame(maxWidth: .infinity)
+                }
+                .buttonStyle(.bordered)
+            }
         }
         .padding(14)
         .background(Color(.secondarySystemBackground))
         .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
-        .contentShape(Rectangle())
-        .onTapGesture {
-            onTap()
-        }
-        .accessibilityElement(children: .combine)
     }
 }
 
