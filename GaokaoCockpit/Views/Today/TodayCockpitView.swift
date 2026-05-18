@@ -124,6 +124,11 @@ struct TodayCockpitView: View {
         .task {
             loadToday()
         }
+        .onAppear {
+            if loadState == .loaded {
+                refreshTaskData()
+            }
+        }
         .sheet(isPresented: $isShowingQuickAddTask) {
             TodayQuickAddTaskSheet(
                 dayKey: todayKey,

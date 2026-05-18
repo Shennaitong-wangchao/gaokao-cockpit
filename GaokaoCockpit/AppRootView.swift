@@ -11,7 +11,7 @@ struct AppRootView: View {
             }
 
             NavigationStack {
-                TaskListPlaceholderView()
+                TaskListView()
             }
             .tabItem {
                 Label("任务", systemImage: "checklist")

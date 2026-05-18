@@ -128,15 +128,17 @@
 
 ## Stage 4：实现学习任务与专注计时
 
+当前进度：Stage 4A TaskListView MVP 已完成；Stage 4B FocusSession 专注计时尚未开始。
+
 ### 目标
 
 让用户能围绕学习任务开始、记录并结束一次专注学习。
 
 ### 需要修改/新增的内容
 
-- TaskListView。
-- 新建和编辑 StudyTask。
-- 任务状态切换。
+- TaskListView。（Stage 4A 已完成）
+- 新建和编辑 StudyTask。（Stage 4A 已完成）
+- 任务状态切换。（Stage 4A 已完成）
 - FocusSessionView。
 - 专注开始、暂停、结束。
 - 分心次数记录。
@@ -309,4 +311,3 @@
 - 不为了技术好看而做 RAG。
 - 不把个人自用 App 变成大型平台。
 - 不牺牲本地优先和隐私边界。
-
