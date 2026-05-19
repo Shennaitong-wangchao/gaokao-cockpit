@@ -38,4 +38,13 @@ enum DailyReviewStore {
 
         return try createDailyReview(for: Date(), in: context)
     }
+
+    static func updateDailyReviewTimestamp(_ review: DailyReview) {
+        review.updatedAt = Date()
+    }
+
+    static func countReviews(in context: ModelContext) throws -> Int {
+        let descriptor = FetchDescriptor<DailyReview>()
+        return try context.fetchCount(descriptor)
+    }
 }

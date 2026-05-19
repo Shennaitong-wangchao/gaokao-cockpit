@@ -43,6 +43,9 @@
 		A00000000000000000000134 /* PromptRenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000265 /* PromptRenderer.swift */; };
 		A00000000000000000000135 /* PromptLibraryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000266 /* PromptLibraryView.swift */; };
 		A00000000000000000000136 /* PromptTemplateDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000267 /* PromptTemplateDetailView.swift */; };
+		A00000000000000000000137 /* WeeklyReviewStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000268 /* WeeklyReviewStore.swift */; };
+		A00000000000000000000138 /* ReviewAggregationStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000269 /* ReviewAggregationStore.swift */; };
+		A00000000000000000000139 /* ReviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000271 /* ReviewView.swift */; };
 		A00000000000000000000140 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000270 /* Assets.xcassets */; };
 /* End PBXBuildFile section */
 
@@ -93,7 +96,10 @@
 		A00000000000000000000265 /* PromptRenderer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PromptRenderer.swift; sourceTree = "<group>"; };
 		A00000000000000000000266 /* PromptLibraryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PromptLibraryView.swift; sourceTree = "<group>"; };
 		A00000000000000000000267 /* PromptTemplateDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PromptTemplateDetailView.swift; sourceTree = "<group>"; };
+		A00000000000000000000268 /* WeeklyReviewStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeeklyReviewStore.swift; sourceTree = "<group>"; };
+		A00000000000000000000269 /* ReviewAggregationStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReviewAggregationStore.swift; sourceTree = "<group>"; };
 		A00000000000000000000270 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		A00000000000000000000271 /* ReviewView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReviewView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -195,6 +201,7 @@
 		A00000000000000000000409 /* Reviews */ = {
 			isa = PBXGroup;
 			children = (
+				A00000000000000000000271 /* ReviewView.swift */,
 				A00000000000000000000208 /* ReviewPlaceholderView.swift */,
 			);
 			path = Reviews;
@@ -230,6 +237,8 @@
 				A00000000000000000000255 /* PromptTemplateStore.swift */,
 				A00000000000000000000265 /* PromptRenderer.swift */,
 				A00000000000000000000256 /* DailyReviewStore.swift */,
+				A00000000000000000000268 /* WeeklyReviewStore.swift */,
+				A00000000000000000000269 /* ReviewAggregationStore.swift */,
 				A00000000000000000000210 /* README.md */,
 			);
 			path = Stores;
@@ -348,6 +357,7 @@
 				A00000000000000000000135 /* PromptLibraryView.swift in Sources */,
 				A00000000000000000000136 /* PromptTemplateDetailView.swift in Sources */,
 				A00000000000000000000107 /* PromptLibraryPlaceholderView.swift in Sources */,
+				A00000000000000000000139 /* ReviewView.swift in Sources */,
 				A00000000000000000000108 /* ReviewPlaceholderView.swift in Sources */,
 				A00000000000000000000109 /* ModelDefaults.swift in Sources */,
 				A00000000000000000000110 /* DayPlan.swift in Sources */,
@@ -369,6 +379,8 @@
 				A00000000000000000000124 /* PromptTemplateStore.swift in Sources */,
 				A00000000000000000000134 /* PromptRenderer.swift in Sources */,
 				A00000000000000000000125 /* DailyReviewStore.swift in Sources */,
+				A00000000000000000000137 /* WeeklyReviewStore.swift in Sources */,
+				A00000000000000000000138 /* ReviewAggregationStore.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

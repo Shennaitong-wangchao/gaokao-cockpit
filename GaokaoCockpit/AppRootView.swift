@@ -32,7 +32,7 @@ struct AppRootView: View {
             }
 
             NavigationStack {
-                ReviewPlaceholderView()
+                ReviewView()
             }
             .tabItem {
                 Label("复盘", systemImage: "chart.line.uptrend.xyaxis")

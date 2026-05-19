@@ -243,6 +243,8 @@ private struct PromptVariableInput: View {
         "unfinishedTasks",
         "focusSummary",
         "mistakeSummary",
+        "subjectBreakdown",
+        "mistakeTypeBreakdown",
         "keyDailyProblems",
         "imageContent"
     ]

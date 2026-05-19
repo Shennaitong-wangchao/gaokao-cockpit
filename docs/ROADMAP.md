@@ -226,6 +226,8 @@
 
 ## Stage 7：实现每日复盘与周复盘
 
+当前进度：Stage 7 Daily Review / Weekly Review 复盘 MVP 已完成；仅做本地复盘记录、基础汇总和 Prompt 生成，不接 AI API。
+
 ### 目标
 
 完成当天闭环与一周结构化回顾。

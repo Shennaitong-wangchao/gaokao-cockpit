@@ -156,7 +156,14 @@ struct TodayCockpitView: View {
             topTasksText = plan.topTasksText
             baselineTasksText = plan.baselineTasksText
             bonusTasksText = plan.bonusTasksText
-            tomorrowFirstAction = plan.tomorrowFirstAction
+
+            let reviewTomorrowFirstAction = try DailyReviewStore
+                .fetchDailyReview(for: plan.dayKey, in: modelContext)?
+                .tomorrowFirstAction
+                .trimmingCharacters(in: .whitespacesAndNewlines)
+            tomorrowFirstAction = reviewTomorrowFirstAction?.isEmpty == false
+                ? reviewTomorrowFirstAction ?? ""
+                : plan.tomorrowFirstAction
 
             try refreshTaskDataThrowing(for: plan.dayKey)
             loadState = .loaded
