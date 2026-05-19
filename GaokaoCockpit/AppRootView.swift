@@ -25,7 +25,7 @@ struct AppRootView: View {
             }
 
             NavigationStack {
-                PromptLibraryPlaceholderView()
+                PromptLibraryView()
             }
             .tabItem {
                 Label("Prompt", systemImage: "text.bubble")

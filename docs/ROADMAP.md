@@ -193,6 +193,8 @@
 
 ## Stage 6：实现 Prompt 仓库
 
+当前进度：Stage 6 Prompt Library / Prompt 仓库 MVP 已完成；仅生成和复制 Prompt，不接 AI API。
+
 ### 目标
 
 实现内置 Prompt 模板的一键生成和复制。

@@ -38,3 +38,5 @@ final class PromptTemplate {
         self.updatedAt = updatedAt
     }
 }
+
+extension PromptTemplate: Identifiable {}

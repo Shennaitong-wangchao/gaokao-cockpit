@@ -14,6 +14,7 @@ struct MistakeSurgeryView: View {
     @State private var isLoading = true
     @State private var statusMessage: String?
     @State private var activeEditor: MistakeEditorMode?
+    @State private var activePromptSheet: MistakePromptSheet?
 
     var body: some View {
         ScrollView {
@@ -57,6 +58,9 @@ struct MistakeSurgeryView: View {
                                 mistake: mistake,
                                 onTap: {
                                     activeEditor = .edit(mistake)
+                                },
+                                onGeneratePrompt: {
+                                    prepareMistakePrompt(for: mistake)
                                 },
                                 onChangeStatus: { status in
                                     updateReviewStatus(mistake, to: status)
@@ -106,6 +110,14 @@ struct MistakeSurgeryView: View {
         .sheet(item: $activeEditor) { editor in
             MistakeEditorView(mode: editor) { message in
                 refreshMistakeData()
+                statusMessage = message
+            }
+        }
+        .sheet(item: $activePromptSheet) { promptSheet in
+            PromptTemplateDetailView(
+                template: promptSheet.template,
+                initialValues: promptSheet.values
+            ) { message in
                 statusMessage = message
             }
         }
@@ -168,6 +180,28 @@ struct MistakeSurgeryView: View {
             statusMessage = "更新复习状态失败：\(error.localizedDescription)"
         }
     }
+
+    private func prepareMistakePrompt(for mistake: MistakeRecord) {
+        do {
+            guard let template = try PromptTemplateStore.fetchTemplate(title: "错题手术", in: modelContext) else {
+                statusMessage = "找不到内置“错题手术”模板。请检查 Prompt seed 是否成功。"
+                return
+            }
+
+            activePromptSheet = MistakePromptSheet(
+                template: template,
+                values: mistake.promptValues
+            )
+        } catch {
+            statusMessage = "加载错题 Prompt 失败：\(error.localizedDescription)"
+        }
+    }
+}
+
+private struct MistakePromptSheet: Identifiable {
+    let id = UUID()
+    let template: PromptTemplate
+    let values: [String: String]
 }
 
 private enum MistakeSubjectFilter: String, CaseIterable, Identifiable {
@@ -366,6 +400,7 @@ private struct MistakeFilterBar: View {
 private struct MistakeRow: View {
     let mistake: MistakeRecord
     let onTap: () -> Void
+    let onGeneratePrompt: () -> Void
     let onChangeStatus: (String) -> Void
 
     var body: some View {
@@ -438,6 +473,14 @@ private struct MistakeRow: View {
                 .buttonStyle(.bordered)
                 .accessibilityLabel("切换复习状态")
             }
+
+            Button {
+                onGeneratePrompt()
+            } label: {
+                Label("生成错题 Prompt", systemImage: "text.bubble")
+                    .frame(maxWidth: .infinity)
+            }
+            .buttonStyle(.bordered)
         }
         .padding(14)
         .background(Color(.secondarySystemBackground))
@@ -506,6 +549,32 @@ private extension MistakeRecord {
 
     var shortUpdatedDateText: String {
         "更新 \(Self.shortDateFormatter.string(from: updatedAt))"
+    }
+
+    var promptValues: [String: String] {
+        [
+            "subject": subject,
+            "chapter": chapter,
+            "question": questionText,
+            "mySolution": mySolution,
+            "correctAnswer": correctSolution,
+            "currentConfusion": currentConfusionText
+        ]
+    }
+
+    private var currentConfusionText: String {
+        let parts = [
+            labeledPromptPart(title: "根因", value: rootCause),
+            labeledPromptPart(title: "题目信号", value: questionSignal),
+            labeledPromptPart(title: "正确模型", value: correctModel)
+        ].compactMap { $0 }
+
+        return parts.joined(separator: "\n")
+    }
+
+    private func labeledPromptPart(title: String, value: String) -> String? {
+        let text = value.trimmingCharacters(in: .whitespacesAndNewlines)
+        return text.isEmpty ? nil : "\(title)：\(text)"
     }
 
     private static let shortDateFormatter: DateFormatter = {
