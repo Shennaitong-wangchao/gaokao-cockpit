@@ -96,7 +96,15 @@
 - [ ] checksum 校验结果显示合理。
 - [ ] 有图片错题时，导出文件包含 `mistakeImages`。
 - [ ] 图片缺失时显示 warnings，且不导致导出失败。
-- [ ] UI 明确说明不支持导入恢复。
+- [ ] UI 明确说明不支持真正导入恢复。
+- [ ] 能选择 JSON 备份文件做导入 Dry-run。
+- [ ] 能解析刚导出的备份文件。
+- [ ] 能显示 incoming summary 和 local summary。
+- [ ] 能显示 ID、dayKey、同日同名任务和错题 fingerprint 冲突摘要。
+- [ ] 能显示错题图片恢复摘要。
+- [ ] Dry-run 后本地数据数量不改变。
+- [ ] 选择错误文件或损坏 JSON 不会崩溃。
+- [ ] UI 明确说明 Dry-run 不会导入数据。
 
 ## 8. 持久化
 

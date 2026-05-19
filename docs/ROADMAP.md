@@ -425,7 +425,43 @@
 - 不做数据模型迁移。
 - 不接 AI API。
 
-## Stage 13：未来扩展：AI API、RAG、GoodNotes/NotebookLM 索引、macOS 端、云同步
+## Stage 13：Backup Import Dry-run / 导入恢复预检
+
+当前进度：Stage 13 已完成。
+
+### 目标
+
+在不写入 SwiftData、不恢复图片文件、不覆盖任何本地数据的前提下，让用户选择备份 JSON 并预检未来恢复风险。
+
+### 已完成内容
+
+- 新增系统 `UIDocumentPickerViewController` SwiftUI wrapper，用于选择单个 JSON 备份文件。
+- 新增 `BackupImportDryRunStore`，复用备份校验逻辑读取 schema、version、checksum 和 summary。
+- 计算 incoming summary 与当前 local summary。
+- 检查各模型 UUID 冲突、`DayPlan.dayKey` 冲突、同日同名任务和错题 fingerprint 疑似重复。
+- 统计备份内错题图片数量、base64 可用数量、缺失数量和图片总字节数。
+- 在备份页新增“导入预检（Dry-run）”区块，明确说明不会导入或覆盖数据。
+
+### 验收标准
+
+- 用户能选择 JSON 文件并完成 dry-run。
+- 刚导出的备份可被解析并显示 summary。
+- 错误文件不会导致崩溃。
+- Dry-run 后本地数据数量不改变。
+- UI 明确说明本阶段不会真正导入。
+
+### 不做什么
+
+- 不做真正导入按钮。
+- 不写入 SwiftData。
+- 不恢复图片文件。
+- 不覆盖任何本地数据。
+- 不做云同步、账号、加密、zip。
+- 不引入第三方依赖。
+- 不做数据模型迁移。
+- 不接 AI API。
+
+## Stage 14：未来扩展：AI API、RAG、GoodNotes/NotebookLM 索引、macOS 端、云同步
 
 ### 目标
 
