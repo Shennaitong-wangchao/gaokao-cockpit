@@ -85,6 +85,15 @@
 - [ ] 能导出 JSON 备份文件。
 - [ ] 导出完成后能打开分享面板。
 - [ ] 导出结果显示各类记录数量。
+- [ ] 导出结果显示文件名、导出时间、错题图片数量、图片总大小和 warnings 数量。
+- [ ] 导出结果显示 checksum 前 12 位。
+- [ ] checksum 说明清楚：基于 checksum 字段为空时的备份内容，不是加密签名。
+- [ ] 导出后可验证刚生成的备份文件。
+- [ ] 验证结果能显示可读/不可读、schema、version、数量一致性、warnings 和 errors。
+- [ ] `recordSummary` 中的记录数量与 JSON 数组实际数量一致。
+- [ ] `mistakeImageCount` 与 `mistakeImages.count` 一致。
+- [ ] `warningCount` 与 `warnings.count` 一致。
+- [ ] checksum 校验结果显示合理。
 - [ ] 有图片错题时，导出文件包含 `mistakeImages`。
 - [ ] 图片缺失时显示 warnings，且不导致导出失败。
 - [ ] UI 明确说明不支持导入恢复。

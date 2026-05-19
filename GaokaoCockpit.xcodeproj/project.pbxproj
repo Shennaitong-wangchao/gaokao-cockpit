@@ -54,6 +54,7 @@
 		A00000000000000000000145 /* BackupExportStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000276 /* BackupExportStore.swift */; };
 		A00000000000000000000146 /* ShareSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000277 /* ShareSheet.swift */; };
 		A00000000000000000000147 /* BackupExportView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000278 /* BackupExportView.swift */; };
+		A00000000000000000000148 /* BackupValidationStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000279 /* BackupValidationStore.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -114,6 +115,7 @@
 		A00000000000000000000276 /* BackupExportStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackupExportStore.swift; sourceTree = "<group>"; };
 		A00000000000000000000277 /* ShareSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareSheet.swift; sourceTree = "<group>"; };
 		A00000000000000000000278 /* BackupExportView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackupExportView.swift; sourceTree = "<group>"; };
+		A00000000000000000000279 /* BackupValidationStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackupValidationStore.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -271,6 +273,7 @@
 				A00000000000000000000262 /* MistakeRecordStore.swift */,
 				A00000000000000000000272 /* MistakeImageStore.swift */,
 				A00000000000000000000276 /* BackupExportStore.swift */,
+				A00000000000000000000279 /* BackupValidationStore.swift */,
 				A00000000000000000000255 /* PromptTemplateStore.swift */,
 				A00000000000000000000265 /* PromptRenderer.swift */,
 				A00000000000000000000256 /* DailyReviewStore.swift */,
@@ -420,6 +423,7 @@
 				A00000000000000000000131 /* MistakeRecordStore.swift in Sources */,
 				A00000000000000000000141 /* MistakeImageStore.swift in Sources */,
 				A00000000000000000000145 /* BackupExportStore.swift in Sources */,
+				A00000000000000000000148 /* BackupValidationStore.swift in Sources */,
 				A00000000000000000000124 /* PromptTemplateStore.swift in Sources */,
 				A00000000000000000000134 /* PromptRenderer.swift in Sources */,
 				A00000000000000000000125 /* DailyReviewStore.swift in Sources */,

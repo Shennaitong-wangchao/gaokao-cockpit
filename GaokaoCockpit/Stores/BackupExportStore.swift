@@ -1,21 +1,214 @@
+import CryptoKit
 import Foundation
 import SwiftData
 
+enum GaokaoBackupFormat {
+    static let schemaName = "GaokaoCockpitBackup"
+    static let exportVersion = 1
+    static let exportSchemaVersion = 1
+}
+
+struct BackupRecordSummary: Codable, Equatable {
+    let dayPlanCount: Int
+    let studyTaskCount: Int
+    let focusSessionCount: Int
+    let mistakeRecordCount: Int
+    let promptTemplateCount: Int
+    let resourceItemCount: Int
+    let dailyReviewCount: Int
+    let weeklyReviewCount: Int
+    let mistakeImageCount: Int
+
+    var countDictionary: [String: Int] {
+        [
+            "dayPlans": dayPlanCount,
+            "studyTasks": studyTaskCount,
+            "focusSessions": focusSessionCount,
+            "mistakeRecords": mistakeRecordCount,
+            "promptTemplates": promptTemplateCount,
+            "resourceItems": resourceItemCount,
+            "dailyReviews": dailyReviewCount,
+            "weeklyReviews": weeklyReviewCount,
+            "mistakeImages": mistakeImageCount
+        ]
+    }
+}
+
+struct BackupIntegritySummary: Codable, Equatable {
+    let jsonPayloadSHA256: String
+    let payloadWithoutChecksumSHA256: String
+    let imageTotalBytes: Int
+    let missingImageCount: Int
+    let warningCount: Int
+
+    var displayChecksum: String {
+        if !payloadWithoutChecksumSHA256.isEmpty {
+            return payloadWithoutChecksumSHA256
+        }
+
+        return jsonPayloadSHA256
+    }
+
+    init(
+        jsonPayloadSHA256: String,
+        payloadWithoutChecksumSHA256: String,
+        imageTotalBytes: Int,
+        missingImageCount: Int,
+        warningCount: Int
+    ) {
+        self.jsonPayloadSHA256 = jsonPayloadSHA256
+        self.payloadWithoutChecksumSHA256 = payloadWithoutChecksumSHA256
+        self.imageTotalBytes = imageTotalBytes
+        self.missingImageCount = missingImageCount
+        self.warningCount = warningCount
+    }
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        jsonPayloadSHA256 = try container.decodeIfPresent(String.self, forKey: .jsonPayloadSHA256) ?? ""
+        payloadWithoutChecksumSHA256 = try container.decodeIfPresent(
+            String.self,
+            forKey: .payloadWithoutChecksumSHA256
+        ) ?? jsonPayloadSHA256
+        imageTotalBytes = try container.decodeIfPresent(Int.self, forKey: .imageTotalBytes) ?? 0
+        missingImageCount = try container.decodeIfPresent(Int.self, forKey: .missingImageCount) ?? 0
+        warningCount = try container.decodeIfPresent(Int.self, forKey: .warningCount) ?? 0
+    }
+
+    func clearingChecksumFields() -> BackupIntegritySummary {
+        BackupIntegritySummary(
+            jsonPayloadSHA256: "",
+            payloadWithoutChecksumSHA256: "",
+            imageTotalBytes: imageTotalBytes,
+            missingImageCount: missingImageCount,
+            warningCount: warningCount
+        )
+    }
+
+    func withPayloadChecksum(_ checksum: String) -> BackupIntegritySummary {
+        BackupIntegritySummary(
+            jsonPayloadSHA256: checksum,
+            payloadWithoutChecksumSHA256: checksum,
+            imageTotalBytes: imageTotalBytes,
+            missingImageCount: missingImageCount,
+            warningCount: warningCount
+        )
+    }
+}
+
 struct GaokaoBackupEnvelope: Codable {
-    let appName: String
-    let appVersion: String
-    let exportVersion: Int
-    let exportedAt: Date
-    let notes: String
-    let dayPlans: [DayPlanSnapshot]
-    let studyTasks: [StudyTaskSnapshot]
-    let focusSessions: [FocusSessionSnapshot]
-    let mistakeRecords: [MistakeRecordSnapshot]
-    let promptTemplates: [PromptTemplateSnapshot]
-    let resourceItems: [ResourceItemSnapshot]
-    let dailyReviews: [DailyReviewSnapshot]
-    let weeklyReviews: [WeeklyReviewSnapshot]
-    let mistakeImages: [MistakeImageSnapshot]
+    var appName: String
+    var appVersion: String
+    var exportVersion: Int
+    var schemaName: String
+    var exportSchemaVersion: Int
+    var exportedAt: Date
+    var notes: String
+    var recordSummary: BackupRecordSummary
+    var integrity: BackupIntegritySummary
+    var warnings: [String]
+    var dayPlans: [DayPlanSnapshot]
+    var studyTasks: [StudyTaskSnapshot]
+    var focusSessions: [FocusSessionSnapshot]
+    var mistakeRecords: [MistakeRecordSnapshot]
+    var promptTemplates: [PromptTemplateSnapshot]
+    var resourceItems: [ResourceItemSnapshot]
+    var dailyReviews: [DailyReviewSnapshot]
+    var weeklyReviews: [WeeklyReviewSnapshot]
+    var mistakeImages: [MistakeImageSnapshot]
+
+    init(
+        appName: String,
+        appVersion: String,
+        exportVersion: Int,
+        schemaName: String,
+        exportSchemaVersion: Int,
+        exportedAt: Date,
+        notes: String,
+        recordSummary: BackupRecordSummary,
+        integrity: BackupIntegritySummary,
+        warnings: [String],
+        dayPlans: [DayPlanSnapshot],
+        studyTasks: [StudyTaskSnapshot],
+        focusSessions: [FocusSessionSnapshot],
+        mistakeRecords: [MistakeRecordSnapshot],
+        promptTemplates: [PromptTemplateSnapshot],
+        resourceItems: [ResourceItemSnapshot],
+        dailyReviews: [DailyReviewSnapshot],
+        weeklyReviews: [WeeklyReviewSnapshot],
+        mistakeImages: [MistakeImageSnapshot]
+    ) {
+        self.appName = appName
+        self.appVersion = appVersion
+        self.exportVersion = exportVersion
+        self.schemaName = schemaName
+        self.exportSchemaVersion = exportSchemaVersion
+        self.exportedAt = exportedAt
+        self.notes = notes
+        self.recordSummary = recordSummary
+        self.integrity = integrity
+        self.warnings = warnings
+        self.dayPlans = dayPlans
+        self.studyTasks = studyTasks
+        self.focusSessions = focusSessions
+        self.mistakeRecords = mistakeRecords
+        self.promptTemplates = promptTemplates
+        self.resourceItems = resourceItems
+        self.dailyReviews = dailyReviews
+        self.weeklyReviews = weeklyReviews
+        self.mistakeImages = mistakeImages
+    }
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+
+        appName = try container.decode(String.self, forKey: .appName)
+        appVersion = try container.decode(String.self, forKey: .appVersion)
+        exportVersion = try container.decode(Int.self, forKey: .exportVersion)
+        schemaName = try container.decodeIfPresent(String.self, forKey: .schemaName) ?? GaokaoBackupFormat.schemaName
+        exportSchemaVersion = try container.decodeIfPresent(
+            Int.self,
+            forKey: .exportSchemaVersion
+        ) ?? exportVersion
+        exportedAt = try container.decode(Date.self, forKey: .exportedAt)
+        notes = try container.decode(String.self, forKey: .notes)
+        warnings = try container.decodeIfPresent([String].self, forKey: .warnings) ?? []
+        dayPlans = try container.decode([DayPlanSnapshot].self, forKey: .dayPlans)
+        studyTasks = try container.decode([StudyTaskSnapshot].self, forKey: .studyTasks)
+        focusSessions = try container.decode([FocusSessionSnapshot].self, forKey: .focusSessions)
+        mistakeRecords = try container.decode([MistakeRecordSnapshot].self, forKey: .mistakeRecords)
+        promptTemplates = try container.decode([PromptTemplateSnapshot].self, forKey: .promptTemplates)
+        resourceItems = try container.decode([ResourceItemSnapshot].self, forKey: .resourceItems)
+        dailyReviews = try container.decode([DailyReviewSnapshot].self, forKey: .dailyReviews)
+        weeklyReviews = try container.decode([WeeklyReviewSnapshot].self, forKey: .weeklyReviews)
+        mistakeImages = try container.decode([MistakeImageSnapshot].self, forKey: .mistakeImages)
+
+        let calculatedSummary = BackupRecordSummary(
+            dayPlanCount: dayPlans.count,
+            studyTaskCount: studyTasks.count,
+            focusSessionCount: focusSessions.count,
+            mistakeRecordCount: mistakeRecords.count,
+            promptTemplateCount: promptTemplates.count,
+            resourceItemCount: resourceItems.count,
+            dailyReviewCount: dailyReviews.count,
+            weeklyReviewCount: weeklyReviews.count,
+            mistakeImageCount: mistakeImages.count
+        )
+        recordSummary = try container.decodeIfPresent(
+            BackupRecordSummary.self,
+            forKey: .recordSummary
+        ) ?? calculatedSummary
+        integrity = try container.decodeIfPresent(
+            BackupIntegritySummary.self,
+            forKey: .integrity
+        ) ?? BackupIntegritySummary(
+            jsonPayloadSHA256: "",
+            payloadWithoutChecksumSHA256: "",
+            imageTotalBytes: mistakeImages.reduce(0) { $0 + $1.byteCount },
+            missingImageCount: 0,
+            warningCount: warnings.count
+        )
+    }
 }
 
 struct DayPlanSnapshot: Codable {
@@ -271,10 +464,81 @@ struct MistakeImageSnapshot: Codable {
     let byteCount: Int
 }
 
+extension BackupRecordSummary {
+    init(envelope: GaokaoBackupEnvelope) {
+        self.init(
+            dayPlanCount: envelope.dayPlans.count,
+            studyTaskCount: envelope.studyTasks.count,
+            focusSessionCount: envelope.focusSessions.count,
+            mistakeRecordCount: envelope.mistakeRecords.count,
+            promptTemplateCount: envelope.promptTemplates.count,
+            resourceItemCount: envelope.resourceItems.count,
+            dailyReviewCount: envelope.dailyReviews.count,
+            weeklyReviewCount: envelope.weeklyReviews.count,
+            mistakeImageCount: envelope.mistakeImages.count
+        )
+    }
+
+    func mismatches(comparedTo actual: BackupRecordSummary) -> [String] {
+        var messages: [String] = []
+
+        let labels: [(String, Int, Int)] = [
+            ("dayPlanCount", dayPlanCount, actual.dayPlanCount),
+            ("studyTaskCount", studyTaskCount, actual.studyTaskCount),
+            ("focusSessionCount", focusSessionCount, actual.focusSessionCount),
+            ("mistakeRecordCount", mistakeRecordCount, actual.mistakeRecordCount),
+            ("promptTemplateCount", promptTemplateCount, actual.promptTemplateCount),
+            ("resourceItemCount", resourceItemCount, actual.resourceItemCount),
+            ("dailyReviewCount", dailyReviewCount, actual.dailyReviewCount),
+            ("weeklyReviewCount", weeklyReviewCount, actual.weeklyReviewCount),
+            ("mistakeImageCount", mistakeImageCount, actual.mistakeImageCount)
+        ]
+
+        for (label, expected, found) in labels where expected != found {
+            messages.append("\(label) 不一致：摘要为 \(expected)，实际数组为 \(found)。")
+        }
+
+        return messages
+    }
+}
+
 struct GaokaoBackupResult {
     let fileURL: URL
+    let exportedAt: Date
     let exportedRecordCounts: [String: Int]
+    let recordSummary: BackupRecordSummary
+    let integrity: BackupIntegritySummary
     let warnings: [String]
+}
+
+enum BackupChecksum {
+    static func encode(_ envelope: GaokaoBackupEnvelope) throws -> Data {
+        let encoder = JSONEncoder()
+        encoder.outputFormatting = [.prettyPrinted, .sortedKeys]
+        encoder.dateEncodingStrategy = .iso8601
+        return try encoder.encode(envelope)
+    }
+
+    static func decode(_ data: Data) throws -> GaokaoBackupEnvelope {
+        let decoder = JSONDecoder()
+        decoder.dateDecodingStrategy = .iso8601
+        return try decoder.decode(GaokaoBackupEnvelope.self, from: data)
+    }
+
+    static func payloadWithoutChecksumSHA256(for envelope: GaokaoBackupEnvelope) throws -> String {
+        var payloadEnvelope = envelope
+        payloadEnvelope.integrity = payloadEnvelope.integrity.clearingChecksumFields()
+
+        // The checksum intentionally hashes the backup payload with checksum fields empty.
+        // It is a deterministic export check, not an encryption layer or digital signature.
+        return sha256Hex(data: try encode(payloadEnvelope))
+    }
+
+    static func sha256Hex(data: Data) -> String {
+        SHA256.hash(data: data)
+            .map { String(format: "%02x", $0) }
+            .joined()
+    }
 }
 
 enum BackupExportStore {
@@ -308,12 +572,36 @@ enum BackupExportStore {
         ))
         let imageExport = makeMistakeImageSnapshots(from: mistakeRecords)
         let exportedAt = Date()
-        let envelope = GaokaoBackupEnvelope(
+        let recordSummary = BackupRecordSummary(
+            dayPlanCount: dayPlans.count,
+            studyTaskCount: studyTasks.count,
+            focusSessionCount: focusSessions.count,
+            mistakeRecordCount: mistakeRecords.count,
+            promptTemplateCount: promptTemplates.count,
+            resourceItemCount: resourceItems.count,
+            dailyReviewCount: dailyReviews.count,
+            weeklyReviewCount: weeklyReviews.count,
+            mistakeImageCount: imageExport.snapshots.count
+        )
+        let imageTotalBytes = imageExport.snapshots.reduce(0) { $0 + $1.byteCount }
+        let integrity = BackupIntegritySummary(
+            jsonPayloadSHA256: "",
+            payloadWithoutChecksumSHA256: "",
+            imageTotalBytes: imageTotalBytes,
+            missingImageCount: imageExport.warnings.count,
+            warningCount: imageExport.warnings.count
+        )
+        var envelope = GaokaoBackupEnvelope(
             appName: "Gaokao Cockpit",
             appVersion: appVersionText,
-            exportVersion: 1,
+            exportVersion: GaokaoBackupFormat.exportVersion,
+            schemaName: GaokaoBackupFormat.schemaName,
+            exportSchemaVersion: GaokaoBackupFormat.exportSchemaVersion,
             exportedAt: exportedAt,
             notes: "Local JSON backup export. Import/restore is not supported in this MVP.",
+            recordSummary: recordSummary,
+            integrity: integrity,
+            warnings: imageExport.warnings,
             dayPlans: dayPlans.map(DayPlanSnapshot.init),
             studyTasks: studyTasks.map(StudyTaskSnapshot.init),
             focusSessions: focusSessions.map(FocusSessionSnapshot.init),
@@ -325,27 +613,19 @@ enum BackupExportStore {
             mistakeImages: imageExport.snapshots
         )
 
-        let encoder = JSONEncoder()
-        encoder.outputFormatting = [.prettyPrinted, .sortedKeys]
-        encoder.dateEncodingStrategy = .iso8601
+        let checksum = try BackupChecksum.payloadWithoutChecksumSHA256(for: envelope)
+        envelope.integrity = envelope.integrity.withPayloadChecksum(checksum)
 
-        let data = try encoder.encode(envelope)
+        let data = try BackupChecksum.encode(envelope)
         let fileURL = exportDirectory().appendingPathComponent(makeExportFileName(date: exportedAt))
         try data.write(to: fileURL, options: [.atomic])
 
         return GaokaoBackupResult(
             fileURL: fileURL,
-            exportedRecordCounts: [
-                "dayPlans": envelope.dayPlans.count,
-                "studyTasks": envelope.studyTasks.count,
-                "focusSessions": envelope.focusSessions.count,
-                "mistakeRecords": envelope.mistakeRecords.count,
-                "promptTemplates": envelope.promptTemplates.count,
-                "resourceItems": envelope.resourceItems.count,
-                "dailyReviews": envelope.dailyReviews.count,
-                "weeklyReviews": envelope.weeklyReviews.count,
-                "mistakeImages": envelope.mistakeImages.count
-            ],
+            exportedAt: exportedAt,
+            exportedRecordCounts: envelope.recordSummary.countDictionary,
+            recordSummary: envelope.recordSummary,
+            integrity: envelope.integrity,
             warnings: imageExport.warnings
         )
     }

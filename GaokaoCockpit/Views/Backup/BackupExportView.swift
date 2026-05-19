@@ -9,6 +9,9 @@ struct BackupExportView: View {
     @State private var exportResult: GaokaoBackupResult?
     @State private var errorMessage: String?
     @State private var shareItem: BackupShareItem?
+    @State private var isValidating = false
+    @State private var validationResult: BackupValidationResult?
+    @State private var validationErrorMessage: String?
 
     private let countDisplayOrder: [(key: String, title: String)] = [
         ("dayPlans", "计划"),
@@ -65,9 +68,14 @@ struct BackupExportView: View {
                     if let exportResult {
                         BackupResultCard(
                             result: exportResult,
-                            countDisplayOrder: countDisplayOrder
+                            countDisplayOrder: countDisplayOrder,
+                            isValidating: isValidating,
+                            validationResult: validationResult,
+                            validationErrorMessage: validationErrorMessage
                         ) {
                             shareItem = BackupShareItem(fileURL: exportResult.fileURL)
+                        } onValidate: {
+                            validateExportedBackup(exportResult)
                         }
                     }
                 }
@@ -92,6 +100,8 @@ struct BackupExportView: View {
     private func exportBackup() {
         isExporting = true
         errorMessage = nil
+        validationResult = nil
+        validationErrorMessage = nil
 
         Task { @MainActor in
             await Task.yield()
@@ -103,6 +113,24 @@ struct BackupExportView: View {
             }
 
             isExporting = false
+        }
+    }
+
+    private func validateExportedBackup(_ result: GaokaoBackupResult) {
+        isValidating = true
+        validationResult = nil
+        validationErrorMessage = nil
+
+        Task { @MainActor in
+            await Task.yield()
+
+            do {
+                validationResult = try BackupValidationStore.validateBackupFile(url: result.fileURL)
+            } catch {
+                validationErrorMessage = "验证失败：\(error.localizedDescription)"
+            }
+
+            isValidating = false
         }
     }
 }
@@ -134,7 +162,11 @@ private struct BackupHeaderCard: View {
 private struct BackupResultCard: View {
     let result: GaokaoBackupResult
     let countDisplayOrder: [(key: String, title: String)]
+    let isValidating: Bool
+    let validationResult: BackupValidationResult?
+    let validationErrorMessage: String?
     let onShare: () -> Void
+    let onValidate: () -> Void
 
     var body: some View {
         BackupCard(tint: .green) {
@@ -154,6 +186,15 @@ private struct BackupResultCard: View {
                         .lineLimit(2)
                         .textSelection(.enabled)
                 }
+
+                VStack(alignment: .leading, spacing: 8) {
+                    BackupSummaryRow(title: "导出时间", value: result.exportedAt.formatted(date: .abbreviated, time: .shortened))
+                    BackupSummaryRow(title: "错题图片", value: "\(result.recordSummary.mistakeImageCount) 张")
+                    BackupSummaryRow(title: "图片总大小", value: Self.byteFormatter.string(fromByteCount: Int64(result.integrity.imageTotalBytes)))
+                    BackupSummaryRow(title: "warnings", value: "\(result.integrity.warningCount) 条")
+                    BackupSummaryRow(title: "checksum", value: checksumPreview)
+                }
+                .font(.footnote)
 
                 LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 10) {
                     ForEach(countDisplayOrder, id: \.key) { item in
@@ -181,6 +222,34 @@ private struct BackupResultCard: View {
                     .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
                 }
 
+                Text("checksum 基于 checksum 字段为空时的备份内容计算，用于检测导出流程是否稳定，不是加密签名。")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+
+                Button {
+                    onValidate()
+                } label: {
+                    if isValidating {
+                        Label("正在验证备份", systemImage: "hourglass")
+                            .frame(maxWidth: .infinity)
+                    } else {
+                        Label("验证刚刚导出的备份", systemImage: "checkmark.shield")
+                            .frame(maxWidth: .infinity)
+                    }
+                }
+                .buttonStyle(.bordered)
+                .disabled(isValidating)
+
+                if let validationErrorMessage {
+                    Label(validationErrorMessage, systemImage: "exclamationmark.triangle")
+                        .font(.footnote.weight(.semibold))
+                        .foregroundStyle(.red)
+                }
+
+                if let validationResult {
+                    BackupValidationResultView(result: validationResult)
+                }
+
                 Button {
                     onShare()
                 } label: {
@@ -188,6 +257,106 @@ private struct BackupResultCard: View {
                         .frame(maxWidth: .infinity)
                 }
                 .buttonStyle(.borderedProminent)
+            }
+        }
+    }
+
+    private var checksumPreview: String {
+        let checksum = result.integrity.displayChecksum
+        guard !checksum.isEmpty else {
+            return "未生成"
+        }
+
+        return "\(String(checksum.prefix(12)))..."
+    }
+
+    private static let byteFormatter: ByteCountFormatter = {
+        let formatter = ByteCountFormatter()
+        formatter.allowedUnits = [.useKB, .useMB]
+        formatter.countStyle = .file
+        return formatter
+    }()
+}
+
+private struct BackupSummaryRow: View {
+    let title: String
+    let value: String
+
+    var body: some View {
+        HStack(alignment: .firstTextBaseline) {
+            Text(title)
+                .foregroundStyle(.secondary)
+
+            Spacer(minLength: 12)
+
+            Text(value)
+                .fontWeight(.semibold)
+                .multilineTextAlignment(.trailing)
+                .textSelection(.enabled)
+        }
+    }
+}
+
+private struct BackupValidationResultView: View {
+    let result: BackupValidationResult
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            Label(result.isValid ? "备份结构可读" : "备份需要检查", systemImage: result.isValid ? "checkmark.circle.fill" : "xmark.octagon.fill")
+                .font(.subheadline.weight(.semibold))
+                .foregroundStyle(result.isValid ? Color.green : Color.red)
+
+            VStack(alignment: .leading, spacing: 8) {
+                BackupSummaryRow(title: "文件读取", value: result.isReadable ? "可读" : "不可读")
+                BackupSummaryRow(title: "schema", value: result.schemaName ?? "未识别")
+                BackupSummaryRow(title: "version", value: result.exportVersion.map { String($0) } ?? "未识别")
+                BackupSummaryRow(title: "数量一致", value: result.isCountConsistent ? "一致" : "不一致")
+                BackupSummaryRow(title: "checksum", value: checksumStatus)
+            }
+            .font(.footnote)
+
+            if !result.warnings.isEmpty {
+                BackupMessageList(title: "warnings", systemImage: "exclamationmark.triangle", color: .orange, messages: result.warnings)
+            }
+
+            if !result.errors.isEmpty {
+                BackupMessageList(title: "errors", systemImage: "xmark.octagon", color: .red, messages: result.errors)
+            }
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(10)
+        .background(Color(.systemBackground))
+        .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+    }
+
+    private var checksumStatus: String {
+        switch result.checksumMatches {
+        case .some(true):
+            return "匹配"
+        case .some(false):
+            return "不匹配"
+        case .none:
+            return "未校验"
+        }
+    }
+}
+
+private struct BackupMessageList: View {
+    let title: String
+    let systemImage: String
+    let color: Color
+    let messages: [String]
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 6) {
+            Label(title, systemImage: systemImage)
+                .font(.footnote.weight(.semibold))
+                .foregroundStyle(color)
+
+            ForEach(messages, id: \.self) { message in
+                Text(message)
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
             }
         }
     }

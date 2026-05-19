@@ -384,11 +384,52 @@
 - 不接 AI API。
 - 不做 OCR。
 
-## Stage 12：未来扩展：AI API、RAG、GoodNotes/NotebookLM 索引、macOS 端、云同步
+## Stage 12：Backup Validation / Format Strategy / 备份校验与格式策略
 
 ### 目标
 
-在本地学习闭环和备份能力稳定后，再评估更强的自动化和跨端能力。
+让 Stage 11 的本地 JSON 备份更可信、更可读，也为未来导入恢复留下清晰格式边界。本阶段只做导出摘要、结构校验和版本策略，不做导入恢复。
+
+### 已完成内容
+
+- `GaokaoBackupEnvelope` 向后兼容新增 `schemaName`、`exportSchemaVersion`、`recordSummary`、`integrity` 和 `warnings`。
+- `BackupRecordSummary` 记录各类数据数组数量。
+- `BackupIntegritySummary` 记录 checksum、图片总字节数、缺失图片数和 warnings 数。
+- checksum 使用 CryptoKit SHA256，计算对象为 checksum 字段为空时的备份 JSON payload。
+- 新增 `BackupValidationStore`，支持验证刚导出的本地备份文件结构。
+- `BackupExportView` 导出后显示文件名、导出时间、记录数量、错题图片数量、图片总大小、warnings 数量和 checksum 前 12 位。
+- `BackupExportView` 支持一键验证刚导出的备份，显示可读性、schema、version、数量一致性、warnings 和 errors。
+- 新增 `docs/BACKUP_FORMAT.md`，说明当前备份格式、版本策略、base64 图片、checksum 策略和未来导入恢复风险。
+
+### 验收标准
+
+- 导出的 JSON 仍保留 Stage 11 的旧数组字段。
+- 新导出的 JSON 包含 schema、summary、integrity、warnings 和 checksum。
+- 记录数量摘要与实际 JSON 数组数量一致。
+- 图片总大小、缺失图片数和 warnings 数显示合理。
+- 导出后可验证刚生成的备份文件。
+- checksum 能重新计算并匹配。
+- UI 和文档明确说明 checksum 不是加密签名。
+- UI 和文档明确说明当前只支持导出和校验，不支持导入恢复。
+
+### 不做什么
+
+- 不做导入恢复。
+- 不写入 SwiftData。
+- 不做云同步。
+- 不做账号系统。
+- 不做加密。
+- 不做 zip。
+- 不导出原始 sqlite。
+- 不引入第三方依赖。
+- 不做数据模型迁移。
+- 不接 AI API。
+
+## Stage 13：未来扩展：AI API、RAG、GoodNotes/NotebookLM 索引、macOS 端、云同步
+
+### 目标
+
+在本地学习闭环、备份导出和备份校验稳定后，再评估更强的自动化和跨端能力。
 
 ### 需要修改/新增的内容
 
