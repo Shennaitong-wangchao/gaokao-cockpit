@@ -24,6 +24,7 @@ struct TodayCockpitView: View {
     @State private var saveMessage: String?
     @State private var taskMessage: String?
     @State private var isShowingQuickAddTask = false
+    @State private var activePlanTaskGeneration: PlanTaskGenerationState?
 
     private var pendingTaskCount: Int {
         max(totalTaskCount - completedTaskCount, 0)
@@ -85,6 +86,10 @@ struct TodayCockpitView: View {
                                 isLowEnergyMode: isLowEnergyMode
                             )
 
+                            PlanToTaskActionCard(
+                                onGenerate: preparePlanTaskGeneration
+                            )
+
                             TodayTaskSummaryCard(
                                 totalTaskCount: totalTaskCount,
                                 completedTaskCount: completedTaskCount,
@@ -137,6 +142,11 @@ struct TodayCockpitView: View {
             ) {
                 refreshTaskData()
                 taskMessage = "已新增今日任务。"
+            }
+        }
+        .sheet(item: $activePlanTaskGeneration) { generation in
+            PlanTaskGenerationSheet(generation: generation) {
+                createTasksFromPlan(generation.parsedTasks)
             }
         }
     }
@@ -194,19 +204,74 @@ struct TodayCockpitView: View {
         }
 
         do {
-            plan.stateScore = stateScore
-            plan.mainSubject = mainSubject.trimmingCharacters(in: .whitespacesAndNewlines)
-            plan.topTasksText = topTasksText
-            plan.baselineTasksText = baselineTasksText
-            plan.bonusTasksText = bonusTasksText
-            plan.tomorrowFirstAction = tomorrowFirstAction.trimmingCharacters(in: .whitespacesAndNewlines)
-            DayPlanStore.updateDayPlanTimestamp(plan)
-
+            applyDraftPlanFields(to: plan)
             try modelContext.save()
             saveMessage = "已保存今日计划：\(Date.now.formatted(date: .omitted, time: .shortened))"
         } catch {
             saveMessage = "保存失败：\(error.localizedDescription)"
         }
+    }
+
+    private func preparePlanTaskGeneration() {
+        let parsedTasks = PlanTaskParser.parsePlanSections(
+            top: topTasksText,
+            baseline: baselineTasksText,
+            bonus: bonusTasksText
+        )
+
+        guard !parsedTasks.isEmpty else {
+            taskMessage = "先在 Top / 保底 / 加分任务里写几行计划。"
+            return
+        }
+
+        do {
+            let existingTitleKeys = Set(
+                try StudyTaskStore.fetchTasks(for: todayKey, in: modelContext).map {
+                    PlanTaskParser.normalizedTitleKey($0.title)
+                }
+            )
+            let items = parsedTasks.map { parsedTask in
+                PlanTaskConfirmationItem(
+                    parsedTask: parsedTask,
+                    alreadyExists: existingTitleKeys.contains(PlanTaskParser.normalizedTitleKey(parsedTask.title))
+                )
+            }
+
+            activePlanTaskGeneration = PlanTaskGenerationState(items: items)
+        } catch {
+            taskMessage = "读取今日任务失败：\(error.localizedDescription)"
+        }
+    }
+
+    private func createTasksFromPlan(_ parsedTasks: [ParsedPlanTask]) {
+        guard let plan = dayPlan else {
+            taskMessage = "生成失败：今日计划尚未加载。"
+            return
+        }
+
+        do {
+            applyDraftPlanFields(to: plan)
+            let result = try StudyTaskStore.createTasksFromPlan(
+                dayPlan: plan,
+                parsedTasks: parsedTasks,
+                in: modelContext
+            )
+            try refreshTaskDataThrowing(for: todayKey)
+            saveMessage = "已保存今日计划。"
+            taskMessage = "已添加 \(result.created) 个任务，跳过 \(result.skipped) 个重复项。"
+        } catch {
+            taskMessage = "生成今日任务失败：\(error.localizedDescription)"
+        }
+    }
+
+    private func applyDraftPlanFields(to plan: DayPlan) {
+        plan.stateScore = stateScore
+        plan.mainSubject = mainSubject.trimmingCharacters(in: .whitespacesAndNewlines)
+        plan.topTasksText = topTasksText
+        plan.baselineTasksText = baselineTasksText
+        plan.bonusTasksText = bonusTasksText
+        plan.tomorrowFirstAction = tomorrowFirstAction.trimmingCharacters(in: .whitespacesAndNewlines)
+        DayPlanStore.updateDayPlanTimestamp(plan)
     }
 
     private func toggleTaskStatus(_ task: StudyTask) {
@@ -354,6 +419,132 @@ private struct TodayPlanTextCard: View {
                         placeholder: "有余力就多做一点",
                         text: $bonusTasksText
                     )
+                }
+            }
+        }
+    }
+}
+
+private struct PlanToTaskActionCard: View {
+    let onGenerate: () -> Void
+
+    var body: some View {
+        TodayCard {
+            VStack(alignment: .leading, spacing: 12) {
+                SectionTitle(title: "计划转任务", systemImage: "arrow.triangle.branch")
+
+                Text("按行拆分 Top / 保底 / 加分任务，自动生成今日任务。")
+                    .font(.footnote)
+                    .foregroundStyle(.secondary)
+
+                Button {
+                    onGenerate()
+                } label: {
+                    Label("把计划加入任务页", systemImage: "text.badge.plus")
+                        .frame(maxWidth: .infinity)
+                }
+                .buttonStyle(.borderedProminent)
+            }
+        }
+    }
+}
+
+private struct PlanTaskGenerationState: Identifiable {
+    let id = UUID()
+    let items: [PlanTaskConfirmationItem]
+
+    var parsedTasks: [ParsedPlanTask] {
+        items.map(\.parsedTask)
+    }
+
+    var creatableItems: [PlanTaskConfirmationItem] {
+        items.filter { !$0.alreadyExists }
+    }
+
+    var duplicateItems: [PlanTaskConfirmationItem] {
+        items.filter(\.alreadyExists)
+    }
+}
+
+private struct PlanTaskConfirmationItem: Identifiable {
+    let id = UUID()
+    let parsedTask: ParsedPlanTask
+    let alreadyExists: Bool
+}
+
+private struct PlanTaskGenerationSheet: View {
+    @Environment(\.dismiss) private var dismiss
+
+    let generation: PlanTaskGenerationState
+    let onConfirm: () -> Void
+
+    var body: some View {
+        NavigationStack {
+            List {
+                Section {
+                    Text("已存在的同名任务会自动跳过。")
+                        .font(.footnote)
+                        .foregroundStyle(.secondary)
+                }
+
+                if !generation.creatableItems.isEmpty {
+                    Section("将创建") {
+                        ForEach(generation.creatableItems) { item in
+                            PlanTaskPreviewRow(item: item)
+                        }
+                    }
+                }
+
+                if !generation.duplicateItems.isEmpty {
+                    Section("已存在，将跳过") {
+                        ForEach(generation.duplicateItems) { item in
+                            PlanTaskPreviewRow(item: item)
+                        }
+                    }
+                }
+            }
+            .navigationTitle("生成今日任务")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button("取消") {
+                        dismiss()
+                    }
+                }
+
+                ToolbarItem(placement: .confirmationAction) {
+                    Button("确认添加") {
+                        onConfirm()
+                        dismiss()
+                    }
+                }
+            }
+        }
+    }
+}
+
+private struct PlanTaskPreviewRow: View {
+    let item: PlanTaskConfirmationItem
+
+    var body: some View {
+        HStack(alignment: .top, spacing: 10) {
+            Image(systemName: item.alreadyExists ? "checkmark.circle" : "plus.circle")
+                .foregroundStyle(item.alreadyExists ? Color.secondary : Color.green)
+                .frame(width: 22, height: 22)
+
+            VStack(alignment: .leading, spacing: 5) {
+                Text(item.parsedTask.title)
+                    .font(.subheadline.weight(.semibold))
+                    .foregroundStyle(item.alreadyExists ? .secondary : .primary)
+
+                HStack(spacing: 8) {
+                    SmallTag(text: item.parsedTask.sourceTitle)
+                    SmallTag(text: item.parsedTask.category)
+                    if item.alreadyExists {
+                        Text("将跳过")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
                 }
             }
         }

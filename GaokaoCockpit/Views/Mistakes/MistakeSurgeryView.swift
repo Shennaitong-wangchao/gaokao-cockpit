@@ -1,5 +1,6 @@
 import SwiftData
 import SwiftUI
+import UIKit
 
 struct MistakeSurgeryView: View {
     @Environment(\.modelContext) private var modelContext
@@ -408,40 +409,44 @@ private struct MistakeRow: View {
             Button {
                 onTap()
             } label: {
-                VStack(alignment: .leading, spacing: 10) {
-                    HStack(alignment: .top, spacing: 8) {
-                        MistakeTag(text: mistake.subject.isEmpty ? "未设科目" : mistake.subject)
-                        MistakeTag(text: mistake.chapter.isEmpty ? "未设章节" : mistake.chapter)
-                        Spacer(minLength: 8)
-                        MistakeStatusBadge(status: mistake.reviewStatus)
-                    }
+                HStack(alignment: .top, spacing: 12) {
+                    MistakeQuestionThumbnail(path: mistake.questionImagePath)
 
-                    Text(mistake.questionPreviewText)
-                        .font(.headline)
-                        .foregroundStyle(mistake.questionText.isEmpty ? .secondary : .primary)
-                        .lineLimit(2)
+                    VStack(alignment: .leading, spacing: 10) {
+                        HStack(alignment: .top, spacing: 8) {
+                            MistakeTag(text: mistake.subject.isEmpty ? "未设科目" : mistake.subject)
+                            MistakeTag(text: mistake.chapter.isEmpty ? "未设章节" : mistake.chapter)
+                            Spacer(minLength: 8)
+                            MistakeStatusBadge(status: mistake.reviewStatus)
+                        }
 
-                    HStack(spacing: 8) {
-                        Label(MistakeTypeOption.title(for: mistake.mistakeType), systemImage: MistakeTypeOption.systemImage(for: mistake.mistakeType))
-                        Text(mistake.source.isEmpty ? "来源未填写" : mistake.source)
-                    }
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-                    .lineLimit(1)
+                        Text(mistake.questionPreviewText)
+                            .font(.headline)
+                            .foregroundStyle(mistake.questionText.isEmpty ? .secondary : .primary)
+                            .lineLimit(2)
 
-                    Label("根因：\(mistake.rootCausePreviewText)", systemImage: "stethoscope")
-                        .font(.subheadline)
-                        .foregroundStyle(.primary)
-                        .lineLimit(2)
-
-                    Label("信号：\(mistake.questionSignalPreviewText)", systemImage: "scope")
+                        HStack(spacing: 8) {
+                            Label(MistakeTypeOption.title(for: mistake.mistakeType), systemImage: MistakeTypeOption.systemImage(for: mistake.mistakeType))
+                            Text(mistake.source.isEmpty ? "来源未填写" : mistake.source)
+                        }
                         .font(.caption)
                         .foregroundStyle(.secondary)
                         .lineLimit(1)
 
-                    Text(mistake.shortUpdatedDateText)
-                        .font(.caption2)
-                        .foregroundStyle(.secondary)
+                        Label("根因：\(mistake.rootCausePreviewText)", systemImage: "stethoscope")
+                            .font(.subheadline)
+                            .foregroundStyle(.primary)
+                            .lineLimit(2)
+
+                        Label("信号：\(mistake.questionSignalPreviewText)", systemImage: "scope")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                            .lineLimit(1)
+
+                        Text(mistake.shortUpdatedDateText)
+                            .font(.caption2)
+                            .foregroundStyle(.secondary)
+                    }
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .contentShape(Rectangle())
@@ -485,6 +490,35 @@ private struct MistakeRow: View {
         .padding(14)
         .background(Color(.secondarySystemBackground))
         .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+    }
+}
+
+private struct MistakeQuestionThumbnail: View {
+    let path: String
+
+    var body: some View {
+        let cleanPath = path.trimmingCharacters(in: .whitespacesAndNewlines)
+
+        if let image = MistakeImageStore.loadImage(path: cleanPath) {
+            Image(uiImage: image)
+                .resizable()
+                .scaledToFill()
+                .frame(width: 58, height: 58)
+                .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+                .overlay {
+                    RoundedRectangle(cornerRadius: 8, style: .continuous)
+                        .stroke(Color(.separator).opacity(0.35), lineWidth: 1)
+                }
+                .accessibilityLabel("有题图")
+        } else if !cleanPath.isEmpty {
+            Image(systemName: "photo")
+                .font(.title3)
+                .foregroundStyle(.secondary)
+                .frame(width: 58, height: 58)
+                .background(Color(.tertiarySystemBackground))
+                .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+                .accessibilityLabel("有题图但暂时无法读取")
+        }
     }
 }
 
@@ -534,7 +568,13 @@ private struct MistakeSurgeryCard<Content: View>: View {
 private extension MistakeRecord {
     var questionPreviewText: String {
         let text = questionText.trimmingCharacters(in: .whitespacesAndNewlines)
-        return text.isEmpty ? "未填写题面，先记录错因也可以。" : text
+        if !text.isEmpty {
+            return text
+        }
+
+        return questionImagePath.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+            ? "未填写题面，先记录错因也可以。"
+            : "已上传题图，题面文字未填写。"
     }
 
     var rootCausePreviewText: String {
@@ -555,11 +595,22 @@ private extension MistakeRecord {
         [
             "subject": subject,
             "chapter": chapter,
-            "question": questionText,
+            "question": questionPromptText,
             "mySolution": mySolution,
             "correctAnswer": correctSolution,
             "currentConfusion": currentConfusionText
         ]
+    }
+
+    private var questionPromptText: String {
+        let text = questionText.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard text.isEmpty else {
+            return text
+        }
+
+        return questionImagePath.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+            ? ""
+            : "题目文字未填写，但本错题有本地题图，请用户手动上传图片或补充题面。"
     }
 
     private var currentConfusionText: String {

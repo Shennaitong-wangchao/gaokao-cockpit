@@ -56,6 +56,7 @@ enum MistakeRecordStore {
     }
 
     static func createMistake(
+        id: UUID = UUID(),
         subject: String,
         chapter: String,
         source: String,
@@ -74,6 +75,7 @@ enum MistakeRecordStore {
     ) throws -> MistakeRecord {
         let now = Date()
         let mistake = MistakeRecord(
+            id: id,
             subject: subject,
             chapter: chapter,
             source: source,

@@ -62,6 +62,52 @@ enum StudyTaskStore {
         return task
     }
 
+    static func createTasksFromPlan(
+        dayPlan: DayPlan,
+        parsedTasks: [ParsedPlanTask],
+        in context: ModelContext
+    ) throws -> (created: Int, skipped: Int) {
+        var existingTitleKeys = Set(
+            try fetchTasks(for: dayPlan.dayKey, in: context).map {
+                PlanTaskParser.normalizedTitleKey($0.title)
+            }
+        )
+        var createdCount = 0
+        var skippedCount = 0
+        let subject = dayPlan.mainSubject.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+            ? "其他"
+            : dayPlan.mainSubject.trimmingCharacters(in: .whitespacesAndNewlines)
+
+        for parsedTask in parsedTasks {
+            let titleKey = PlanTaskParser.normalizedTitleKey(parsedTask.title)
+            guard !existingTitleKeys.contains(titleKey) else {
+                skippedCount += 1
+                continue
+            }
+
+            let now = Date()
+            let task = StudyTask(
+                dayPlanId: dayPlan.id,
+                dayKey: dayPlan.dayKey,
+                title: parsedTask.title,
+                subject: subject,
+                category: parsedTask.category,
+                estimatedMinutes: 25,
+                status: ModelDefaults.StudyTaskStatus.pending,
+                outputNote: "From Today \(parsedTask.source) plan",
+                createdAt: now,
+                updatedAt: now
+            )
+
+            context.insert(task)
+            existingTitleKeys.insert(titleKey)
+            createdCount += 1
+        }
+
+        try context.save()
+        return (created: createdCount, skipped: skippedCount)
+    }
+
     static func countTasks(for dayKey: String, in context: ModelContext) throws -> Int {
         let descriptor = FetchDescriptor<StudyTask>(
             predicate: #Predicate<StudyTask> { task in

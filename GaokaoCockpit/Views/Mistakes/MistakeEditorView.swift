@@ -1,5 +1,7 @@
+import PhotosUI
 import SwiftData
 import SwiftUI
+import UIKit
 
 enum MistakeEditorMode: Identifiable {
     case add
@@ -30,6 +32,8 @@ struct MistakeEditorView: View {
 
     let mode: MistakeEditorMode
     let onChanged: (String) -> Void
+    private let draftMistakeID: UUID
+    private let originalQuestionImagePath: String
 
     @State private var subject: String
     @State private var chapter: String
@@ -47,14 +51,24 @@ struct MistakeEditorView: View {
     @State private var nextReminder: Date
     @State private var reviewStatus: String
     @State private var errorMessage: String?
+    @State private var selectedPhotoItem: PhotosPickerItem?
+    @State private var showingCameraPicker = false
+    @State private var showingDeleteImageConfirmation = false
     @State private var showingDeleteConfirmation = false
+    @State private var pendingImagePathsToDelete: Set<String> = []
+    @State private var didCommitImageChanges = false
 
     init(mode: MistakeEditorMode, onChanged: @escaping (String) -> Void) {
         self.mode = mode
         self.onChanged = onChanged
 
+        let initialMistakeID: UUID
+        let initialImagePath: String
+
         switch mode {
         case .add:
+            initialMistakeID = UUID()
+            initialImagePath = ""
             _subject = State(initialValue: "数学")
             _chapter = State(initialValue: "")
             _source = State(initialValue: "")
@@ -72,6 +86,8 @@ struct MistakeEditorView: View {
             _reviewStatus = State(initialValue: ModelDefaults.ReviewStatus.new)
 
         case .edit(let mistake):
+            initialMistakeID = mistake.id
+            initialImagePath = mistake.questionImagePath.trimmingCharacters(in: .whitespacesAndNewlines)
             _subject = State(initialValue: mistake.subject.isEmpty ? "其他" : mistake.subject)
             _chapter = State(initialValue: mistake.chapter)
             _source = State(initialValue: mistake.source)
@@ -88,6 +104,9 @@ struct MistakeEditorView: View {
             _nextReminder = State(initialValue: mistake.nextReminder ?? Date())
             _reviewStatus = State(initialValue: mistake.reviewStatus.isEmpty ? ModelDefaults.ReviewStatus.new : mistake.reviewStatus)
         }
+
+        self.draftMistakeID = initialMistakeID
+        self.originalQuestionImagePath = initialImagePath
     }
 
     var body: some View {
@@ -111,11 +130,66 @@ struct MistakeEditorView: View {
                     TextEditor(text: $questionText)
                         .frame(minHeight: 100)
                         .accessibilityLabel("题目文字")
+                }
 
-                    TextField("图片路径文本", text: $questionImagePath)
-                        .textInputAutocapitalization(.never)
-                        .autocorrectionDisabled()
-                        .accessibilityLabel("图片路径文本")
+                Section("题目图片") {
+                    VStack(alignment: .leading, spacing: 12) {
+                        if let image = currentQuestionImage {
+                            Image(uiImage: image)
+                                .resizable()
+                                .scaledToFit()
+                                .frame(maxHeight: 240)
+                                .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+                                .accessibilityLabel("错题题图预览")
+                        } else if hasQuestionImagePath {
+                            ContentUnavailableView {
+                                Label("题图暂时无法读取", systemImage: "photo.badge.exclamationmark")
+                            } description: {
+                                Text("可以重新选择一张图片，或删除当前图片记录。")
+                            }
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, 8)
+                        } else {
+                            Text("还没有题图。可以从相册选择或直接拍照。")
+                                .font(.subheadline)
+                                .foregroundStyle(.secondary)
+                        }
+
+                        HStack {
+                            PhotosPicker(
+                                selection: $selectedPhotoItem,
+                                matching: .images,
+                                photoLibrary: .shared()
+                            ) {
+                                Label(hasQuestionImagePath ? "更换图片" : "从相册选择", systemImage: "photo")
+                                    .frame(maxWidth: .infinity)
+                            }
+                            .buttonStyle(.bordered)
+
+                            Button {
+                                showingCameraPicker = true
+                            } label: {
+                                Label("拍照上传", systemImage: "camera")
+                                    .frame(maxWidth: .infinity)
+                            }
+                            .buttonStyle(.bordered)
+                            .disabled(!isCameraAvailable)
+                        }
+
+                        if !isCameraAvailable {
+                            Text("当前设备没有可用相机。")
+                                .font(.footnote)
+                                .foregroundStyle(.secondary)
+                        }
+
+                        if hasQuestionImagePath {
+                            Button(role: .destructive) {
+                                showingDeleteImageConfirmation = true
+                            } label: {
+                                Label("删除图片", systemImage: "trash")
+                            }
+                        }
+                    }
                 }
 
                 Section("解法对照") {
@@ -193,7 +267,7 @@ struct MistakeEditorView: View {
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button("取消") {
-                        dismiss()
+                        cancelEditing()
                     }
                 }
 
@@ -203,6 +277,19 @@ struct MistakeEditorView: View {
                     }
                     .disabled(clean(subject).isEmpty)
                 }
+            }
+            .confirmationDialog(
+                "确认删除当前题图？",
+                isPresented: $showingDeleteImageConfirmation,
+                titleVisibility: .visible
+            ) {
+                Button("删除图片", role: .destructive) {
+                    deleteCurrentImage()
+                }
+
+                Button("取消", role: .cancel) {}
+            } message: {
+                Text("保存错题后，图片记录会从这条错题中移除。")
             }
             .confirmationDialog(
                 "确认删除这条错题手术？",
@@ -217,7 +304,134 @@ struct MistakeEditorView: View {
             } message: {
                 Text("删除后无法恢复。")
             }
+            .sheet(isPresented: $showingCameraPicker) {
+                CameraImagePicker { image in
+                    savePickedImage(image)
+                }
+            }
+            .onChange(of: selectedPhotoItem) {
+                guard let selectedPhotoItem else {
+                    return
+                }
+
+                Task {
+                    await loadSelectedPhoto(selectedPhotoItem)
+                }
+            }
+            .onDisappear {
+                cleanupUncommittedDraftImage()
+            }
         }
+    }
+
+    private var isCameraAvailable: Bool {
+        UIImagePickerController.isSourceTypeAvailable(.camera)
+    }
+
+    private var hasQuestionImagePath: Bool {
+        !clean(questionImagePath).isEmpty
+    }
+
+    private var currentQuestionImage: UIImage? {
+        MistakeImageStore.loadImage(path: questionImagePath)
+    }
+
+    @MainActor
+    private func loadSelectedPhoto(_ item: PhotosPickerItem) async {
+        do {
+            guard let data = try await item.loadTransferable(type: Data.self) else {
+                errorMessage = "读取相册图片失败。"
+                selectedPhotoItem = nil
+                return
+            }
+
+            guard let image = UIImage(data: data) else {
+                errorMessage = "相册图片格式无法读取。"
+                selectedPhotoItem = nil
+                return
+            }
+
+            savePickedImage(image)
+            selectedPhotoItem = nil
+        } catch {
+            errorMessage = "读取相册图片失败：\(error.localizedDescription)"
+            selectedPhotoItem = nil
+        }
+    }
+
+    private func savePickedImage(_ image: UIImage) {
+        do {
+            let previousPath = clean(questionImagePath)
+            let savedPath = try MistakeImageStore.saveImage(image, mistakeId: draftMistakeID)
+            stageReplacementImage(previousPath: previousPath, newPath: savedPath)
+            questionImagePath = savedPath
+            errorMessage = nil
+        } catch {
+            errorMessage = "保存图片失败：\(error.localizedDescription)"
+        }
+    }
+
+    private func stageReplacementImage(previousPath: String, newPath: String) {
+        guard !previousPath.isEmpty, previousPath != newPath else {
+            return
+        }
+
+        if previousPath == originalQuestionImagePath {
+            pendingImagePathsToDelete.insert(previousPath)
+        } else {
+            try? MistakeImageStore.deleteImage(path: previousPath)
+        }
+    }
+
+    private func deleteCurrentImage() {
+        let currentPath = clean(questionImagePath)
+        guard !currentPath.isEmpty else {
+            return
+        }
+
+        if currentPath == originalQuestionImagePath {
+            pendingImagePathsToDelete.insert(currentPath)
+            questionImagePath = ""
+            errorMessage = nil
+            return
+        }
+
+        do {
+            try MistakeImageStore.deleteImage(path: currentPath)
+            questionImagePath = ""
+            errorMessage = nil
+        } catch {
+            errorMessage = "删除图片失败：\(error.localizedDescription)"
+        }
+    }
+
+    private func cancelEditing() {
+        cleanupUncommittedDraftImage()
+        dismiss()
+    }
+
+    private func cleanupUncommittedDraftImage() {
+        guard !didCommitImageChanges else {
+            return
+        }
+
+        let currentPath = clean(questionImagePath)
+        guard !currentPath.isEmpty, currentPath != originalQuestionImagePath else {
+            return
+        }
+
+        try? MistakeImageStore.deleteImage(path: currentPath)
+    }
+
+    private func deletePendingImagePathsAfterSave() throws {
+        let savedPath = clean(questionImagePath)
+        let paths = pendingImagePathsToDelete.filter { !$0.isEmpty && $0 != savedPath }
+
+        for path in paths {
+            try MistakeImageStore.deleteImage(path: path)
+        }
+
+        pendingImagePathsToDelete.removeAll()
     }
 
     private var mistakeTypeOptions: [MistakeTypeOption] {
@@ -251,6 +465,7 @@ struct MistakeEditorView: View {
             switch mode {
             case .add:
                 _ = try MistakeRecordStore.createMistake(
+                    id: draftMistakeID,
                     subject: cleanSubject,
                     chapter: clean(chapter),
                     source: clean(source),
@@ -267,6 +482,8 @@ struct MistakeEditorView: View {
                     reviewStatus: reviewStatus,
                     in: modelContext
                 )
+                try deletePendingImagePathsAfterSave()
+                didCommitImageChanges = true
                 onChanged("已新增错题手术。")
 
             case .edit(let mistake):
@@ -286,6 +503,8 @@ struct MistakeEditorView: View {
                 mistake.reviewStatus = reviewStatus
                 MistakeRecordStore.updateMistakeTimestamp(mistake)
                 try modelContext.save()
+                try deletePendingImagePathsAfterSave()
+                didCommitImageChanges = true
                 onChanged("已保存错题手术。")
             }
 
@@ -301,7 +520,15 @@ struct MistakeEditorView: View {
         }
 
         do {
+            let imagePathsToDelete = Set([
+                clean(mistake.questionImagePath),
+                clean(questionImagePath)
+            ]).filter { !$0.isEmpty }
             try MistakeRecordStore.deleteMistake(mistake, in: modelContext)
+            for path in imagePathsToDelete {
+                try? MistakeImageStore.deleteImage(path: path)
+            }
+            didCommitImageChanges = true
             onChanged("已删除错题手术。")
             dismiss()
         } catch {
