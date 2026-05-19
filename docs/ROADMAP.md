@@ -343,11 +343,52 @@
 - 不做新数据模型迁移。
 - 不做复杂统计图表。
 
-## Stage 11：未来扩展：AI API、RAG、GoodNotes/NotebookLM 索引、macOS 端、云同步
+## Stage 11：Local Backup Export MVP / 本地数据备份导出
 
 ### 目标
 
-在本地学习闭环稳定后，再评估更强的自动化和跨端能力。
+给已经进入主力试用阶段的 Gaokao Cockpit 增加本地导出能力，保护用户的学习数据和错题图片。第一版只做“导出备份”，不做导入恢复，避免数据合并和覆盖风险。
+
+### 已完成内容
+
+- 新增 `BackupExportStore`，通过 SwiftData `ModelContext` 读取所有核心模型数据。
+- 定义独立 Codable Snapshot 和 `GaokaoBackupEnvelope`，不让 SwiftData `@Model` 直接遵守 Codable。
+- 支持导出本地 JSON 文件，文件名格式为 `gaokao-cockpit-backup-YYYYMMDD-HHmmss.json`。
+- 导出内容包含 DayPlan、StudyTask、FocusSession、MistakeRecord、PromptTemplate、ResourceItem、DailyReview、WeeklyReview。
+- 错题图片从本地 `MistakeImages` 路径读取，只在导出 JSON 中以 base64 嵌入。
+- 图片缺失或读取失败时写入 warnings，不中断整体导出。
+- 新增 `BackupExportView` 和系统 ShareSheet，用于导出后分享或保存 JSON 文件。
+- Reviews 页面底部新增低调“数据与备份”入口。
+
+### 验收标准
+
+- 用户能从 Reviews 打开数据备份页。
+- 用户能导出一个本地 JSON 备份文件。
+- 导出完成后显示各类记录数量。
+- 导出完成后可以打开系统分享面板保存或转发文件。
+- 有图片错题时，导出 JSON 包含 `mistakeImages`。
+- 图片缺失时显示 warnings，但不导致备份失败。
+- UI 明确说明本阶段不支持导入恢复。
+
+### 不做什么
+
+- 不做导入恢复。
+- 不做云同步。
+- 不做账号系统。
+- 不做自动定时备份。
+- 不做 iCloud Drive 自动同步。
+- 不引入第三方依赖。
+- 不做复杂加密。
+- 不做 zip。
+- 不导出 SwiftData 原始 sqlite。
+- 不接 AI API。
+- 不做 OCR。
+
+## Stage 12：未来扩展：AI API、RAG、GoodNotes/NotebookLM 索引、macOS 端、云同步
+
+### 目标
+
+在本地学习闭环和备份能力稳定后，再评估更强的自动化和跨端能力。
 
 ### 需要修改/新增的内容
 
@@ -357,7 +398,6 @@
 - GoodNotes / NotebookLM 资料索引。
 - macOS 端。
 - iCloud 或其他云同步。
-- 数据备份和导出。
 
 ### 验收标准
 

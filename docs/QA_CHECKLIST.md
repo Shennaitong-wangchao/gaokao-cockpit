@@ -79,13 +79,23 @@
 - [ ] 每日复盘 Prompt 可生成和复制。
 - [ ] 周复盘 Prompt 可生成和复制。
 
-## 7. 持久化
+## 7. 数据备份
+
+- [ ] Reviews 底部能打开数据备份页。
+- [ ] 能导出 JSON 备份文件。
+- [ ] 导出完成后能打开分享面板。
+- [ ] 导出结果显示各类记录数量。
+- [ ] 有图片错题时，导出文件包含 `mistakeImages`。
+- [ ] 图片缺失时显示 warnings，且不导致导出失败。
+- [ ] UI 明确说明不支持导入恢复。
+
+## 8. 持久化
 
 - [ ] 重启 App 后 Today / Tasks / Mistakes / Reviews 数据仍在。
 - [ ] 内置 Prompt 不重复 seed。
 - [ ] 图片文件路径可读取。
 
-## 8. 构建
+## 9. 构建
 
 - [ ] `xcodebuild -project GaokaoCockpit.xcodeproj -scheme GaokaoCockpit -configuration Debug -destination 'generic/platform=iOS Simulator' build` 通过。
 - [ ] `xcodebuild -project GaokaoCockpit.xcodeproj -scheme GaokaoCockpit -configuration Debug -destination 'platform=iOS Simulator,name=iPhone 17' build` 通过。

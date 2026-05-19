@@ -29,6 +29,7 @@ struct ReviewView: View {
     @State private var nextWeekFocusText = ""
 
     @State private var activePromptSheet: ReviewPromptSheet?
+    @State private var activeBackupSheet: ReviewBackupSheet?
 
     var body: some View {
         Group {
@@ -97,6 +98,10 @@ struct ReviewView: View {
                                 .foregroundStyle(statusMessage.contains("失败") ? Color.red : Color.secondary)
                                 .frame(maxWidth: .infinity, alignment: .leading)
                         }
+
+                        ReviewBackupEntryCard {
+                            activeBackupSheet = ReviewBackupSheet()
+                        }
                     }
                     .padding()
                     .frame(maxWidth: .infinity, alignment: .leading)
@@ -118,6 +123,9 @@ struct ReviewView: View {
             ) { message in
                 statusMessage = message
             }
+        }
+        .sheet(item: $activeBackupSheet) { _ in
+            BackupExportView()
         }
     }
 
@@ -430,6 +438,10 @@ private struct ReviewPromptSheet: Identifiable {
     let values: [String: String]
 }
 
+private struct ReviewBackupSheet: Identifiable {
+    let id = UUID()
+}
+
 private struct DailyReviewSummary {
     let taskCount: Int
     let completedTaskCount: Int
@@ -699,6 +711,34 @@ private struct ReviewActionButtons: View {
                     .frame(maxWidth: .infinity)
             }
             .buttonStyle(.bordered)
+        }
+    }
+}
+
+private struct ReviewBackupEntryCard: View {
+    let onOpenBackup: () -> Void
+
+    var body: some View {
+        ReviewCard {
+            HStack(alignment: .center, spacing: 12) {
+                VStack(alignment: .leading, spacing: 4) {
+                    Label("数据与备份", systemImage: "externaldrive")
+                        .font(.subheadline.weight(.semibold))
+
+                    Text("导出本地 JSON 备份，不包含导入恢复。")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+
+                Spacer()
+
+                Button {
+                    onOpenBackup()
+                } label: {
+                    Label("导出本地备份", systemImage: "square.and.arrow.up")
+                }
+                .buttonStyle(.bordered)
+            }
         }
     }
 }

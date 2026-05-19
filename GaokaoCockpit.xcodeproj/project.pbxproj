@@ -51,6 +51,9 @@
 		A00000000000000000000142 /* PlanTaskParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000273 /* PlanTaskParser.swift */; };
 		A00000000000000000000143 /* CameraImagePicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000274 /* CameraImagePicker.swift */; };
 		A00000000000000000000144 /* MistakeImagePreviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000275 /* MistakeImagePreviewView.swift */; };
+		A00000000000000000000145 /* BackupExportStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000276 /* BackupExportStore.swift */; };
+		A00000000000000000000146 /* ShareSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000277 /* ShareSheet.swift */; };
+		A00000000000000000000147 /* BackupExportView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000278 /* BackupExportView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -108,6 +111,9 @@
 		A00000000000000000000273 /* PlanTaskParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlanTaskParser.swift; sourceTree = "<group>"; };
 		A00000000000000000000274 /* CameraImagePicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraImagePicker.swift; sourceTree = "<group>"; };
 		A00000000000000000000275 /* MistakeImagePreviewView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MistakeImagePreviewView.swift; sourceTree = "<group>"; };
+		A00000000000000000000276 /* BackupExportStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackupExportStore.swift; sourceTree = "<group>"; };
+		A00000000000000000000277 /* ShareSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareSheet.swift; sourceTree = "<group>"; };
+		A00000000000000000000278 /* BackupExportView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackupExportView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -147,6 +153,8 @@
 		A00000000000000000000403 /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				A00000000000000000000413 /* Backup */,
+				A00000000000000000000414 /* Shared */,
 				A00000000000000000000404 /* Today */,
 				A00000000000000000000405 /* Tasks */,
 				A00000000000000000000406 /* Focus */,
@@ -155,6 +163,22 @@
 				A00000000000000000000409 /* Reviews */,
 			);
 			path = Views;
+			sourceTree = "<group>";
+		};
+		A00000000000000000000413 /* Backup */ = {
+			isa = PBXGroup;
+			children = (
+				A00000000000000000000278 /* BackupExportView.swift */,
+			);
+			path = Backup;
+			sourceTree = "<group>";
+		};
+		A00000000000000000000414 /* Shared */ = {
+			isa = PBXGroup;
+			children = (
+				A00000000000000000000277 /* ShareSheet.swift */,
+			);
+			path = Shared;
 			sourceTree = "<group>";
 		};
 		A00000000000000000000404 /* Today */ = {
@@ -246,6 +270,7 @@
 				A00000000000000000000259 /* FocusSessionStore.swift */,
 				A00000000000000000000262 /* MistakeRecordStore.swift */,
 				A00000000000000000000272 /* MistakeImageStore.swift */,
+				A00000000000000000000276 /* BackupExportStore.swift */,
 				A00000000000000000000255 /* PromptTemplateStore.swift */,
 				A00000000000000000000265 /* PromptRenderer.swift */,
 				A00000000000000000000256 /* DailyReviewStore.swift */,
@@ -373,6 +398,8 @@
 				A00000000000000000000107 /* PromptLibraryPlaceholderView.swift in Sources */,
 				A00000000000000000000139 /* ReviewView.swift in Sources */,
 				A00000000000000000000108 /* ReviewPlaceholderView.swift in Sources */,
+				A00000000000000000000147 /* BackupExportView.swift in Sources */,
+				A00000000000000000000146 /* ShareSheet.swift in Sources */,
 				A00000000000000000000109 /* ModelDefaults.swift in Sources */,
 				A00000000000000000000110 /* DayPlan.swift in Sources */,
 				A00000000000000000000111 /* StudyTask.swift in Sources */,
@@ -392,6 +419,7 @@
 				A00000000000000000000128 /* FocusSessionStore.swift in Sources */,
 				A00000000000000000000131 /* MistakeRecordStore.swift in Sources */,
 				A00000000000000000000141 /* MistakeImageStore.swift in Sources */,
+				A00000000000000000000145 /* BackupExportStore.swift in Sources */,
 				A00000000000000000000124 /* PromptTemplateStore.swift in Sources */,
 				A00000000000000000000134 /* PromptRenderer.swift in Sources */,
 				A00000000000000000000125 /* DailyReviewStore.swift in Sources */,
