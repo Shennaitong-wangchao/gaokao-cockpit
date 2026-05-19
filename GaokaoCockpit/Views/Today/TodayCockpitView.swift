@@ -4,6 +4,8 @@ import SwiftUI
 struct TodayCockpitView: View {
     @Environment(\.modelContext) private var modelContext
 
+    private let onViewTasks: (() -> Void)?
+
     @State private var loadState: LoadState = .loading
     @State private var dayPlan: DayPlan?
     @State private var todayKey = DateKey.todayKey()
@@ -23,8 +25,13 @@ struct TodayCockpitView: View {
 
     @State private var saveMessage: String?
     @State private var taskMessage: String?
+    @State private var planTaskGenerationResult: PlanTaskGenerationResult?
     @State private var isShowingQuickAddTask = false
     @State private var activePlanTaskGeneration: PlanTaskGenerationState?
+
+    init(onViewTasks: (() -> Void)? = nil) {
+        self.onViewTasks = onViewTasks
+    }
 
     private var pendingTaskCount: Int {
         max(totalTaskCount - completedTaskCount, 0)
@@ -100,10 +107,12 @@ struct TodayCockpitView: View {
                             TodayTaskListCard(
                                 tasks: tasks,
                                 taskMessage: taskMessage,
+                                planTaskGenerationResult: planTaskGenerationResult,
                                 onToggleStatus: toggleTaskStatus,
                                 onQuickAdd: {
                                     isShowingQuickAddTask = true
-                                }
+                                },
+                                onViewTasks: viewGeneratedTasks
                             )
 
                             TomorrowFirstActionCard(text: $tomorrowFirstAction)
@@ -141,6 +150,7 @@ struct TodayCockpitView: View {
                 defaultSubject: mainSubject.trimmingCharacters(in: .whitespacesAndNewlines)
             ) {
                 refreshTaskData()
+                planTaskGenerationResult = nil
                 taskMessage = "已新增今日任务。"
             }
         }
@@ -155,6 +165,7 @@ struct TodayCockpitView: View {
         loadState = .loading
         saveMessage = nil
         taskMessage = nil
+        planTaskGenerationResult = nil
 
         do {
             let plan = try DayPlanStore.fetchOrCreateToday(in: modelContext)
@@ -213,6 +224,9 @@ struct TodayCockpitView: View {
     }
 
     private func preparePlanTaskGeneration() {
+        taskMessage = nil
+        planTaskGenerationResult = nil
+
         let parsedTasks = PlanTaskParser.parsePlanSections(
             top: topTasksText,
             baseline: baselineTasksText,
@@ -258,10 +272,20 @@ struct TodayCockpitView: View {
             )
             try refreshTaskDataThrowing(for: todayKey)
             saveMessage = "已保存今日计划。"
-            taskMessage = "已添加 \(result.created) 个任务，跳过 \(result.skipped) 个重复项。"
+            planTaskGenerationResult = PlanTaskGenerationResult(created: result.created, skipped: result.skipped)
+            taskMessage = nil
         } catch {
             taskMessage = "生成今日任务失败：\(error.localizedDescription)"
         }
+    }
+
+    private func viewGeneratedTasks() {
+        guard let onViewTasks else {
+            taskMessage = "请进入 Tasks 页查看已生成任务。"
+            return
+        }
+
+        onViewTasks()
     }
 
     private func applyDraftPlanFields(to plan: DayPlan) {
@@ -472,6 +496,15 @@ private struct PlanTaskConfirmationItem: Identifiable {
     let alreadyExists: Bool
 }
 
+private struct PlanTaskGenerationResult: Equatable {
+    let created: Int
+    let skipped: Int
+
+    var message: String {
+        "已添加 \(created) 个任务，跳过 \(skipped) 个重复项。"
+    }
+}
+
 private struct PlanTaskGenerationSheet: View {
     @Environment(\.dismiss) private var dismiss
 
@@ -579,8 +612,10 @@ private struct TodayTaskSummaryCard: View {
 private struct TodayTaskListCard: View {
     let tasks: [StudyTask]
     let taskMessage: String?
+    let planTaskGenerationResult: PlanTaskGenerationResult?
     let onToggleStatus: (StudyTask) -> Void
     let onQuickAdd: () -> Void
+    let onViewTasks: () -> Void
 
     var body: some View {
         TodayCard {
@@ -616,6 +651,13 @@ private struct TodayTaskListCard: View {
                     }
                 }
 
+                if let planTaskGenerationResult {
+                    PlanTaskGenerationResultView(
+                        result: planTaskGenerationResult,
+                        onViewTasks: onViewTasks
+                    )
+                }
+
                 if let taskMessage {
                     Text(taskMessage)
                         .font(.footnote)
@@ -623,6 +665,30 @@ private struct TodayTaskListCard: View {
                 }
             }
         }
+    }
+}
+
+private struct PlanTaskGenerationResultView: View {
+    let result: PlanTaskGenerationResult
+    let onViewTasks: () -> Void
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            Label(result.message, systemImage: "checkmark.circle.fill")
+                .font(.footnote.weight(.semibold))
+                .foregroundStyle(.green)
+
+            Button {
+                onViewTasks()
+            } label: {
+                Label("查看任务页", systemImage: "checklist")
+                    .frame(maxWidth: .infinity)
+            }
+            .buttonStyle(.bordered)
+        }
+        .padding(10)
+        .background(Color.green.opacity(0.1))
+        .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
     }
 }
 

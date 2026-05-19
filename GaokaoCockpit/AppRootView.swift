@@ -1,14 +1,19 @@
 import SwiftUI
 
 struct AppRootView: View {
+    @State private var selectedTab: AppTab = .today
+
     var body: some View {
-        TabView {
+        TabView(selection: $selectedTab) {
             NavigationStack {
-                TodayCockpitView()
+                TodayCockpitView {
+                    selectedTab = .tasks
+                }
             }
             .tabItem {
                 Label("今日", systemImage: "sun.max")
             }
+            .tag(AppTab.today)
 
             NavigationStack {
                 TaskListView()
@@ -16,6 +21,7 @@ struct AppRootView: View {
             .tabItem {
                 Label("任务", systemImage: "checklist")
             }
+            .tag(AppTab.tasks)
 
             NavigationStack {
                 MistakeSurgeryView()
@@ -23,6 +29,7 @@ struct AppRootView: View {
             .tabItem {
                 Label("错题", systemImage: "cross.case")
             }
+            .tag(AppTab.mistakes)
 
             NavigationStack {
                 PromptLibraryView()
@@ -30,6 +37,7 @@ struct AppRootView: View {
             .tabItem {
                 Label("Prompt", systemImage: "text.bubble")
             }
+            .tag(AppTab.prompts)
 
             NavigationStack {
                 ReviewView()
@@ -37,8 +45,17 @@ struct AppRootView: View {
             .tabItem {
                 Label("复盘", systemImage: "chart.line.uptrend.xyaxis")
             }
+            .tag(AppTab.reviews)
         }
     }
+}
+
+private enum AppTab: Hashable {
+    case today
+    case tasks
+    case mistakes
+    case prompts
+    case reviews
 }
 
 struct StagePlaceholderView: View {

@@ -55,6 +55,7 @@ struct MistakeEditorView: View {
     @State private var showingCameraPicker = false
     @State private var showingDeleteImageConfirmation = false
     @State private var showingDeleteConfirmation = false
+    @State private var activeImagePreview: MistakeImagePreviewItem?
     @State private var pendingImagePathsToDelete: Set<String> = []
     @State private var didCommitImageChanges = false
 
@@ -135,17 +136,33 @@ struct MistakeEditorView: View {
                 Section("题目图片") {
                     VStack(alignment: .leading, spacing: 12) {
                         if let image = currentQuestionImage {
-                            Image(uiImage: image)
-                                .resizable()
-                                .scaledToFit()
-                                .frame(maxHeight: 240)
-                                .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
-                                .accessibilityLabel("错题题图预览")
+                            Button {
+                                activeImagePreview = MistakeImagePreviewItem(path: questionImagePath)
+                            } label: {
+                                ZStack(alignment: .bottomTrailing) {
+                                    Image(uiImage: image)
+                                        .resizable()
+                                        .scaledToFit()
+                                        .frame(maxHeight: 240)
+                                        .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+
+                                    Image(systemName: "arrow.up.left.and.arrow.down.right")
+                                        .font(.caption.weight(.semibold))
+                                        .foregroundStyle(.white)
+                                        .padding(7)
+                                        .background(Color.black.opacity(0.55))
+                                        .clipShape(Circle())
+                                        .padding(8)
+                                }
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                            }
+                            .buttonStyle(.plain)
+                            .accessibilityLabel("打开题图预览")
                         } else if hasQuestionImagePath {
                             ContentUnavailableView {
                                 Label("题图暂时无法读取", systemImage: "photo.badge.exclamationmark")
                             } description: {
-                                Text("可以重新选择一张图片，或删除当前图片记录。")
+                                Text("题图读取失败，可能文件已被移动或删除。")
                             }
                             .frame(maxWidth: .infinity)
                             .padding(.vertical, 8)
@@ -308,6 +325,9 @@ struct MistakeEditorView: View {
                 CameraImagePicker { image in
                     savePickedImage(image)
                 }
+            }
+            .sheet(item: $activeImagePreview) { item in
+                MistakeImagePreviewView(path: item.path)
             }
             .onChange(of: selectedPhotoItem) {
                 guard let selectedPhotoItem else {

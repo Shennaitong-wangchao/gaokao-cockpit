@@ -16,6 +16,7 @@ struct MistakeSurgeryView: View {
     @State private var statusMessage: String?
     @State private var activeEditor: MistakeEditorMode?
     @State private var activePromptSheet: MistakePromptSheet?
+    @State private var activeImagePreview: MistakeImagePreviewItem?
 
     var body: some View {
         ScrollView {
@@ -59,6 +60,9 @@ struct MistakeSurgeryView: View {
                                 mistake: mistake,
                                 onTap: {
                                     activeEditor = .edit(mistake)
+                                },
+                                onPreviewImage: { path in
+                                    activeImagePreview = MistakeImagePreviewItem(path: path)
                                 },
                                 onGeneratePrompt: {
                                     prepareMistakePrompt(for: mistake)
@@ -121,6 +125,9 @@ struct MistakeSurgeryView: View {
             ) { message in
                 statusMessage = message
             }
+        }
+        .sheet(item: $activeImagePreview) { item in
+            MistakeImagePreviewView(path: item.path)
         }
     }
 
@@ -401,17 +408,21 @@ private struct MistakeFilterBar: View {
 private struct MistakeRow: View {
     let mistake: MistakeRecord
     let onTap: () -> Void
+    let onPreviewImage: (String) -> Void
     let onGeneratePrompt: () -> Void
     let onChangeStatus: (String) -> Void
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Button {
-                onTap()
-            } label: {
-                HStack(alignment: .top, spacing: 12) {
-                    MistakeQuestionThumbnail(path: mistake.questionImagePath)
+            HStack(alignment: .top, spacing: 12) {
+                MistakeQuestionThumbnail(
+                    path: mistake.questionImagePath,
+                    onTap: onPreviewImage
+                )
 
+                Button {
+                    onTap()
+                } label: {
                     VStack(alignment: .leading, spacing: 10) {
                         HStack(alignment: .top, spacing: 8) {
                             MistakeTag(text: mistake.subject.isEmpty ? "未设科目" : mistake.subject)
@@ -447,12 +458,12 @@ private struct MistakeRow: View {
                             .font(.caption2)
                             .foregroundStyle(.secondary)
                     }
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .contentShape(Rectangle())
                 }
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .contentShape(Rectangle())
+                .buttonStyle(.plain)
+                .accessibilityLabel("编辑错题手术")
             }
-            .buttonStyle(.plain)
-            .accessibilityLabel("编辑错题手术")
 
             HStack(spacing: 10) {
                 Button {
@@ -495,29 +506,50 @@ private struct MistakeRow: View {
 
 private struct MistakeQuestionThumbnail: View {
     let path: String
+    let onTap: (String) -> Void
 
     var body: some View {
         let cleanPath = path.trimmingCharacters(in: .whitespacesAndNewlines)
 
         if let image = MistakeImageStore.loadImage(path: cleanPath) {
-            Image(uiImage: image)
-                .resizable()
-                .scaledToFill()
-                .frame(width: 58, height: 58)
-                .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
-                .overlay {
-                    RoundedRectangle(cornerRadius: 8, style: .continuous)
-                        .stroke(Color(.separator).opacity(0.35), lineWidth: 1)
+            Button {
+                onTap(cleanPath)
+            } label: {
+                ZStack(alignment: .bottomTrailing) {
+                    Image(uiImage: image)
+                        .resizable()
+                        .scaledToFill()
+                        .frame(width: 58, height: 58)
+                        .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+                        .overlay {
+                            RoundedRectangle(cornerRadius: 8, style: .continuous)
+                                .stroke(Color(.separator).opacity(0.35), lineWidth: 1)
+                        }
+
+                    Image(systemName: "magnifyingglass")
+                        .font(.caption2.weight(.bold))
+                        .foregroundStyle(.white)
+                        .padding(4)
+                        .background(Color.black.opacity(0.55))
+                        .clipShape(Circle())
+                        .padding(4)
                 }
-                .accessibilityLabel("有题图")
+            }
+            .buttonStyle(.plain)
+            .accessibilityLabel("打开题图预览")
         } else if !cleanPath.isEmpty {
-            Image(systemName: "photo")
-                .font(.title3)
-                .foregroundStyle(.secondary)
-                .frame(width: 58, height: 58)
-                .background(Color(.tertiarySystemBackground))
-                .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
-                .accessibilityLabel("有题图但暂时无法读取")
+            Button {
+                onTap(cleanPath)
+            } label: {
+                Image(systemName: "photo.badge.exclamationmark")
+                    .font(.title3)
+                    .foregroundStyle(.secondary)
+                    .frame(width: 58, height: 58)
+                    .background(Color(.tertiarySystemBackground))
+                    .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+            }
+            .buttonStyle(.plain)
+            .accessibilityLabel("题图读取失败，打开说明")
         }
     }
 }
@@ -609,8 +641,8 @@ private extension MistakeRecord {
         }
 
         return questionImagePath.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
-            ? ""
-            : "题目文字未填写，但本错题有本地题图，请用户手动上传图片或补充题面。"
+            ? "题目文字和题图都未提供，请先补充题面。"
+            : "题目文字未填写。本错题有本地题图，请我在 AI 对话中同时上传图片，或先补充题面文字。"
     }
 
     private var currentConfusionText: String {

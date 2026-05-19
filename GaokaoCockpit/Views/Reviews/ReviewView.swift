@@ -74,6 +74,7 @@ struct ReviewView: View {
                                 bestMistakeId: $bestMistakeId,
                                 stateScoreEnd: $stateScoreEnd,
                                 tomorrowFirstAction: $tomorrowFirstAction,
+                                onApplyQuickTemplate: applyDailyQuickTemplate,
                                 onSave: saveDailyReview,
                                 onGeneratePrompt: generateDailyPrompt
                             )
@@ -225,6 +226,26 @@ struct ReviewView: View {
         } catch {
             statusMessage = "保存每日复盘失败：\(error.localizedDescription)"
         }
+    }
+
+    private func applyDailyQuickTemplate() {
+        if clean(completedSummary).isEmpty {
+            completedSummary = "完成了主要学习任务，记录了任务与专注情况。"
+        }
+
+        if clean(unfinishedSummary).isEmpty {
+            unfinishedSummary = "未完成内容待补充。"
+        }
+
+        if clean(biggestProblem).isEmpty {
+            biggestProblem = "今日最大问题待总结。"
+        }
+
+        if clean(tomorrowFirstAction).isEmpty {
+            tomorrowFirstAction = "打开 Today，先完成一个保底任务。"
+        }
+
+        statusMessage = "已填入空白复盘字段。"
     }
 
     private func saveWeeklyReview() {
@@ -466,6 +487,7 @@ private struct DailyReviewSection: View {
     @Binding var bestMistakeId: UUID?
     @Binding var stateScoreEnd: Int
     @Binding var tomorrowFirstAction: String
+    let onApplyQuickTemplate: () -> Void
     let onSave: () -> Void
     let onGeneratePrompt: () -> Void
 
@@ -489,7 +511,16 @@ private struct DailyReviewSection: View {
 
             ReviewCard {
                 VStack(alignment: .leading, spacing: 16) {
-                    ReviewSectionTitle(title: "每日复盘", systemImage: "square.and.pencil")
+                    HStack(alignment: .firstTextBaseline, spacing: 10) {
+                        ReviewSectionTitle(title: "每日复盘", systemImage: "square.and.pencil")
+                        Spacer()
+                        Button {
+                            onApplyQuickTemplate()
+                        } label: {
+                            Label("快速复盘模板", systemImage: "text.badge.checkmark")
+                        }
+                        .buttonStyle(.bordered)
+                    }
 
                     ReviewTextEditor(
                         title: "今日完成",

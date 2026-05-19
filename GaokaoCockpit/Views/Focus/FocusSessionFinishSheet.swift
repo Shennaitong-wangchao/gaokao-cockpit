@@ -38,7 +38,7 @@ struct FocusSessionFinishSheet: View {
 
         _actualMinutes = State(initialValue: Self.defaultActualMinutes(from: elapsedSeconds))
         _draftDistractionCount = State(initialValue: distractionCount)
-        _completionScore = State(initialValue: session.completionScore ?? 0)
+        _completionScore = State(initialValue: session.completionScore ?? 4)
         _sessionNote = State(initialValue: session.sessionNote)
         _nextAction = State(initialValue: session.nextAction)
     }
@@ -46,6 +46,20 @@ struct FocusSessionFinishSheet: View {
     var body: some View {
         NavigationStack {
             Form {
+                Section("快速结束") {
+                    Label("可以先保存本轮时间和分心次数，备注与下一步之后再补。", systemImage: "bolt.fill")
+                        .font(.footnote)
+                        .foregroundStyle(.secondary)
+
+                    Button {
+                        save(useQuickDefaults: true)
+                    } label: {
+                        Label("快速保存", systemImage: "checkmark.circle.fill")
+                            .frame(maxWidth: .infinity)
+                    }
+                    .buttonStyle(.borderedProminent)
+                }
+
                 Section("本轮结果") {
                     Stepper(value: $actualMinutes, in: 1...600) {
                         Text("实际 \(actualMinutes) 分钟")
@@ -82,6 +96,16 @@ struct FocusSessionFinishSheet: View {
                     Toggle("同步产出到任务备注", isOn: $syncOutputToTask)
                 }
 
+                Section {
+                    Button {
+                        save(useQuickDefaults: false)
+                    } label: {
+                        Label("保存详细记录", systemImage: "tray.and.arrow.down")
+                            .frame(maxWidth: .infinity)
+                    }
+                    .buttonStyle(.borderedProminent)
+                }
+
                 if let errorMessage {
                     Section {
                         Text(errorMessage)
@@ -101,24 +125,25 @@ struct FocusSessionFinishSheet: View {
                 }
 
                 ToolbarItem(placement: .confirmationAction) {
-                    Button("保存记录") {
-                        save()
+                    Button("保存详细记录") {
+                        save(useQuickDefaults: false)
                     }
                 }
             }
         }
     }
 
-    private func save() {
+    private func save(useQuickDefaults: Bool) {
         let cleanSessionNote = sessionNote.trimmingCharacters(in: .whitespacesAndNewlines)
         let cleanNextAction = nextAction.trimmingCharacters(in: .whitespacesAndNewlines)
+        let finalCompletionScore = useQuickDefaults && completionScore == 0 ? 4 : completionScore
 
         do {
             try FocusSessionStore.finishSession(
                 session,
                 actualMinutes: actualMinutes,
                 distractionCount: draftDistractionCount,
-                completionScore: completionScore == 0 ? nil : completionScore,
+                completionScore: finalCompletionScore == 0 ? nil : finalCompletionScore,
                 sessionNote: cleanSessionNote,
                 nextAction: cleanNextAction,
                 in: modelContext
