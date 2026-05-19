@@ -10,11 +10,13 @@ enum ModelDefaults {
 
     enum MistakeType {
         static let concept = "concept"
+        static let method = "method"
         static let calculation = "calculation"
         static let reading = "reading"
         static let model = "model"
         static let expression = "expression"
         static let time = "time"
+        static let other = "other"
     }
 
     enum ReviewStatus {

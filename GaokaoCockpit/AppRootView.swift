@@ -18,7 +18,7 @@ struct AppRootView: View {
             }
 
             NavigationStack {
-                MistakeSurgeryPlaceholderView()
+                MistakeSurgeryView()
             }
             .tabItem {
                 Label("错题", systemImage: "cross.case")

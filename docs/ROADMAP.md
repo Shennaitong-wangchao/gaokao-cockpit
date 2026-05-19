@@ -160,6 +160,8 @@
 
 ## Stage 5：实现错题手术
 
+当前进度：Stage 5 Mistake Surgery / 错题手术 MVP 已完成；正式 Prompt 生成和仓库联动留到 Stage 6。
+
 ### 目标
 
 实现 MistakeSurgeryView，让错题记录从“收藏”变成“诊断和复练”。

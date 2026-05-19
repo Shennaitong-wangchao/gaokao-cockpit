@@ -37,6 +37,9 @@
 		A00000000000000000000128 /* FocusSessionStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000259 /* FocusSessionStore.swift */; };
 		A00000000000000000000129 /* FocusSessionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000260 /* FocusSessionView.swift */; };
 		A00000000000000000000130 /* FocusSessionFinishSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000261 /* FocusSessionFinishSheet.swift */; };
+		A00000000000000000000131 /* MistakeRecordStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000262 /* MistakeRecordStore.swift */; };
+		A00000000000000000000132 /* MistakeSurgeryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000263 /* MistakeSurgeryView.swift */; };
+		A00000000000000000000133 /* MistakeEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000264 /* MistakeEditorView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -73,6 +76,9 @@
 		A00000000000000000000259 /* FocusSessionStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FocusSessionStore.swift; sourceTree = "<group>"; };
 		A00000000000000000000260 /* FocusSessionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FocusSessionView.swift; sourceTree = "<group>"; };
 		A00000000000000000000261 /* FocusSessionFinishSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FocusSessionFinishSheet.swift; sourceTree = "<group>"; };
+		A00000000000000000000262 /* MistakeRecordStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MistakeRecordStore.swift; sourceTree = "<group>"; };
+		A00000000000000000000263 /* MistakeSurgeryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MistakeSurgeryView.swift; sourceTree = "<group>"; };
+		A00000000000000000000264 /* MistakeEditorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MistakeEditorView.swift; sourceTree = "<group>"; };
 		A00000000000000000000220 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		A00000000000000000000221 /* PRODUCT_SPEC.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = PRODUCT_SPEC.md; sourceTree = "<group>"; };
 		A00000000000000000000222 /* DATA_MODEL.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = DATA_MODEL.md; sourceTree = "<group>"; };
@@ -161,6 +167,8 @@
 		A00000000000000000000407 /* Mistakes */ = {
 			isa = PBXGroup;
 			children = (
+				A00000000000000000000263 /* MistakeSurgeryView.swift */,
+				A00000000000000000000264 /* MistakeEditorView.swift */,
 				A00000000000000000000206 /* MistakeSurgeryPlaceholderView.swift */,
 			);
 			path = Mistakes;
@@ -208,6 +216,7 @@
 				A00000000000000000000253 /* DayPlanStore.swift */,
 				A00000000000000000000254 /* StudyTaskStore.swift */,
 				A00000000000000000000259 /* FocusSessionStore.swift */,
+				A00000000000000000000262 /* MistakeRecordStore.swift */,
 				A00000000000000000000255 /* PromptTemplateStore.swift */,
 				A00000000000000000000256 /* DailyReviewStore.swift */,
 				A00000000000000000000210 /* Stores README.md */,
@@ -320,6 +329,8 @@
 				A00000000000000000000129 /* FocusSessionView.swift in Sources */,
 				A00000000000000000000130 /* FocusSessionFinishSheet.swift in Sources */,
 				A00000000000000000000105 /* FocusSessionPlaceholderView.swift in Sources */,
+				A00000000000000000000132 /* MistakeSurgeryView.swift in Sources */,
+				A00000000000000000000133 /* MistakeEditorView.swift in Sources */,
 				A00000000000000000000106 /* MistakeSurgeryPlaceholderView.swift in Sources */,
 				A00000000000000000000107 /* PromptLibraryPlaceholderView.swift in Sources */,
 				A00000000000000000000108 /* ReviewPlaceholderView.swift in Sources */,
@@ -339,6 +350,7 @@
 				A00000000000000000000122 /* DayPlanStore.swift in Sources */,
 				A00000000000000000000123 /* StudyTaskStore.swift in Sources */,
 				A00000000000000000000128 /* FocusSessionStore.swift in Sources */,
+				A00000000000000000000131 /* MistakeRecordStore.swift in Sources */,
 				A00000000000000000000124 /* PromptTemplateStore.swift in Sources */,
 				A00000000000000000000125 /* DailyReviewStore.swift in Sources */,
 			);
