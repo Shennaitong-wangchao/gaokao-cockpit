@@ -43,7 +43,7 @@ struct MistakeSurgeryView: View {
                     ContentUnavailableView {
                         Label("还没有错题", systemImage: "cross.case")
                     } description: {
-                        Text("还没有错题。下一次做错题时，别只存答案，把错因拆出来。")
+                        Text("下一次做错题时，先拍题图，再拆错因。")
                     } actions: {
                         Button {
                             activeEditor = .add

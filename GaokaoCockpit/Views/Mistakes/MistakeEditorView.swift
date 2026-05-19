@@ -300,13 +300,13 @@ struct MistakeEditorView: View {
                 isPresented: $showingDeleteImageConfirmation,
                 titleVisibility: .visible
             ) {
-                Button("删除图片", role: .destructive) {
+                Button("删除题图", role: .destructive) {
                     deleteCurrentImage()
                 }
 
                 Button("取消", role: .cancel) {}
             } message: {
-                Text("保存错题后，图片记录会从这条错题中移除。")
+                Text("保存后，这条错题将不再关联这张题图。")
             }
             .confirmationDialog(
                 "确认删除这条错题手术？",
@@ -319,7 +319,7 @@ struct MistakeEditorView: View {
 
                 Button("取消", role: .cancel) {}
             } message: {
-                Text("删除后无法恢复。")
+                Text("这会删除错题记录，并清理已关联题图。操作无法恢复。")
             }
             .sheet(isPresented: $showingCameraPicker) {
                 CameraImagePicker { image in

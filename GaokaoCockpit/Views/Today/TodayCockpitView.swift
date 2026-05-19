@@ -122,7 +122,9 @@ struct TodayCockpitView: View {
                                 onSave: saveTodayPlan
                             )
 
-                            TodayDebugDisclosureCard()
+                            #if DEBUG
+                            DeveloperDiagnosticsDisclosureCard()
+                            #endif
                         }
                         .padding()
                         .frame(maxWidth: .infinity, alignment: .leading)
@@ -189,7 +191,7 @@ struct TodayCockpitView: View {
             try refreshTaskDataThrowing(for: plan.dayKey)
             loadState = .loaded
         } catch {
-            loadState = .failed(error.localizedDescription)
+            loadState = .failed("无法读取或创建今日 DayPlan：\(error.localizedDescription)")
         }
     }
 
@@ -217,7 +219,7 @@ struct TodayCockpitView: View {
         do {
             applyDraftPlanFields(to: plan)
             try modelContext.save()
-            saveMessage = "已保存今日计划：\(Date.now.formatted(date: .omitted, time: .shortened))"
+            saveMessage = "今日计划已保存。"
         } catch {
             saveMessage = "保存失败：\(error.localizedDescription)"
         }
@@ -302,7 +304,7 @@ struct TodayCockpitView: View {
         guard task.status == ModelDefaults.StudyTaskStatus.pending
             || task.status == ModelDefaults.StudyTaskStatus.done
         else {
-            taskMessage = "Stage 3A 只支持 pending / done 快速切换。"
+            taskMessage = "Today 只支持快速切换待做/完成；更多状态请到任务页处理。"
             return
         }
 
@@ -772,9 +774,9 @@ private struct SavePlanCard: View {
                 .buttonStyle(.borderedProminent)
 
                 if let saveMessage {
-                    Text(saveMessage)
+                    Label(saveMessage, systemImage: saveMessage.hasPrefix("保存失败") ? "exclamationmark.triangle" : "checkmark.circle.fill")
                         .font(.footnote)
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(saveMessage.hasPrefix("保存失败") ? Color.red : Color.green)
                 } else {
                     Text("编辑内容会先留在本页，点击按钮后统一写回 DayPlan。")
                         .font(.footnote)
@@ -785,7 +787,8 @@ private struct SavePlanCard: View {
     }
 }
 
-private struct TodayDebugDisclosureCard: View {
+#if DEBUG
+private struct DeveloperDiagnosticsDisclosureCard: View {
     @State private var isExpanded = false
 
     var body: some View {
@@ -794,18 +797,20 @@ private struct TodayDebugDisclosureCard: View {
                 .padding(.top, 10)
         } label: {
             VStack(alignment: .leading, spacing: 4) {
-                Label("Stage 2 Debug", systemImage: "wrench.and.screwdriver")
+                Label("开发诊断 / Developer Diagnostics", systemImage: "wrench.and.screwdriver")
                     .font(.footnote.weight(.semibold))
-                Text("Stage 2 Debug only - will be removed later.")
+                Text("仅 DEBUG 构建显示，用于本地持久化检查。")
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }
         }
-        .padding(12)
-        .background(Color(.secondarySystemBackground))
+        .font(.footnote)
+        .padding(10)
+        .background(Color(.tertiarySystemBackground))
         .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
     }
 }
+#endif
 
 private struct TodayQuickAddTaskSheet: View {
     @Environment(\.dismiss) private var dismiss

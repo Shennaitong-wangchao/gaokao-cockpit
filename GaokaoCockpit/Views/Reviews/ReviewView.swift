@@ -94,7 +94,7 @@ struct ReviewView: View {
                         if let statusMessage {
                             Text(statusMessage)
                                 .font(.footnote)
-                                .foregroundStyle(statusMessage.hasPrefix("已") ? Color.secondary : Color.red)
+                                .foregroundStyle(statusMessage.contains("失败") ? Color.red : Color.secondary)
                                 .frame(maxWidth: .infinity, alignment: .leading)
                         }
                     }
@@ -222,7 +222,7 @@ struct ReviewView: View {
             DayPlanStore.updateDayPlanTimestamp(dayPlan)
 
             try modelContext.save()
-            statusMessage = "已保存每日复盘，并同步明日第一步。"
+            statusMessage = "复盘已保存，明日第一步已回流到 Today。"
         } catch {
             statusMessage = "保存每日复盘失败：\(error.localizedDescription)"
         }
@@ -659,7 +659,7 @@ private struct BestMistakePicker: View {
                 .font(.subheadline.weight(.semibold))
 
             if mistakes.isEmpty {
-                Text("今天暂无可选错题。")
+                Text("今天还没有错题可选，空着也可以。")
                     .font(.footnote)
                     .foregroundStyle(.secondary)
             } else {

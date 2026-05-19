@@ -54,7 +54,7 @@ struct FocusSessionFinishSheet: View {
                     Button {
                         save(useQuickDefaults: true)
                     } label: {
-                        Label("快速保存", systemImage: "checkmark.circle.fill")
+                        Label("快速保存并返回", systemImage: "checkmark.circle.fill")
                             .frame(maxWidth: .infinity)
                     }
                     .buttonStyle(.borderedProminent)
@@ -136,12 +136,13 @@ struct FocusSessionFinishSheet: View {
     private func save(useQuickDefaults: Bool) {
         let cleanSessionNote = sessionNote.trimmingCharacters(in: .whitespacesAndNewlines)
         let cleanNextAction = nextAction.trimmingCharacters(in: .whitespacesAndNewlines)
+        let finalActualMinutes = max(actualMinutes, 1)
         let finalCompletionScore = useQuickDefaults && completionScore == 0 ? 4 : completionScore
 
         do {
             try FocusSessionStore.finishSession(
                 session,
-                actualMinutes: actualMinutes,
+                actualMinutes: finalActualMinutes,
                 distractionCount: draftDistractionCount,
                 completionScore: finalCompletionScore == 0 ? nil : finalCompletionScore,
                 sessionNote: cleanSessionNote,
@@ -149,7 +150,7 @@ struct FocusSessionFinishSheet: View {
                 in: modelContext
             )
 
-            task.actualMinutes = (task.actualMinutes ?? 0) + actualMinutes
+            task.actualMinutes = (task.actualMinutes ?? 0) + finalActualMinutes
             if markTaskDone {
                 task.status = ModelDefaults.StudyTaskStatus.done
             } else {

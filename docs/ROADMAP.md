@@ -317,7 +317,33 @@
 - 不引入第三方依赖。
 - 不做新数据模型大迁移。
 
-## Stage 10：未来扩展：AI API、RAG、GoodNotes/NotebookLM 索引、macOS 端、云同步
+## Stage 10：Stability / Debug Cleanup / QA Checklist / 闭环稳定性与调试入口收口
+
+当前进度：Stage 10 已完成。
+
+### 目标
+
+让 Gaokao Cockpit 更像可以主力使用的 v0.1 App，而不是开发调试版。重点收口调试入口，补强主流程反馈，并留下每次迭代后可人工验收的闭环清单。
+
+### 已完成内容
+
+- Today 页面不再默认展示 Stage 2 Debug 大块入口。
+- Stage 2 Debug 能力保留为 DEBUG 构建底部的低调“开发诊断 / Developer Diagnostics”折叠项。
+- Release 构建不显示开发诊断入口。
+- Today / Tasks / Focus / Mistakes / Prompts / Reviews 的空状态、保存反馈、复制反馈、删除确认文案做了轻量优化。
+- 新增 `docs/QA_CHECKLIST.md`，覆盖启动、Today、Tasks、Focus、Mistakes、Prompts、Reviews、持久化和构建验收。
+
+### 不做什么
+
+- 不接 AI API。
+- 不做 OCR。
+- 不做自动批改。
+- 不做云同步或账号。
+- 不引入第三方依赖。
+- 不做新数据模型迁移。
+- 不做复杂统计图表。
+
+## Stage 11：未来扩展：AI API、RAG、GoodNotes/NotebookLM 索引、macOS 端、云同步
 
 ### 目标
 

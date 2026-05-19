@@ -136,7 +136,7 @@ struct TaskListView: View {
             isLoading = false
         } catch {
             isLoading = false
-            statusMessage = "加载今日任务失败：\(error.localizedDescription)"
+            statusMessage = "加载任务失败，请重试。"
         }
     }
 
@@ -144,7 +144,7 @@ struct TaskListView: View {
         do {
             try refreshTaskDataThrowing()
         } catch {
-            statusMessage = "刷新任务失败：\(error.localizedDescription)"
+            statusMessage = "刷新任务失败，请重试。"
         }
     }
 
@@ -175,7 +175,7 @@ struct TaskListView: View {
             try refreshTaskDataThrowing()
             statusMessage = "已更新状态：\(TaskStatusOption.title(for: status))。"
         } catch {
-            statusMessage = "更新状态失败：\(error.localizedDescription)"
+            statusMessage = "更新状态失败，请重试。"
         }
     }
 }
@@ -228,7 +228,7 @@ private enum TaskFilter: String, CaseIterable, Identifiable {
     var emptyMessage: String {
         switch self {
         case .all:
-            return "先加一个能立刻开始的学习动作。"
+            return "还没有任务。可以从 Today 生成，或在这里手动添加。"
         case .unfinished:
             return "当前筛选下没有 pending 或 inProgress 任务。"
         case .done:
@@ -473,6 +473,7 @@ private struct TaskEditorSheet: View {
     @State private var status: String
     @State private var outputNote: String
     @State private var errorMessage: String?
+    @State private var showingDeleteConfirmation = false
 
     private let subjects = ["数学", "语文", "英语", "物理", "化学", "生物", "其他"]
     private let categories = ["做题", "预习", "复盘", "背诵", "整理", "其他"]
@@ -561,7 +562,7 @@ private struct TaskEditorSheet: View {
                 if case .edit = mode {
                     Section {
                         Button(role: .destructive) {
-                            deleteTask()
+                            showingDeleteConfirmation = true
                         } label: {
                             Label("删除任务", systemImage: "trash")
                         }
@@ -583,6 +584,19 @@ private struct TaskEditorSheet: View {
                     }
                     .disabled(title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
                 }
+            }
+            .confirmationDialog(
+                "确认删除这个任务？",
+                isPresented: $showingDeleteConfirmation,
+                titleVisibility: .visible
+            ) {
+                Button("删除任务", role: .destructive) {
+                    deleteTask()
+                }
+
+                Button("取消", role: .cancel) {}
+            } message: {
+                Text("删除后，这个任务和任务页里的记录将无法恢复。")
             }
         }
     }
@@ -633,7 +647,7 @@ private struct TaskEditorSheet: View {
 
             dismiss()
         } catch {
-            errorMessage = "保存任务失败：\(error.localizedDescription)"
+            errorMessage = "保存失败，请重试。"
         }
     }
 
@@ -647,7 +661,7 @@ private struct TaskEditorSheet: View {
             onChanged("已删除任务。")
             dismiss()
         } catch {
-            errorMessage = "删除任务失败：\(error.localizedDescription)"
+            errorMessage = "删除失败，请重试。"
         }
     }
 
