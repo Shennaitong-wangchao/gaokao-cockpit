@@ -9,6 +9,12 @@ enum BackupRestorePlanBuilder {
     ) -> BackupRestorePlan {
         let incomingSummary = dryRun.incomingSummary ?? BackupRecordSummary(envelope: envelope)
         let referenceSummary = makeReferenceSummary(envelope: envelope)
+        let referenceRepairSummary = BackupRestoreReferenceRepairSummary(
+            studyTasksWithMissingDayPlan: referenceSummary.invalidStudyTaskDayPlanReferences,
+            focusSessionsWithMissingTask: referenceSummary.invalidFocusSessionTaskReferences,
+            dailyReviewsWithMissingBestMistake: referenceSummary.invalidDailyReviewMistakeReferences,
+            totalRecordsNeedingRepair: referenceSummary.invalidReferenceCount
+        )
         let builtInPromptTemplates = envelope.promptTemplates.filter(\.isBuiltIn).count
         let skippedSummary = BackupRestoreSkippedSummary(
             duplicateDayPlans: dryRun.conflictSummary.duplicateDayKeys,
@@ -17,7 +23,7 @@ enum BackupRestorePlanBuilder {
             duplicateDailyReviews: dryRun.conflictSummary.duplicateDailyReviewDayKeys,
             duplicateWeeklyReviews: dryRun.conflictSummary.duplicateWeeklyReviewStartKeys,
             builtInPromptTemplates: builtInPromptTemplates,
-            invalidReferences: referenceSummary.invalidReferenceCount
+            invalidReferences: 0
         )
         let plannedSummary = BackupRestorePlannedSummary(
             dayPlansToInsert: remaining(
@@ -26,12 +32,9 @@ enum BackupRestorePlanBuilder {
             ),
             studyTasksToInsert: remaining(
                 incomingSummary.studyTaskCount,
-                skippedSummary.duplicateStudyTasks + referenceSummary.invalidStudyTaskDayPlanReferences
+                skippedSummary.duplicateStudyTasks
             ),
-            focusSessionsToInsert: remaining(
-                incomingSummary.focusSessionCount,
-                referenceSummary.invalidFocusSessionTaskReferences
-            ),
+            focusSessionsToInsert: incomingSummary.focusSessionCount,
             mistakeRecordsToInsert: remaining(
                 incomingSummary.mistakeRecordCount,
                 skippedSummary.duplicateMistakes
@@ -43,7 +46,7 @@ enum BackupRestorePlanBuilder {
             resourceItemsToInsert: incomingSummary.resourceItemCount,
             dailyReviewsToInsert: remaining(
                 incomingSummary.dailyReviewCount,
-                skippedSummary.duplicateDailyReviews + referenceSummary.invalidDailyReviewMistakeReferences
+                skippedSummary.duplicateDailyReviews
             ),
             weeklyReviewsToInsert: remaining(
                 incomingSummary.weeklyReviewCount,
@@ -68,7 +71,7 @@ enum BackupRestorePlanBuilder {
             envelope: envelope,
             dryRun: dryRun,
             skippedSummary: skippedSummary,
-            referenceSummary: referenceSummary
+            referenceRepairSummary: referenceRepairSummary
         )
 
         return BackupRestorePlan(
@@ -77,11 +80,23 @@ enum BackupRestorePlanBuilder {
             incomingSummary: incomingSummary,
             plannedSummary: plannedSummary,
             skippedSummary: skippedSummary,
+            referenceRepairSummary: referenceRepairSummary,
             idMappingSummary: idMappingSummary,
             imagePlanSummary: imagePlanSummary,
             warnings: warnings,
             errors: errors,
             isSafeToProceed: dryRun.isReadable && errors.isEmpty
+        )
+    }
+
+    static func makeReferenceRepairSummary(envelope: GaokaoBackupEnvelope) -> BackupRestoreReferenceRepairSummary {
+        let referenceSummary = makeReferenceSummary(envelope: envelope)
+
+        return BackupRestoreReferenceRepairSummary(
+            studyTasksWithMissingDayPlan: referenceSummary.invalidStudyTaskDayPlanReferences,
+            focusSessionsWithMissingTask: referenceSummary.invalidFocusSessionTaskReferences,
+            dailyReviewsWithMissingBestMistake: referenceSummary.invalidDailyReviewMistakeReferences,
+            totalRecordsNeedingRepair: referenceSummary.invalidReferenceCount
         )
     }
 
@@ -121,7 +136,7 @@ enum BackupRestorePlanBuilder {
         envelope: GaokaoBackupEnvelope,
         dryRun: BackupImportDryRunResult,
         skippedSummary: BackupRestoreSkippedSummary,
-        referenceSummary: ReferenceSummary
+        referenceRepairSummary: BackupRestoreReferenceRepairSummary
     ) -> [String] {
         var warnings = dryRun.validationWarnings
 
@@ -157,8 +172,10 @@ enum BackupRestorePlanBuilder {
             warnings.append("检测到 \(dryRun.imageRestoreSummary.missingBase64Count) 张错题图片缺少 base64，未来恢复时不会自动恢复这些图片。")
         }
 
-        if referenceSummary.invalidReferenceCount > 0 {
-            warnings.append("检测到 \(referenceSummary.invalidReferenceCount) 个跨记录引用无法在备份内找到目标，相关记录需要跳过或人工确认。")
+        if referenceRepairSummary.totalRecordsNeedingRepair > 0 {
+            warnings.append("检测到部分记录引用了备份中不存在的对象。Stage 15 将它们标记为需要引用修复，而不是直接视为跳过。未来真实恢复时可选择置空引用、重新映射或人工确认。")
+            warnings.append("需要引用修复的记录：StudyTask \(referenceRepairSummary.studyTasksWithMissingDayPlan) 条、FocusSession \(referenceRepairSummary.focusSessionsWithMissingTask) 条、DailyReview \(referenceRepairSummary.dailyReviewsWithMissingBestMistake) 条。")
+            warnings.append("当前 restore plan 仍保留这些记录的 planned insert 计数；未来真实恢复前需要先确定引用修复策略。")
         }
 
         if envelope.resourceItems.contains(where: { $0.uri.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty }) {

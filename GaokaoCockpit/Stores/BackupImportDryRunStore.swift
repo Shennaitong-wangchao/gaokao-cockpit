@@ -127,10 +127,12 @@ enum BackupImportDryRunStore {
         let localSummary = localData.recordSummary
         let conflictSummary = makeConflictSummary(envelope: envelope, localData: localData)
         let imageRestoreSummary = makeImageRestoreSummary(envelope: envelope)
+        let referenceRepairSummary = BackupRestorePlanBuilder.makeReferenceRepairSummary(envelope: envelope)
         let recommendation = makeRecommendation(
             validationErrors: validationResult.errors,
             conflictSummary: conflictSummary,
-            imageRestoreSummary: imageRestoreSummary
+            imageRestoreSummary: imageRestoreSummary,
+            referenceRepairSummary: referenceRepairSummary
         )
 
         let resultWithoutPlan = BackupImportDryRunResult(
@@ -300,7 +302,8 @@ enum BackupImportDryRunStore {
     private static func makeRecommendation(
         validationErrors: [String],
         conflictSummary: BackupConflictSummary,
-        imageRestoreSummary: BackupImageRestoreSummary
+        imageRestoreSummary: BackupImageRestoreSummary,
+        referenceRepairSummary: BackupRestoreReferenceRepairSummary
     ) -> String {
         if !validationErrors.isEmpty {
             return "不建议恢复：备份存在 schema、version、summary 或 checksum 校验错误。请优先重新导出或修正备份文件；本阶段不会写入 SwiftData 或恢复图片。"
@@ -334,6 +337,10 @@ enum BackupImportDryRunStore {
 
         if imageRestoreSummary.missingBase64Count > 0 {
             recommendations.append("部分错题图片缺少 base64，未来恢复时这些图片不可自动恢复。")
+        }
+
+        if referenceRepairSummary.totalRecordsNeedingRepair > 0 {
+            recommendations.append("检测到 \(referenceRepairSummary.totalRecordsNeedingRepair) 条记录需要引用修复；预检不会把它们直接判定为跳过，未来真实恢复前需要选择置空引用、重新映射或人工确认。")
         }
 
         if recommendations.isEmpty {

@@ -498,7 +498,44 @@
 - 不引入第三方依赖。
 - 不做数据模型迁移。
 
-## Stage 15：未来扩展：AI API、RAG、GoodNotes/NotebookLM 索引、macOS 端、云同步
+## Stage 15：Restore Plan Semantics / 恢复计划语义修正与风险分类
+
+当前进度：Stage 15 已完成。
+
+### 目标
+
+修正 Stage 14 restore plan 对 invalid references 的表达方式：invalid reference 不默认等同于 skipped，而是进入 reference repair / needs review，为未来真实恢复时的置空引用、重新映射或人工确认留下空间。
+
+### 已完成内容
+
+- 新增纯结构 `BackupRestoreReferenceRepairSummary`，统计缺失 DayPlan 的 StudyTask、缺失 Task 的 FocusSession、缺失 Mistake 的 DailyReview，以及总计需要修复的记录数。
+- `BackupRestorePlan` 新增 `referenceRepairSummary`，并为旧 plan 解码提供默认空值。
+- `BackupRestorePlanBuilder` 不再把 invalid references 计入 skipped，也不再仅因 invalid reference 扣减 planned counts。
+- Restore plan warnings 和 dry-run recommendation 明确说明未来真实恢复前需要引用修复策略。
+- 备份页“未来恢复计划预览”新增“需要处理的引用”区域，保留 planned / skipped 展示。
+- 新增 `fixtures/backups/invalid-reference-backup.json`，用于手动验证 reference repair 区域。
+- 更新恢复策略、备份格式、restore plan 测试说明和 QA checklist。
+
+### 验收标准
+
+- duplicate conflict 和内置 Prompt 仍进入 `skippedSummary`。
+- invalid reference 进入 `referenceRepairSummary` / needs review，不默认视为 skipped。
+- StudyTask、FocusSession、DailyReview 的 planned counts 不会仅因 invalid reference 自动减少。
+- UI 明确说明 invalid references 未来需要置空引用、重新映射或人工确认。
+- Debug / Release 构建通过。
+
+### 不做什么
+
+- 不做真实导入恢复。
+- 不写入 SwiftData。
+- 不恢复图片文件。
+- 不覆盖任何用户数据。
+- 不接 AI API。
+- 不做云同步、账号、加密、zip。
+- 不引入第三方依赖。
+- 不做数据模型迁移。
+
+## Stage 16：未来扩展：AI API、RAG、GoodNotes/NotebookLM 索引、macOS 端、云同步
 
 ### 目标
 

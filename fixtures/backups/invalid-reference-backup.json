@@ -1,0 +1,82 @@
+{
+  "appName": "Gaokao Cockpit",
+  "appVersion": "1.0 (fixture)",
+  "exportVersion": 1,
+  "schemaName": "GaokaoCockpitBackup",
+  "exportSchemaVersion": 1,
+  "exportedAt": "2026-05-20T10:00:00Z",
+  "notes": "Stage 15 invalid-reference fixture for restore plan reference repair checks. Checksum fields are intentionally empty for fixture use.",
+  "recordSummary": {
+    "dayPlanCount": 0,
+    "studyTaskCount": 1,
+    "focusSessionCount": 1,
+    "mistakeRecordCount": 0,
+    "promptTemplateCount": 0,
+    "resourceItemCount": 0,
+    "dailyReviewCount": 1,
+    "weeklyReviewCount": 0,
+    "mistakeImageCount": 0
+  },
+  "integrity": {
+    "jsonPayloadSHA256": "",
+    "payloadWithoutChecksumSHA256": "",
+    "imageTotalBytes": 0,
+    "missingImageCount": 0,
+    "warningCount": 0
+  },
+  "warnings": [],
+  "dayPlans": [],
+  "studyTasks": [
+    {
+      "id": "12121212-1212-1212-1212-121212121212",
+      "dayPlanId": "abababab-abab-abab-abab-abababababab",
+      "dayKey": "2026-05-20",
+      "title": "引用缺失的任务样本",
+      "subject": "数学",
+      "category": "top",
+      "estimatedMinutes": 40,
+      "actualMinutes": null,
+      "status": "pending",
+      "outputNote": "",
+      "createdAt": "2026-05-20T06:50:00Z",
+      "updatedAt": "2026-05-20T06:50:00Z"
+    }
+  ],
+  "focusSessions": [
+    {
+      "id": "34343434-3434-3434-3434-343434343434",
+      "taskId": "cdcdcdcd-cdcd-cdcd-cdcd-cdcdcdcdcdcd",
+      "dayKey": "2026-05-20",
+      "subject": "数学",
+      "startTime": "2026-05-20T07:10:00Z",
+      "endTime": "2026-05-20T07:50:00Z",
+      "plannedMinutes": 40,
+      "actualMinutes": 40,
+      "distractionCount": 0,
+      "completionScore": 4,
+      "sessionNote": "该专注记录指向备份中不存在的 StudyTask。",
+      "nextAction": "等待未来恢复时选择引用修复策略。",
+      "createdAt": "2026-05-20T07:10:00Z"
+    }
+  ],
+  "mistakeRecords": [],
+  "promptTemplates": [],
+  "resourceItems": [],
+  "dailyReviews": [
+    {
+      "id": "56565656-5656-5656-5656-565656565656",
+      "dayKey": "2026-05-20",
+      "date": "2026-05-20T00:00:00Z",
+      "completedSummary": "用于验证 bestMistakeId 缺失引用。",
+      "unfinishedSummary": "",
+      "biggestProblem": "引用目标不在备份内。",
+      "bestMistakeId": "efefefef-efef-efef-efef-efefefefefef",
+      "stateScoreEnd": 4,
+      "tomorrowFirstAction": "确认 restore plan 不把无效引用直接视为跳过。",
+      "createdAt": "2026-05-20T12:00:00Z",
+      "updatedAt": "2026-05-20T12:05:00Z"
+    }
+  ],
+  "weeklyReviews": [],
+  "mistakeImages": []
+}

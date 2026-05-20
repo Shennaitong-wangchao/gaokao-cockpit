@@ -580,7 +580,33 @@ private struct BackupRestorePlanPreviewSection: View {
                 BackupSummaryRow(title: "重复错题", value: "\(plan.skippedSummary.duplicateMistakes)")
                 BackupSummaryRow(title: "内置 Prompt", value: "\(plan.skippedSummary.builtInPromptTemplates)")
                 BackupSummaryRow(title: "重复复盘", value: "\(skippedReviewCount)")
-                BackupSummaryRow(title: "无效引用", value: "\(plan.skippedSummary.invalidReferences)")
+            }
+            .font(.caption)
+
+            VStack(alignment: .leading, spacing: 7) {
+                Text("需要处理的引用")
+                    .font(.caption.weight(.semibold))
+
+                BackupSummaryRow(
+                    title: "StudyTask 缺失 DayPlan",
+                    value: "\(plan.referenceRepairSummary.studyTasksWithMissingDayPlan)"
+                )
+                BackupSummaryRow(
+                    title: "FocusSession 缺失 Task",
+                    value: "\(plan.referenceRepairSummary.focusSessionsWithMissingTask)"
+                )
+                BackupSummaryRow(
+                    title: "DailyReview 缺失 Mistake",
+                    value: "\(plan.referenceRepairSummary.dailyReviewsWithMissingBestMistake)"
+                )
+                BackupSummaryRow(
+                    title: "总计需修复",
+                    value: "\(plan.referenceRepairSummary.totalRecordsNeedingRepair)"
+                )
+
+                Text("这些记录不会在预检中被直接判定为跳过。未来真正恢复时需要选择置空引用、重新映射或人工确认。")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
             }
             .font(.caption)
 

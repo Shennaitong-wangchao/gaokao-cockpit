@@ -105,11 +105,16 @@
 - [ ] Dry-run 后能看到“未来恢复计划预览”。
 - [ ] Restore plan 显示 `merge-with-new-ids` 策略。
 - [ ] Restore plan 显示 planned/skipped counts。
+- [ ] Restore plan 能区分 duplicate skipped 和 invalid reference needsReview / referenceRepair。
+- [ ] invalid references 有明确 UI 文案，说明不会在预检中被直接判定为跳过。
+- [ ] invalid references 不会让 planned counts 自动减少。
 - [ ] Restore plan 明确说明本阶段不会写入数据。
 - [ ] `fixtures/backups/minimal-valid-backup.json` 可解析并显示 summary。
 - [ ] `fixtures/backups/duplicate-conflict-backup.json` 可解析；本地存在相同样本时能显示冲突。
+- [ ] `fixtures/backups/invalid-reference-backup.json` 可解析，并在“需要处理的引用”区域显示 3 条引用修复。
 - [ ] Dry-run 和 restore plan 不改变本地数据数量。
 - [ ] Dry-run 后本地数据数量不改变。
+- [ ] 导入预检不写入 SwiftData。
 - [ ] 选择错误文件或损坏 JSON 不会崩溃。
 - [ ] UI 明确说明 Dry-run 不会导入数据。
 
