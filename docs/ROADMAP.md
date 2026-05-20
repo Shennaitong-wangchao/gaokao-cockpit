@@ -650,7 +650,51 @@
 - 不改 SwiftData 模型字段类型。
 - 不改变备份 schema。
 
-## Stage 19：未来扩展：AI API、RAG、GoodNotes/NotebookLM 索引、macOS 端、云同步
+## Stage 19：Prompt Library Daily Usability Polish / Prompt 库日用体验增强
+
+当前进度：Stage 19 已完成。
+
+### 目标
+
+提升 Prompt Library 日用效率，让常用模板更容易找到，增加最近使用记录，不接 AI API，不改变 SwiftData 模型。
+
+### 已完成内容
+
+- 新增 `RecentPromptStore`，基于 UserDefaults 轻量记录最近使用的 Prompt 模板，最多保留 20 条。
+- 复制 Prompt 后自动调用 `RecentPromptStore.recordUse`，记录最近使用。
+- PromptLibraryView 新增"常用 Prompt"区域，按 usageCount 降序显示前 5 个使用过的模板。
+- PromptLibraryView 新增"最近使用"区域，显示最近复制的 5 个模板，支持点击打开详情。
+- 搜索结果和分类结果按 usageCount 降序排序，更容易找到常用模板。
+- 最近使用模板被删除后点击提示"这个模板当前不存在，可能已被移除或重命名。"。
+- 搜索或分类筛选时不显示常用/最近使用区域，避免页面混乱。
+- 不接 AI API，不保存 AI 返回，不保存变量输入历史。
+
+### 验收标准
+
+- 复制 Prompt 后 usageCount 增加。
+- 复制 Prompt 后最近使用出现。
+- 常用 Prompt 区按 usageCount 显示前 5 个使用过的模板。
+- 最近使用点击能打开模板详情。
+- 搜索 + 分类筛选仍正常。
+- 错题/复盘 initialValues 入口不受影响。
+- 备份 schema 和 exportVersion 不变。
+- Debug / Release 构建通过。
+
+### 不做什么
+
+- 不接 AI API。
+- 不做聊天窗口。
+- 不保存 AI 返回。
+- 不保存变量输入历史。
+- 不做模型选择器。
+- 不做云同步或账号。
+- 不引入第三方依赖。
+- 不改 SwiftData 模型字段类型。
+- 不改变备份 schema。
+- 不改变 exportVersion。
+- RecentPromptStore 不纳入备份导出。
+
+## Stage 20：未来扩展：AI API、RAG、GoodNotes/NotebookLM 索引、macOS 端、云同步
 
 ### 目标
 

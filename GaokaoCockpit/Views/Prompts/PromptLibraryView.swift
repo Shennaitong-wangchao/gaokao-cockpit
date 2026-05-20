@@ -12,6 +12,7 @@ struct PromptLibraryView: View {
     @State private var isLoading = true
     @State private var statusMessage: String?
     @State private var selectedTemplate: PromptTemplate?
+    @State private var recentEntries: [RecentPromptEntry] = []
 
     var body: some View {
         ScrollView {
@@ -26,6 +27,19 @@ struct PromptLibraryView: View {
                 PromptCategoryFilterBar(selectedCategory: $selectedCategory)
 
                 PromptSearchBar(searchText: $searchText)
+
+                if searchText.isEmpty && selectedCategory == .all {
+                    PromptFrequentSection(templates: frequentTemplates) { template in
+                        selectedTemplate = template
+                    }
+
+                    PromptRecentSection(
+                        recentEntries: recentEntries,
+                        onSelect: { entry in
+                            handleRecentEntryTap(entry)
+                        }
+                    )
+                }
 
                 if isLoading {
                     ProgressView("正在加载 Prompt 模板")
@@ -76,6 +90,7 @@ struct PromptLibraryView: View {
             if !isLoading {
                 refreshTemplates()
             }
+            refreshRecentEntries()
         }
         .onChange(of: selectedCategory) {
             refreshTemplates()
@@ -89,9 +104,51 @@ struct PromptLibraryView: View {
         .sheet(item: $selectedTemplate) { template in
             PromptTemplateDetailView(template: template) { message in
                 refreshTemplates()
+                refreshRecentEntries()
                 statusMessage = message
             }
         }
+    }
+
+    private var frequentTemplates: [PromptTemplate] {
+        let allTemplates = templates
+        let used = allTemplates.filter { $0.usageCount > 0 }
+        let sorted = used.sorted { $0.usageCount > $1.usageCount }
+        return Array(sorted.prefix(5))
+    }
+
+    private func refreshRecentEntries() {
+        recentEntries = RecentPromptStore.recent(limit: 5)
+    }
+
+    private func handleRecentEntryTap(_ entry: RecentPromptEntry) {
+        do {
+            // 优先通过 templateId 查找
+            if let template = try findTemplateById(entry.templateId) {
+                selectedTemplate = template
+                return
+            }
+
+            // 如果找不到，再用 title 查找
+            if let template = try PromptTemplateStore.fetchTemplate(title: entry.title, in: modelContext) {
+                selectedTemplate = template
+                return
+            }
+
+            // 找不到则提示
+            statusMessage = "这个模板当前不存在，可能已被移除或重命名。"
+        } catch {
+            statusMessage = "查找模板失败：\(error.localizedDescription)"
+        }
+    }
+
+    private func findTemplateById(_ id: UUID) throws -> PromptTemplate? {
+        let descriptor = FetchDescriptor<PromptTemplate>(
+            predicate: #Predicate<PromptTemplate> { template in
+                template.id == id
+            }
+        )
+        return try modelContext.fetch(descriptor).first
     }
 
     private func loadTemplates() {
@@ -127,6 +184,24 @@ struct PromptLibraryView: View {
                 template.title.lowercased().contains(query)
                     || template.templateDescription.lowercased().contains(query)
                     || template.category.lowercased().contains(query)
+            }
+            // 搜索结果按 usageCount 降序排序
+            results.sort { lhs, rhs in
+                if lhs.usageCount != rhs.usageCount {
+                    return lhs.usageCount > rhs.usageCount
+                }
+                return lhs.title < rhs.title
+            }
+        } else {
+            // 无搜索时按 category + usageCount desc + title 排序
+            results.sort { lhs, rhs in
+                if lhs.category != rhs.category {
+                    return lhs.category < rhs.category
+                }
+                if lhs.usageCount != rhs.usageCount {
+                    return lhs.usageCount > rhs.usageCount
+                }
+                return lhs.title < rhs.title
             }
         }
 
@@ -341,6 +416,123 @@ private struct PromptLibraryCard<Content: View>: View {
             .padding(16)
             .background(Color(.secondarySystemBackground))
             .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+    }
+}
+
+private struct PromptFrequentSection: View {
+    let templates: [PromptTemplate]
+    let onSelect: (PromptTemplate) -> Void
+
+    var body: some View {
+        if templates.isEmpty {
+            VStack(alignment: .leading, spacing: 8) {
+                Text("常用 Prompt")
+                    .font(.headline)
+
+                Text("复制几次模板后，这里会出现常用 Prompt。")
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+                    .padding(.vertical, 8)
+            }
+        } else {
+            VStack(alignment: .leading, spacing: 10) {
+                Text("常用 Prompt")
+                    .font(.headline)
+
+                ForEach(templates, id: \.id) { template in
+                    Button {
+                        onSelect(template)
+                    } label: {
+                        HStack(spacing: 10) {
+                            VStack(alignment: .leading, spacing: 4) {
+                                Text(template.title)
+                                    .font(.subheadline.weight(.semibold))
+                                    .foregroundStyle(.primary)
+                                    .lineLimit(1)
+
+                                Text(PromptCategory.from(template.category).displayName)
+                                    .font(.caption)
+                                    .foregroundStyle(.secondary)
+                            }
+
+                            Spacer(minLength: 8)
+
+                            Text("\(template.usageCount) 次")
+                                .font(.caption.monospacedDigit())
+                                .foregroundStyle(.secondary)
+                        }
+                        .padding(10)
+                        .background(Color(.tertiarySystemBackground))
+                        .clipShape(RoundedRectangle(cornerRadius: 6, style: .continuous))
+                    }
+                    .buttonStyle(.plain)
+                }
+            }
+        }
+    }
+}
+
+private struct PromptRecentSection: View {
+    let recentEntries: [RecentPromptEntry]
+    let onSelect: (RecentPromptEntry) -> Void
+
+    var body: some View {
+        if !recentEntries.isEmpty {
+            VStack(alignment: .leading, spacing: 10) {
+                Text("最近使用")
+                    .font(.headline)
+
+                ForEach(recentEntries) { entry in
+                    Button {
+                        onSelect(entry)
+                    } label: {
+                        HStack(spacing: 10) {
+                            VStack(alignment: .leading, spacing: 4) {
+                                Text(entry.title)
+                                    .font(.subheadline.weight(.semibold))
+                                    .foregroundStyle(.primary)
+                                    .lineLimit(1)
+
+                                Text(PromptCategory.from(entry.category).displayName)
+                                    .font(.caption)
+                                    .foregroundStyle(.secondary)
+                            }
+
+                            Spacer(minLength: 8)
+
+                            Text(relativeTime(entry.usedAt))
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                        }
+                        .padding(10)
+                        .background(Color(.tertiarySystemBackground))
+                        .clipShape(RoundedRectangle(cornerRadius: 6, style: .continuous))
+                    }
+                    .buttonStyle(.plain)
+                }
+            }
+        }
+    }
+
+    private func relativeTime(_ date: Date) -> String {
+        let interval = Date.now.timeIntervalSince(date)
+        let minutes = Int(interval / 60)
+        let hours = Int(interval / 3600)
+        let days = Int(interval / 86400)
+
+        if minutes < 1 {
+            return "刚刚"
+        } else if minutes < 60 {
+            return "\(minutes) 分钟前"
+        } else if hours < 24 {
+            return "\(hours) 小时前"
+        } else if days < 7 {
+            return "\(days) 天前"
+        } else {
+            let formatter = DateFormatter()
+            formatter.dateFormat = "MM-dd"
+            return formatter.string(from: date)
+        }
     }
 }
 

@@ -136,6 +136,7 @@ struct PromptTemplateDetailView: View {
 
         do {
             try PromptTemplateStore.incrementUsageCount(template, in: modelContext)
+            RecentPromptStore.recordUse(template: template)
             let message = "已复制，可以粘贴到 AI 工具了。"
             statusMessage = message
             onCopied(message)
