@@ -1,4 +1,73 @@
+# macOS
 .DS_Store
+.AppleDouble
+.LSOverride
+Icon?
+._*
+
+# Xcode user state
+xcuserdata/
+*.xcuserstate
+*.xcscmblueprint
+
+# Xcode build output
 DerivedData/
 build/
-*.xcuserstate
+Build/
+*.xcarchive
+*.ipa
+*.dSYM
+*.dSYM.zip
+
+# Swift Package Manager
+.build/
+.swiftpm/
+
+# Local app data and exports
+data/
+logs/
+tmp/
+temp/
+Backups/
+ExportedBackups/
+*.sqlite
+*.sqlite3
+*.sqlite-shm
+*.sqlite-wal
+*.store
+*.store-shm
+*.store-wal
+gaokao-cockpit-backup-*.json
+
+# Environment and secrets
+.env
+.env.*
+!.env.example
+secrets/
+*.p8
+*.p12
+*.cer
+*.certSigningRequest
+*.mobileprovision
+*.provisionprofile
+AuthKey_*.p8
+
+# Tooling caches
+.cache/
+.codex/
+.claude/
+.vscode/
+.idea/
+
+# Logs and reports
+*.log
+*.xcresult
+fastlane/report.xml
+fastlane/Preview.html
+fastlane/screenshots/
+fastlane/test_output/
+
+# Keep synthetic fixtures tracked.
+!fixtures/
+!fixtures/backups/
+!fixtures/backups/*.json

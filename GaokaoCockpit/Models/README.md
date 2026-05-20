@@ -1,5 +1,10 @@
 # Models
 
-Stage 2A contains the first SwiftData model set for the local-first learning loop.
+This folder contains the SwiftData `@Model` types and storage-value wrappers for the local learning loop.
 
-The models intentionally avoid SwiftData relationships for now and use simple `UUID` / `dayKey` fields for light references.
+Model design rules:
+
+- Store stable primitive values that are easy to export and validate.
+- Prefer stored UUID references and day keys over hard SwiftData relationships for now.
+- Keep user-visible status/category values as `String` in SwiftData and expose type-safe enum wrappers in UI/store code.
+- Update `docs/DATA_MODEL.md` and backup docs when model semantics change.

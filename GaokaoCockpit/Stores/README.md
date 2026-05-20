@@ -1,20 +1,18 @@
 # Stores
 
-Stage 2B keeps storage deliberately small. These files are lightweight SwiftData query helpers, not a full Repository layer.
+This folder contains small SwiftData helpers and pure domain utilities. These files are not a broad repository abstraction; they keep repeated fetch, save, prompt, backup, and date-key logic out of SwiftUI views.
 
-- `AppModelContainerFactory` builds the SwiftData `ModelContainer`.
-- `PromptTemplateSeeder` inserts built-in templates once for a fresh local store.
-- `DateKey` creates stable `yyyy-MM-dd` keys and simple week key ranges.
-- `DayPlanStore` fetches or creates a `DayPlan` by `dayKey`.
-- `StudyTaskStore` creates and counts tasks by `dayKey`.
-- `PromptTemplateStore` fetches built-in templates and tracks template usage.
-- `DailyReviewStore` reserves simple daily review fetch/create helpers for Stage 7.
+Key groups:
 
-Current association strategy:
+- `AppModelContainerFactory` creates the SwiftData model container.
+- `DateKey` produces stable day/week keys.
+- `DayPlanStore`, `StudyTaskStore`, `FocusSessionStore`, `MistakeRecordStore`, `DailyReviewStore`, and `WeeklyReviewStore` provide focused data access helpers.
+- `PromptTemplateSeeder`, `PromptTemplateStore`, `PromptRenderer`, and `RecentPromptStore` support built-in/custom prompt workflows.
+- `BackupExportStore`, `BackupValidationStore`, `BackupImportDryRunStore`, `BackupRestorePlan`, and `BackupRestorePlanBuilder` support local export, validation, dry-run, and restore-plan preview.
 
-- Records use `dayKey` for day-based lookup.
-- Optional model references use stored `UUID` values such as `dayPlanId` or `bestMistakeId`.
-- SwiftData relationships are intentionally not used yet.
-- `@Attribute(.unique)` is intentionally not used yet; duplicate prevention is handled by fetch-or-create helper logic where needed.
+Guidelines:
 
-Stage 3, Stage 4, and Stage 5 screens should reuse these helpers so SwiftUI views do not repeat the same SwiftData predicates and sort descriptors.
+- Keep store methods narrow and easy to call from SwiftUI.
+- Do not write SwiftData during backup dry-run or restore-plan preview.
+- Do not overwrite user custom prompt templates from the built-in seeder.
+- Update docs and QA when backup semantics or model contracts change.

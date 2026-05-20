@@ -112,7 +112,7 @@ struct PromptTemplateEditorView: View {
                     .padding(.vertical, 4)
                 }
 
-                if case .edit(let template) = mode {
+                if case .edit = mode {
                     Section {
                         Button(role: .destructive) {
                             showDeleteConfirmation = true

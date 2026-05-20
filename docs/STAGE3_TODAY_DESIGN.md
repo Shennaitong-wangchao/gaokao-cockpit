@@ -1,4 +1,6 @@
-# Stage 3 TodayCockpitView 设计方案
+# Stage 3 TodayCockpitView Design / 历史设计方案
+
+This document is retained as historical design context for the Today cockpit. It helped shape the early implementation, but the current codebase has moved beyond Stage 3. For the current architecture and release status, see [ARCHITECTURE.md](ARCHITECTURE.md) and [ROADMAP.md](ROADMAP.md).
 
 ## 一、信息架构
 

@@ -1,10 +1,12 @@
-# 用户体验流程文档
+# UX Flow / 用户体验流程
+
+This document describes the intended user journeys and screen-level information architecture for the open-source app. Some ASCII sketches are historical low-fidelity references; current implementation details may differ, and code should be treated as the source of truth for exact UI behavior.
 
 本文档描述 Gaokao Cockpit 第一版的主要体验流程和页面草图。草图为低保真 ASCII，只表达信息结构，不代表最终 UI。
 
 ## 总体导航
 
-第一版建议使用底部 Tab 或首页入口卡片，但重点不是导航样式，而是每天能快速进入闭环。
+当前实现使用底部 Tab。重点不是导航样式本身，而是每天能快速进入学习闭环。
 
 ```text
 ┌───────────────────────────────┐
@@ -35,7 +37,7 @@
 ```text
 首次打开
   -> 显示一句定位
-  -> 选择高考年份
+  -> 可选填写考试年份
   -> 可选填写目标分数
   -> 进入今日驾驶舱
 ```
@@ -47,7 +49,7 @@
 │ 高考驾驶舱                     │
 │ 每天启动、专注、错题、复盘。    │
 │                               │
-│ 高考年份  [2028 v]             │
+│ 考试年份  [可选]                │
 │ 目标分数  [700]                │
 │                               │
 │ [进入今日]                     │
@@ -438,4 +440,3 @@ WeeklyReviewView 草图：
 - 不把 Prompt 做成聊天产品。
 - 不用社交激励替代真实学习动作。
 - 不让用户花很多时间美化任务系统。
-

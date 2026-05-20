@@ -1,6 +1,8 @@
-# Restore Plan 测试说明
+# Restore Plan Tests / Restore Plan 测试说明
 
-当前项目没有测试 target。Stage 15 不为了 restore plan 新增测试 target，避免扩大 Xcode 工程复杂度；验证重点放在 fixture、导入 dry-run UI 和纯函数 `BackupRestorePlanBuilder` 的构建结果。
+This document describes manual fixture checks for backup import dry-run and restore-plan preview. Fixture files are intentionally small and synthetic; do not add real exported backups or private study records to this repository.
+
+当前项目没有测试 target。现阶段不为了 restore plan 新增测试 target，避免扩大 Xcode 工程复杂度；验证重点放在 fixture、导入 dry-run UI 和纯函数 `BackupRestorePlanBuilder` 的构建结果。
 
 ## 手动验证 fixture
 
@@ -70,7 +72,7 @@ Restore plan 应显示：
 
 ## 不写入验证
 
-Stage 15 不写入 SwiftData，也不恢复图片。验证方式：
+当前 dry-run 不写入 SwiftData，也不恢复图片。验证方式：
 
 - Dry-run 前记录导出页显示的 local summary。
 - 选择 fixture 完成 dry-run。

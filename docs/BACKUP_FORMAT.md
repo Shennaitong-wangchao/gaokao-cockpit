@@ -1,6 +1,8 @@
-# Gaokao Cockpit 备份格式说明
+# Backup Format / 备份格式
 
-当前备份格式用于本地 JSON 导出，目标是让学习数据可保存、可阅读、可校验。Stage 15 支持导出、结构验证、导入 Dry-run 预检和未来恢复计划预览，并能区分 duplicate skipped 与 invalid reference needs review；仍不支持真正导入恢复，不会写入 SwiftData，也不会覆盖现有数据。
+当前备份格式用于本地 JSON 导出，目标是让学习数据可保存、可阅读、可校验。当前实现支持导出、结构验证、导入 Dry-run 预检和未来恢复计划预览，并能区分 duplicate skipped 与 invalid reference needs review；仍不支持真正导入恢复，不会写入 SwiftData，也不会覆盖现有数据。
+
+Backups can contain private study records and embedded mistake images. Do not publish real exported backups in issues, pull requests, fixtures, or documentation.
 
 恢复策略另见 [RESTORE_STRATEGY.md](RESTORE_STRATEGY.md)。Restore plan 验证说明另见 [RESTORE_PLAN_TESTS.md](RESTORE_PLAN_TESTS.md)。
 
@@ -85,20 +87,20 @@ Dry-run 会比较备份数据与当前本地数据：
 
 Dry-run 后会生成一个纯结构 `BackupRestorePlan` 预览。该 plan 默认策略为 `merge-with-new-ids`，只统计 incoming、planned inserts、skipped、reference repair、ID mapping 和 image plan，不生成真实新 UUID，不写文件，也不访问 `ModelContext`。
 
-Stage 15 为 `BackupRestorePlan` 新增 `referenceRepairSummary`：
+当前 `BackupRestorePlan` 包含 `referenceRepairSummary`：
 
 - `studyTasksWithMissingDayPlan`
 - `focusSessionsWithMissingTask`
 - `dailyReviewsWithMissingBestMistake`
 - `totalRecordsNeedingRepair`
 
-这些字段只存在于 dry-run / restore plan 级别，用于说明未来真实恢复前需要处理的引用修复风险，不改变备份 JSON 文件格式，也不会写入 SwiftData。为保持旧 plan 消费方兼容，`skippedSummary.invalidReferences` 字段保留，但 Stage 15 的 builder 不再把 invalid references 默认归入 skipped。
+这些字段只存在于 dry-run / restore plan 级别，用于说明未来真实恢复前需要处理的引用修复风险，不改变备份 JSON 文件格式，也不会写入 SwiftData。为保持旧 plan 消费方兼容，`skippedSummary.invalidReferences` 字段保留，但当前 builder 不再把 invalid references 默认归入 skipped。
 
 Dry-run 和 restore plan 不会调用 `context.insert`、`context.delete` 或 `context.save`，不会写入 SwiftData，不会恢复图片文件，也不会覆盖现有数据。未来真正恢复建议优先使用 `merge-with-new-ids`，而不是原 ID 覆盖；同日计划、同名任务、疑似重复错题和重复复盘应默认跳过或进入人工确认。
 
 ## Fixture 说明
 
-Stage 14/15 新增小规模 fixture，用于结构解析、dry-run 和 restore plan 人工验证：
+小规模 fixture 用于结构解析、dry-run 和 restore plan 人工验证：
 
 - `fixtures/backups/minimal-valid-backup.json`：包含 1 个 DayPlan、2 个 StudyTask、1 个 FocusSession、1 个 MistakeRecord、1 个 DailyReview 和 1 个 mistakeImage。
 - `fixtures/backups/duplicate-conflict-backup.json`：包含容易与本地样本冲突的 dayKey、任务标题、错题 fingerprint、复盘 key，以及一个内置 PromptTemplate。

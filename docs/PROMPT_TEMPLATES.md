@@ -1,6 +1,8 @@
-# 内置 Prompt 模板设计
+# Prompt Templates / Prompt 模板
 
-第一版不接 AI API。Prompt 模板只负责生成完整提示词，并复制到剪贴板，由用户粘贴到自己使用的 AI 工具中。
+This document describes the local prompt-template system. The app renders prompts on device and copies them to the clipboard; it does not call an AI API, store AI responses, or require network access.
+
+Prompt 模板只负责生成完整提示词，并复制到剪贴板，由用户粘贴到自己使用的 AI 工具中。
 
 ## 自定义模板
 

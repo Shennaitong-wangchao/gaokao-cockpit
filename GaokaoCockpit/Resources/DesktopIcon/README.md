@@ -1,4 +1,4 @@
-# Desktop icon
+# Desktop Icon
 
 This folder contains a standalone desktop icon for GaoKao Cockpit.
 
@@ -7,3 +7,5 @@ This folder contains a standalone desktop icon for GaoKao Cockpit.
 - `GaokaoCockpit-DesktopIcon.svg`: editable source artwork.
 
 The Xcode app icon is generated from the same artwork in `../Assets.xcassets/AppIcon.appiconset`.
+
+These assets are intended to be redistributed with the open-source project. Do not add private screenshots or learner-specific images to this folder.

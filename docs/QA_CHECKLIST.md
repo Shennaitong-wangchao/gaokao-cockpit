@@ -1,6 +1,6 @@
-# Gaokao Cockpit 闭环自测清单
+# QA Checklist / 闭环自测清单
 
-每次迭代后按模块人工打勾。优先验证真实学习闭环，不需要自动化测试。
+每次迭代后按模块人工打勾。优先验证真实学习闭环；当前项目还没有 XCTest target，因此公开发布前应至少完成一次手动冒烟回归和命令行构建。
 
 ## 1. 启动与 Today
 
@@ -165,9 +165,20 @@
 
 ## 9. 构建
 
-- [ ] Stage 17 后 Today / Tasks / Focus / Mistakes / Prompts / Reviews / Backup 主流程均完成一次冒烟回归。
-- [ ] Stage 17 后新增 Components 文件均已加入 Xcode target。
+- [ ] Stage 20 后 Today / Tasks / Focus / Mistakes / Prompts / Reviews / Backup 主流程均完成一次冒烟回归。
+- [ ] 新增 Swift 文件均已加入 Xcode target。
 - [ ] `xcodebuild -project GaokaoCockpit.xcodeproj -scheme GaokaoCockpit -configuration Debug -destination 'generic/platform=iOS Simulator' build` 通过。
 - [ ] `xcodebuild -project GaokaoCockpit.xcodeproj -scheme GaokaoCockpit -configuration Debug -destination 'platform=iOS Simulator,name=iPhone 17' build` 通过。
 - [ ] `xcodebuild -project GaokaoCockpit.xcodeproj -scheme GaokaoCockpit -configuration Release -destination 'generic/platform=iOS Simulator' build` 通过。
 - [ ] `git diff --check` 通过。
+
+## 10. 开源发布前检查
+
+- [ ] README 当前阶段、功能范围和非目标与代码一致。
+- [ ] `docs/README.md` 文档索引可用。
+- [ ] `LICENSE`、`CONTRIBUTING.md`、`SECURITY.md`、`CODE_OF_CONDUCT.md` 和 `CHANGELOG.md` 存在。
+- [ ] `.gitignore` 覆盖 Xcode 构建产物、用户状态、签名材料、本地数据库、日志、导出备份和密钥文件。
+- [ ] `git add -n .` 不包含私有数据、真实备份、日志、签名证书或本地数据库。
+- [ ] 敏感信息扫描没有发现真实 token、API key、私钥、密码或私有学习记录。
+- [ ] fixtures 只包含合成数据。
+- [ ] 不公开 `.DS_Store`、`DerivedData`、`xcuserdata`、`.env`、本地 SwiftData store 或导出的个人备份。
