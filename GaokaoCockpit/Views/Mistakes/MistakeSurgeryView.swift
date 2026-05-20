@@ -6,8 +6,8 @@ struct MistakeSurgeryView: View {
     @Environment(\.modelContext) private var modelContext
 
     @State private var mistakes: [MistakeRecord] = []
-    @State private var selectedSubjectFilter: MistakeSubjectFilter = .all
-    @State private var selectedReviewFilter: MistakeReviewFilter = .all
+    @State private var selectedSubjectFilter: LearningSubject?
+    @State private var selectedReviewFilter: ReviewStatus?
     @State private var totalMistakeCount = 0
     @State private var scheduledCount = 0
     @State private var reviewedCount = 0
@@ -154,36 +154,36 @@ struct MistakeSurgeryView: View {
 
     private func refreshMistakeDataThrowing() throws {
         mistakes = try MistakeRecordStore.fetchMistakes(
-            subject: selectedSubjectFilter.subject,
-            reviewStatus: selectedReviewFilter.reviewStatus,
+            subject: selectedSubjectFilter?.storageValue,
+            reviewStatus: selectedReviewFilter?.storageValue,
             in: modelContext
         )
         totalMistakeCount = try MistakeRecordStore.countMistakes(in: modelContext)
         scheduledCount = try MistakeRecordStore.countMistakes(
-            reviewStatus: ModelDefaults.ReviewStatus.scheduled,
+            reviewStatus: ReviewStatus.scheduled.storageValue,
             in: modelContext
         )
         reviewedCount = try MistakeRecordStore.countMistakes(
-            reviewStatus: ModelDefaults.ReviewStatus.reviewed,
+            reviewStatus: ReviewStatus.reviewed.storageValue,
             in: modelContext
         )
         masteredCount = try MistakeRecordStore.countMistakes(
-            reviewStatus: ModelDefaults.ReviewStatus.mastered,
+            reviewStatus: ReviewStatus.mastered.storageValue,
             in: modelContext
         )
     }
 
-    private func updateReviewStatus(_ mistake: MistakeRecord, to status: String) {
-        guard mistake.reviewStatus != status else {
+    private func updateReviewStatus(_ mistake: MistakeRecord, to status: ReviewStatus) {
+        guard ReviewStatus.from(mistake.reviewStatus) != status else {
             return
         }
 
         do {
-            mistake.reviewStatus = status
+            mistake.reviewStatus = status.storageValue
             MistakeRecordStore.updateMistakeTimestamp(mistake)
             try modelContext.save()
             try refreshMistakeDataThrowing()
-            statusMessage = "已更新复习状态：\(ReviewStatusOption.title(for: status))。"
+            statusMessage = "已更新复习状态：\(status.displayName)。"
         } catch {
             statusMessage = "更新复习状态失败：\(error.localizedDescription)"
         }
@@ -210,84 +210,6 @@ private struct MistakePromptSheet: Identifiable {
     let id = UUID()
     let template: PromptTemplate
     let values: [String: String]
-}
-
-private enum MistakeSubjectFilter: String, CaseIterable, Identifiable {
-    case all
-    case math
-    case chinese
-    case english
-    case physics
-    case chemistry
-    case biology
-    case other
-
-    var id: String { rawValue }
-
-    var title: String {
-        switch self {
-        case .all:
-            return "全部"
-        case .math:
-            return "数学"
-        case .chinese:
-            return "语文"
-        case .english:
-            return "英语"
-        case .physics:
-            return "物理"
-        case .chemistry:
-            return "化学"
-        case .biology:
-            return "生物"
-        case .other:
-            return "其他"
-        }
-    }
-
-    var subject: String? {
-        self == .all ? nil : title
-    }
-}
-
-private enum MistakeReviewFilter: String, CaseIterable, Identifiable {
-    case all
-    case new
-    case scheduled
-    case reviewed
-    case mastered
-
-    var id: String { rawValue }
-
-    var title: String {
-        switch self {
-        case .all:
-            return "全部"
-        case .new:
-            return ReviewStatusOption.title(for: ModelDefaults.ReviewStatus.new)
-        case .scheduled:
-            return ReviewStatusOption.title(for: ModelDefaults.ReviewStatus.scheduled)
-        case .reviewed:
-            return ReviewStatusOption.title(for: ModelDefaults.ReviewStatus.reviewed)
-        case .mastered:
-            return ReviewStatusOption.title(for: ModelDefaults.ReviewStatus.mastered)
-        }
-    }
-
-    var reviewStatus: String? {
-        switch self {
-        case .all:
-            return nil
-        case .new:
-            return ModelDefaults.ReviewStatus.new
-        case .scheduled:
-            return ModelDefaults.ReviewStatus.scheduled
-        case .reviewed:
-            return ModelDefaults.ReviewStatus.reviewed
-        case .mastered:
-            return ModelDefaults.ReviewStatus.mastered
-        }
-    }
 }
 
 private struct MistakeSurgeryHeaderView: View {
@@ -360,8 +282,8 @@ private struct MistakeSummaryValue: View {
 }
 
 private struct MistakeFilterBar: View {
-    @Binding var selectedSubjectFilter: MistakeSubjectFilter
-    @Binding var selectedReviewFilter: MistakeReviewFilter
+    @Binding var selectedSubjectFilter: LearningSubject?
+    @Binding var selectedReviewFilter: ReviewStatus?
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
@@ -370,15 +292,21 @@ private struct MistakeFilterBar: View {
 
             HStack(spacing: 10) {
                 Menu {
-                    ForEach(MistakeSubjectFilter.allCases) { filter in
+                    Button {
+                        selectedSubjectFilter = nil
+                    } label: {
+                        Label("全部", systemImage: selectedSubjectFilter == nil ? "checkmark" : "book.closed")
+                    }
+
+                    ForEach(LearningSubject.allCases) { subject in
                         Button {
-                            selectedSubjectFilter = filter
+                            selectedSubjectFilter = subject
                         } label: {
-                            Label(filter.title, systemImage: selectedSubjectFilter == filter ? "checkmark" : "book.closed")
+                            Label(subject.displayName, systemImage: selectedSubjectFilter == subject ? "checkmark" : "book.closed")
                         }
                     }
                 } label: {
-                    Label("科目：\(selectedSubjectFilter.title)", systemImage: "book.closed")
+                    Label("科目：\(selectedSubjectFilter?.displayName ?? "全部")", systemImage: "book.closed")
                         .frame(maxWidth: .infinity)
                         .lineLimit(1)
                         .minimumScaleFactor(0.85)
@@ -386,15 +314,21 @@ private struct MistakeFilterBar: View {
                 .buttonStyle(.bordered)
 
                 Menu {
-                    ForEach(MistakeReviewFilter.allCases) { filter in
+                    Button {
+                        selectedReviewFilter = nil
+                    } label: {
+                        Label("全部", systemImage: selectedReviewFilter == nil ? "checkmark" : "arrow.triangle.2.circlepath")
+                    }
+
+                    ForEach(ReviewStatus.allCases) { status in
                         Button {
-                            selectedReviewFilter = filter
+                            selectedReviewFilter = status
                         } label: {
-                            Label(filter.title, systemImage: selectedReviewFilter == filter ? "checkmark" : "arrow.triangle.2.circlepath")
+                            Label(status.displayName, systemImage: selectedReviewFilter == status ? "checkmark" : "arrow.triangle.2.circlepath")
                         }
                     }
                 } label: {
-                    Label("状态：\(selectedReviewFilter.title)", systemImage: "arrow.triangle.2.circlepath")
+                    Label("状态：\(selectedReviewFilter?.displayName ?? "全部")", systemImage: "arrow.triangle.2.circlepath")
                         .frame(maxWidth: .infinity)
                         .lineLimit(1)
                         .minimumScaleFactor(0.85)
@@ -410,7 +344,7 @@ private struct MistakeRow: View {
     let onTap: () -> Void
     let onPreviewImage: (String) -> Void
     let onGeneratePrompt: () -> Void
-    let onChangeStatus: (String) -> Void
+    let onChangeStatus: (ReviewStatus) -> Void
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
@@ -425,7 +359,7 @@ private struct MistakeRow: View {
                 } label: {
                     VStack(alignment: .leading, spacing: 10) {
                         HStack(alignment: .top, spacing: 8) {
-                            MistakeTag(text: mistake.subject.isEmpty ? "未设科目" : mistake.subject)
+                            MistakeTag(text: mistake.surgerySubjectText)
                             MistakeTag(text: mistake.chapter.isEmpty ? "未设章节" : mistake.chapter)
                             Spacer(minLength: 8)
                             MistakeStatusBadge(status: mistake.reviewStatus)
@@ -598,6 +532,12 @@ private struct MistakeSurgeryCard<Content: View>: View {
 }
 
 private extension MistakeRecord {
+    var surgerySubjectText: String {
+        subject.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+            ? "未设科目"
+            : LearningSubject.from(subject).displayName
+    }
+
     var questionPreviewText: String {
         let text = questionText.trimmingCharacters(in: .whitespacesAndNewlines)
         if !text.isEmpty {
@@ -674,28 +614,28 @@ private extension MistakeRecord {
 
     context.insert(
         MistakeRecord(
-            subject: "数学",
+            subject: LearningSubject.math.storageValue,
             chapter: "导数与函数零点",
             source: "周练第 17 题",
             questionText: "已知函数 f(x)=... 求参数 a 的取值范围。",
-            mistakeType: ModelDefaults.MistakeType.model,
+            mistakeType: MistakeType.model.storageValue,
             rootCause: "看到参数范围题没有先判断是否适合分离参数，直接进入机械求导。",
             questionSignal: "参数取值范围 + 恒成立结构。",
             correctModel: "先判断分离参数、端点、极值、边界。",
             variantTask: "明天完成 3 道同型题。",
-            reviewStatus: ModelDefaults.ReviewStatus.scheduled
+            reviewStatus: ReviewStatus.scheduled.storageValue
         )
     )
     context.insert(
         MistakeRecord(
-            subject: "英语",
+            subject: LearningSubject.english.storageValue,
             chapter: "阅读理解",
             source: "模考 C 篇",
             questionText: "",
-            mistakeType: ModelDefaults.MistakeType.reading,
+            mistakeType: MistakeType.reading.storageValue,
             rootCause: "定位句和选项之间发生偷换概念时没有回看原文。",
             questionSignal: "选项里出现绝对化表达。",
-            reviewStatus: ModelDefaults.ReviewStatus.new
+            reviewStatus: ReviewStatus.new.storageValue
         )
     )
 

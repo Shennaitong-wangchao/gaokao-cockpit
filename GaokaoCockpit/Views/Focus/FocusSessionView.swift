@@ -80,8 +80,8 @@ struct FocusSessionView: View {
                     .lineLimit(3)
 
                 HStack(spacing: 8) {
-                    FocusTag(text: task.subject.isEmpty ? "未设科目" : task.subject)
-                    FocusTag(text: task.category.isEmpty ? "未分类" : task.category)
+                    FocusTag(text: task.focusSubjectText)
+                    FocusTag(text: task.focusCategoryText)
                     FocusTag(text: task.estimatedMinutes.map { "预计 \($0) 分钟" } ?? "预计未填写")
                 }
             }
@@ -300,8 +300,8 @@ private struct FocusMetric: View {
     let task = StudyTask(
         dayKey: DateKey.todayKey(),
         title: "导数压轴题 6 道",
-        subject: "数学",
-        category: "做题",
+        subject: LearningSubject.math.storageValue,
+        category: StudyTaskCategory.exercise.storageValue,
         estimatedMinutes: 45
     )
 
@@ -311,4 +311,18 @@ private struct FocusMetric: View {
         FocusSessionView(task: task)
     }
     .modelContainer(container)
+}
+
+private extension StudyTask {
+    var focusSubjectText: String {
+        subject.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+            ? "未设科目"
+            : LearningSubject.from(subject).displayName
+    }
+
+    var focusCategoryText: String {
+        category.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+            ? "未分类"
+            : StudyTaskCategory.from(category).displayName
+    }
 }

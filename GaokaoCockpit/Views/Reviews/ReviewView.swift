@@ -879,7 +879,9 @@ private extension MistakeRecord {
         let subjectText = subject.trimmingCharacters(in: .whitespacesAndNewlines)
         let sourceText = source.trimmingCharacters(in: .whitespacesAndNewlines)
         let chapterText = chapter.trimmingCharacters(in: .whitespacesAndNewlines)
-        let typeText = mistakeType.trimmingCharacters(in: .whitespacesAndNewlines)
+        let typeText = mistakeType.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+            ? ""
+            : MistakeType.from(mistakeType).displayName
 
         let headline = [subjectText, chapterText, typeText]
             .filter { !$0.isEmpty }

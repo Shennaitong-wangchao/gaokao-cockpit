@@ -35,21 +35,21 @@ struct MistakeEditorView: View {
     private let draftMistakeID: UUID
     private let originalQuestionImagePath: String
 
-    @State private var subject: String
+    @State private var subject: LearningSubject
     @State private var chapter: String
     @State private var source: String
     @State private var questionText: String
     @State private var questionImagePath: String
     @State private var mySolution: String
     @State private var correctSolution: String
-    @State private var mistakeType: String
+    @State private var mistakeType: MistakeType
     @State private var rootCause: String
     @State private var questionSignal: String
     @State private var correctModel: String
     @State private var variantTask: String
     @State private var hasNextReminder: Bool
     @State private var nextReminder: Date
-    @State private var reviewStatus: String
+    @State private var reviewStatus: ReviewStatus
     @State private var errorMessage: String?
     @State private var selectedPhotoItem: PhotosPickerItem?
     @State private var showingCameraPicker = false
@@ -70,40 +70,40 @@ struct MistakeEditorView: View {
         case .add:
             initialMistakeID = UUID()
             initialImagePath = ""
-            _subject = State(initialValue: "数学")
+            _subject = State(initialValue: .math)
             _chapter = State(initialValue: "")
             _source = State(initialValue: "")
             _questionText = State(initialValue: "")
             _questionImagePath = State(initialValue: "")
             _mySolution = State(initialValue: "")
             _correctSolution = State(initialValue: "")
-            _mistakeType = State(initialValue: ModelDefaults.MistakeType.model)
+            _mistakeType = State(initialValue: .model)
             _rootCause = State(initialValue: "")
             _questionSignal = State(initialValue: "")
             _correctModel = State(initialValue: "")
             _variantTask = State(initialValue: "")
             _hasNextReminder = State(initialValue: false)
             _nextReminder = State(initialValue: Date())
-            _reviewStatus = State(initialValue: ModelDefaults.ReviewStatus.new)
+            _reviewStatus = State(initialValue: .new)
 
         case .edit(let mistake):
             initialMistakeID = mistake.id
             initialImagePath = mistake.questionImagePath.trimmingCharacters(in: .whitespacesAndNewlines)
-            _subject = State(initialValue: mistake.subject.isEmpty ? "其他" : mistake.subject)
+            _subject = State(initialValue: LearningSubject.from(mistake.subject))
             _chapter = State(initialValue: mistake.chapter)
             _source = State(initialValue: mistake.source)
             _questionText = State(initialValue: mistake.questionText)
             _questionImagePath = State(initialValue: mistake.questionImagePath)
             _mySolution = State(initialValue: mistake.mySolution)
             _correctSolution = State(initialValue: mistake.correctSolution)
-            _mistakeType = State(initialValue: mistake.mistakeType.isEmpty ? ModelDefaults.MistakeType.model : mistake.mistakeType)
+            _mistakeType = State(initialValue: mistake.mistakeType.isEmpty ? .model : MistakeType.from(mistake.mistakeType))
             _rootCause = State(initialValue: mistake.rootCause)
             _questionSignal = State(initialValue: mistake.questionSignal)
             _correctModel = State(initialValue: mistake.correctModel)
             _variantTask = State(initialValue: mistake.variantTask)
             _hasNextReminder = State(initialValue: mistake.nextReminder != nil)
             _nextReminder = State(initialValue: mistake.nextReminder ?? Date())
-            _reviewStatus = State(initialValue: mistake.reviewStatus.isEmpty ? ModelDefaults.ReviewStatus.new : mistake.reviewStatus)
+            _reviewStatus = State(initialValue: mistake.reviewStatus.isEmpty ? .new : ReviewStatus.from(mistake.reviewStatus))
         }
 
         self.draftMistakeID = initialMistakeID
@@ -115,8 +115,8 @@ struct MistakeEditorView: View {
             Form {
                 Section("基础信息") {
                     Picker("科目", selection: $subject) {
-                        ForEach(pickerOptions(defaults: MistakeFormOptions.subjects, current: subject), id: \.self) { subject in
-                            Text(subject).tag(subject)
+                        ForEach(LearningSubject.allCases) { subject in
+                            Text(subject.displayName).tag(subject)
                         }
                     }
 
@@ -221,8 +221,8 @@ struct MistakeEditorView: View {
 
                 Section("手术拆解") {
                     Picker("错误类型", selection: $mistakeType) {
-                        ForEach(mistakeTypeOptions) { option in
-                            Text(option.title).tag(option.type)
+                        ForEach(MistakeType.allCases) { type in
+                            Text(type.displayName).tag(type)
                         }
                     }
 
@@ -245,8 +245,8 @@ struct MistakeEditorView: View {
 
                 Section("复习状态") {
                     Picker("状态", selection: $reviewStatus) {
-                        ForEach(reviewStatusOptions) { option in
-                            Text(option.title).tag(option.status)
+                        ForEach(ReviewStatus.allCases) { status in
+                            Text(status.displayName).tag(status)
                         }
                     }
 
@@ -292,7 +292,7 @@ struct MistakeEditorView: View {
                     Button("保存") {
                         saveMistake()
                     }
-                    .disabled(clean(subject).isEmpty)
+                    .disabled(subject.storageValue.isEmpty)
                 }
             }
             .confirmationDialog(
@@ -454,26 +454,8 @@ struct MistakeEditorView: View {
         pendingImagePathsToDelete.removeAll()
     }
 
-    private var mistakeTypeOptions: [MistakeTypeOption] {
-        let options = MistakeTypeOption.all
-        guard !mistakeType.isEmpty, !options.contains(where: { $0.type == mistakeType }) else {
-            return options
-        }
-
-        return options + [MistakeTypeOption(type: mistakeType, title: mistakeType, systemImage: "questionmark.circle")]
-    }
-
-    private var reviewStatusOptions: [ReviewStatusOption] {
-        let options = ReviewStatusOption.all
-        guard !reviewStatus.isEmpty, !options.contains(where: { $0.status == reviewStatus }) else {
-            return options
-        }
-
-        return options + [ReviewStatusOption(status: reviewStatus, title: reviewStatus, systemImage: "questionmark.circle")]
-    }
-
     private func saveMistake() {
-        let cleanSubject = clean(subject)
+        let cleanSubject = subject.storageValue
         guard !cleanSubject.isEmpty else {
             errorMessage = "请先选择或填写科目。"
             return
@@ -493,13 +475,13 @@ struct MistakeEditorView: View {
                     questionImagePath: clean(questionImagePath),
                     mySolution: clean(mySolution),
                     correctSolution: clean(correctSolution),
-                    mistakeType: mistakeType,
+                    mistakeType: mistakeType.storageValue,
                     rootCause: clean(rootCause),
                     questionSignal: clean(questionSignal),
                     correctModel: clean(correctModel),
                     variantTask: clean(variantTask),
                     nextReminder: reminder,
-                    reviewStatus: reviewStatus,
+                    reviewStatus: reviewStatus.storageValue,
                     in: modelContext
                 )
                 try deletePendingImagePathsAfterSave()
@@ -514,13 +496,13 @@ struct MistakeEditorView: View {
                 mistake.questionImagePath = clean(questionImagePath)
                 mistake.mySolution = clean(mySolution)
                 mistake.correctSolution = clean(correctSolution)
-                mistake.mistakeType = mistakeType
+                mistake.mistakeType = mistakeType.storageValue
                 mistake.rootCause = clean(rootCause)
                 mistake.questionSignal = clean(questionSignal)
                 mistake.correctModel = clean(correctModel)
                 mistake.variantTask = clean(variantTask)
                 mistake.nextReminder = reminder
-                mistake.reviewStatus = reviewStatus
+                mistake.reviewStatus = reviewStatus.storageValue
                 MistakeRecordStore.updateMistakeTimestamp(mistake)
                 try modelContext.save()
                 try deletePendingImagePathsAfterSave()
@@ -556,65 +538,57 @@ struct MistakeEditorView: View {
         }
     }
 
-    private func pickerOptions(defaults: [String], current: String) -> [String] {
-        let cleanCurrent = clean(current)
-        guard !cleanCurrent.isEmpty, !defaults.contains(cleanCurrent) else {
-            return defaults
-        }
-
-        return defaults + [cleanCurrent]
-    }
-
     private func clean(_ value: String) -> String {
         value.trimmingCharacters(in: .whitespacesAndNewlines)
     }
 }
 
-enum MistakeFormOptions {
-    static let subjects = ["数学", "语文", "英语", "物理", "化学", "生物", "其他"]
-}
-
 struct MistakeTypeOption: Identifiable {
-    let type: String
-    let title: String
+    let type: MistakeType
     let systemImage: String
 
-    var id: String { type }
+    var id: String { type.rawValue }
+
+    var title: String { type.displayName }
 
     static let all: [MistakeTypeOption] = [
-        MistakeTypeOption(type: ModelDefaults.MistakeType.concept, title: "概念", systemImage: "book.closed"),
-        MistakeTypeOption(type: ModelDefaults.MistakeType.method, title: "方法", systemImage: "point.3.connected.trianglepath.dotted"),
-        MistakeTypeOption(type: ModelDefaults.MistakeType.calculation, title: "计算", systemImage: "function"),
-        MistakeTypeOption(type: ModelDefaults.MistakeType.reading, title: "审题", systemImage: "text.magnifyingglass"),
-        MistakeTypeOption(type: ModelDefaults.MistakeType.model, title: "模型", systemImage: "cube.transparent"),
-        MistakeTypeOption(type: ModelDefaults.MistakeType.expression, title: "表达", systemImage: "text.quote"),
-        MistakeTypeOption(type: ModelDefaults.MistakeType.time, title: "时间", systemImage: "clock"),
-        MistakeTypeOption(type: ModelDefaults.MistakeType.other, title: "其他", systemImage: "ellipsis.circle")
+        MistakeTypeOption(type: .concept, systemImage: "book.closed"),
+        MistakeTypeOption(type: .method, systemImage: "point.3.connected.trianglepath.dotted"),
+        MistakeTypeOption(type: .calculation, systemImage: "function"),
+        MistakeTypeOption(type: .reading, systemImage: "text.magnifyingglass"),
+        MistakeTypeOption(type: .model, systemImage: "cube.transparent"),
+        MistakeTypeOption(type: .expression, systemImage: "text.quote"),
+        MistakeTypeOption(type: .time, systemImage: "clock"),
+        MistakeTypeOption(type: .other, systemImage: "ellipsis.circle")
     ]
 
     static func title(for type: String) -> String {
-        all.first { $0.type == type }?.title ?? (type.isEmpty ? "未分类" : type)
+        type.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+            ? "未分类"
+            : MistakeType.from(type).displayName
     }
 
     static func systemImage(for type: String) -> String {
-        all.first { $0.type == type }?.systemImage ?? "questionmark.circle"
+        let normalizedType = MistakeType.from(type)
+        return all.first { $0.type == normalizedType }?.systemImage ?? "questionmark.circle"
     }
 }
 
 struct ReviewStatusOption: Identifiable {
-    let status: String
-    let title: String
+    let status: ReviewStatus
     let systemImage: String
 
-    var id: String { status }
+    var id: String { status.rawValue }
+
+    var title: String { status.displayName }
 
     var tint: Color {
         switch status {
-        case ModelDefaults.ReviewStatus.scheduled:
+        case .scheduled:
             return .blue
-        case ModelDefaults.ReviewStatus.reviewed:
+        case .reviewed:
             return .green
-        case ModelDefaults.ReviewStatus.mastered:
+        case .mastered:
             return .purple
         default:
             return .orange
@@ -622,22 +596,26 @@ struct ReviewStatusOption: Identifiable {
     }
 
     static let all: [ReviewStatusOption] = [
-        ReviewStatusOption(status: ModelDefaults.ReviewStatus.new, title: "新错题", systemImage: "sparkle"),
-        ReviewStatusOption(status: ModelDefaults.ReviewStatus.scheduled, title: "待复习", systemImage: "calendar.badge.clock"),
-        ReviewStatusOption(status: ModelDefaults.ReviewStatus.reviewed, title: "已复习", systemImage: "checkmark.circle"),
-        ReviewStatusOption(status: ModelDefaults.ReviewStatus.mastered, title: "已掌握", systemImage: "graduationcap")
+        ReviewStatusOption(status: .new, systemImage: "sparkle"),
+        ReviewStatusOption(status: .scheduled, systemImage: "calendar.badge.clock"),
+        ReviewStatusOption(status: .reviewed, systemImage: "checkmark.circle"),
+        ReviewStatusOption(status: .mastered, systemImage: "graduationcap")
     ]
 
     static func title(for status: String) -> String {
-        all.first { $0.status == status }?.title ?? (status.isEmpty ? "未知状态" : status)
+        status.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+            ? "未知状态"
+            : ReviewStatus.from(status).displayName
     }
 
     static func systemImage(for status: String) -> String {
-        all.first { $0.status == status }?.systemImage ?? "questionmark.circle"
+        let normalizedStatus = ReviewStatus.from(status)
+        return all.first { $0.status == normalizedStatus }?.systemImage ?? "questionmark.circle"
     }
 
     static func tint(for status: String) -> Color {
-        all.first { $0.status == status }?.tint ?? .secondary
+        let normalizedStatus = ReviewStatus.from(status)
+        return all.first { $0.status == normalizedStatus }?.tint ?? .secondary
     }
 }
 

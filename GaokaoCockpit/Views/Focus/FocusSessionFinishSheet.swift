@@ -152,9 +152,9 @@ struct FocusSessionFinishSheet: View {
 
             task.actualMinutes = (task.actualMinutes ?? 0) + finalActualMinutes
             if markTaskDone {
-                task.status = ModelDefaults.StudyTaskStatus.done
+                task.status = StudyTaskStatus.done.storageValue
             } else {
-                task.status = ModelDefaults.StudyTaskStatus.inProgress
+                task.status = StudyTaskStatus.inProgress.storageValue
             }
 
             if syncOutputToTask && !cleanSessionNote.isEmpty {
@@ -193,8 +193,8 @@ struct FocusSessionFinishSheet: View {
     let task = StudyTask(
         dayKey: DateKey.todayKey(),
         title: "英语阅读精读 1 篇",
-        subject: "英语",
-        category: "复盘",
+        subject: LearningSubject.english.storageValue,
+        category: StudyTaskCategory.review.storageValue,
         estimatedMinutes: 25
     )
     let session = FocusSession(

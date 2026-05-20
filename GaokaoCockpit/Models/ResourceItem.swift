@@ -21,7 +21,7 @@ final class ResourceItem {
         chapter: String = "",
         type: String = "",
         uri: String = "",
-        status: String = ModelDefaults.ResourceStatus.unread,
+        status: String = ResourceStatus.unread.storageValue,
         note: String = "",
         createdAt: Date = .now,
         updatedAt: Date = .now

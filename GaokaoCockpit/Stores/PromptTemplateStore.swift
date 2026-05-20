@@ -15,9 +15,11 @@ enum PromptTemplateStore {
 
     static func fetchTemplates(category: String?, in context: ModelContext) throws -> [PromptTemplate] {
         if let category = normalizedCategory(category) {
+            let selectedStorageValue = category.storageValue
+            let selectedDisplayName = category.displayName
             let descriptor = FetchDescriptor<PromptTemplate>(
                 predicate: #Predicate<PromptTemplate> { template in
-                    template.category == category
+                    template.category == selectedStorageValue || template.category == selectedDisplayName
                 },
                 sortBy: templateSortDescriptors
             )
@@ -66,13 +68,18 @@ enum PromptTemplateStore {
         try context.save()
     }
 
-    private static func normalizedCategory(_ value: String?) -> String? {
+    private static func normalizedCategory(_ value: String?) -> PromptCategory? {
         guard let value else {
             return nil
         }
 
         let trimmed = value.trimmingCharacters(in: .whitespacesAndNewlines)
-        return trimmed.isEmpty || trimmed == "全部" ? nil : trimmed
+        guard !trimmed.isEmpty else {
+            return nil
+        }
+
+        let category = PromptCategory.from(trimmed)
+        return category == .all ? nil : category
     }
 
     private static var templateSortDescriptors: [SortDescriptor<PromptTemplate>] {

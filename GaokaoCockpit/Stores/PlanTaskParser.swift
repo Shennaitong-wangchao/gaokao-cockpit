@@ -21,11 +21,11 @@ struct ParsedPlanTask: Identifiable, Hashable {
     var category: String {
         switch source {
         case PlanTaskParser.Source.top:
-            return "做题"
+            return StudyTaskCategory.exercise.storageValue
         case PlanTaskParser.Source.baseline:
-            return "复盘"
+            return StudyTaskCategory.review.storageValue
         default:
-            return "其他"
+            return StudyTaskCategory.other.storageValue
         }
     }
 }

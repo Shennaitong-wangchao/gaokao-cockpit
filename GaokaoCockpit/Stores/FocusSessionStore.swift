@@ -42,7 +42,7 @@ enum FocusSessionStore {
             createdAt: now
         )
 
-        task.status = ModelDefaults.StudyTaskStatus.inProgress
+        task.status = StudyTaskStatus.inProgress.storageValue
         task.updatedAt = now
 
         context.insert(session)

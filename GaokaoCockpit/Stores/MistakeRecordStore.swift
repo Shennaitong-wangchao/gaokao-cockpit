@@ -16,7 +16,7 @@ enum MistakeRecordStore {
         in context: ModelContext
     ) throws -> [MistakeRecord] {
         let cleanSubject = normalizedFilter(subject)
-        let cleanStatus = normalizedFilter(reviewStatus)
+        let cleanStatus = normalizedFilter(reviewStatus).map { ReviewStatus.from($0).storageValue }
 
         switch (cleanSubject, cleanStatus) {
         case let (subject?, status?):
@@ -64,13 +64,13 @@ enum MistakeRecordStore {
         questionImagePath: String,
         mySolution: String,
         correctSolution: String,
-        mistakeType: String,
+        mistakeType: String = MistakeType.model.storageValue,
         rootCause: String,
         questionSignal: String,
         correctModel: String,
         variantTask: String,
         nextReminder: Date?,
-        reviewStatus: String,
+        reviewStatus: String = ReviewStatus.new.storageValue,
         in context: ModelContext
     ) throws -> MistakeRecord {
         let now = Date()
@@ -83,13 +83,13 @@ enum MistakeRecordStore {
             questionImagePath: questionImagePath,
             mySolution: mySolution,
             correctSolution: correctSolution,
-            mistakeType: mistakeType,
+            mistakeType: MistakeType.from(mistakeType).storageValue,
             rootCause: rootCause,
             questionSignal: questionSignal,
             correctModel: correctModel,
             variantTask: variantTask,
             nextReminder: nextReminder,
-            reviewStatus: reviewStatus,
+            reviewStatus: ReviewStatus.from(reviewStatus).storageValue,
             createdAt: now,
             updatedAt: now
         )
@@ -115,7 +115,7 @@ enum MistakeRecordStore {
     }
 
     static func countMistakes(reviewStatus: String, in context: ModelContext) throws -> Int {
-        let selectedStatus = reviewStatus
+        let selectedStatus = ReviewStatus.from(reviewStatus).storageValue
         let descriptor = FetchDescriptor<MistakeRecord>(
             predicate: #Predicate<MistakeRecord> { mistake in
                 mistake.reviewStatus == selectedStatus

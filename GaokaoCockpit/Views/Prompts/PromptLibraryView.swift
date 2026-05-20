@@ -5,7 +5,7 @@ struct PromptLibraryView: View {
     @Environment(\.modelContext) private var modelContext
 
     @State private var templates: [PromptTemplate] = []
-    @State private var selectedCategory: PromptCategoryFilter = .all
+    @State private var selectedCategory: PromptCategory = .all
     @State private var totalTemplateCount = 0
     @State private var totalUsageCount = 0
     @State private var isLoading = true
@@ -102,32 +102,13 @@ struct PromptLibraryView: View {
 
     private func refreshTemplatesThrowing() throws {
         templates = try PromptTemplateStore.fetchTemplates(
-            category: selectedCategory.category,
+            category: selectedCategory == .all ? nil : selectedCategory.storageValue,
             in: modelContext
         )
 
         let allTemplates = try PromptTemplateStore.fetchTemplates(category: nil, in: modelContext)
         totalTemplateCount = allTemplates.count
         totalUsageCount = allTemplates.reduce(0) { $0 + $1.usageCount }
-    }
-}
-
-private enum PromptCategoryFilter: String, CaseIterable, Identifiable {
-    case all = "全部"
-    case mistake = "错题"
-    case preview = "预习"
-    case organize = "整理"
-    case variant = "变式"
-    case diagnosis = "诊断"
-    case review = "复盘"
-    case selfTest = "自测"
-
-    var id: String { rawValue }
-
-    var title: String { rawValue }
-
-    var category: String? {
-        self == .all ? nil : rawValue
     }
 }
 
@@ -197,7 +178,7 @@ private struct PromptSummaryValue: View {
 }
 
 private struct PromptCategoryFilterBar: View {
-    @Binding var selectedCategory: PromptCategoryFilter
+    @Binding var selectedCategory: PromptCategory
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
@@ -206,11 +187,11 @@ private struct PromptCategoryFilterBar: View {
 
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 8) {
-                    ForEach(PromptCategoryFilter.allCases) { category in
+                    ForEach(PromptCategory.allCases) { category in
                         Button {
                             selectedCategory = category
                         } label: {
-                            Text(category.title)
+                            Text(category.displayName)
                                 .font(.subheadline.weight(.semibold))
                                 .lineLimit(1)
                                 .padding(.horizontal, 12)
@@ -247,7 +228,7 @@ private struct PromptTemplateRow: View {
 
                     Spacer(minLength: 8)
 
-                    PromptTag(text: template.category)
+                    PromptTag(text: PromptCategory.from(template.category).displayName)
                 }
 
                 Text(template.templateDescription.isEmpty ? "没有模板说明。" : template.templateDescription)

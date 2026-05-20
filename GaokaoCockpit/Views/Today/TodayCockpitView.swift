@@ -301,21 +301,20 @@ struct TodayCockpitView: View {
     }
 
     private func toggleTaskStatus(_ task: StudyTask) {
-        guard task.status == ModelDefaults.StudyTaskStatus.pending
-            || task.status == ModelDefaults.StudyTaskStatus.done
-        else {
+        let currentStatus = StudyTaskStatus.from(task.status)
+        guard currentStatus == .pending || currentStatus == .done else {
             taskMessage = "Today 只支持快速切换待做/完成；更多状态请到任务页处理。"
             return
         }
 
         do {
-            task.status = task.status == ModelDefaults.StudyTaskStatus.done
-                ? ModelDefaults.StudyTaskStatus.pending
-                : ModelDefaults.StudyTaskStatus.done
+            task.status = currentStatus == .done
+                ? StudyTaskStatus.pending.storageValue
+                : StudyTaskStatus.done.storageValue
             task.updatedAt = Date()
             try modelContext.save()
             try refreshTaskDataThrowing(for: todayKey)
-            taskMessage = task.status == ModelDefaults.StudyTaskStatus.done ? "已标记完成。" : "已撤回待做。"
+            taskMessage = StudyTaskStatus.from(task.status) == .done ? "已标记完成。" : "已撤回待做。"
         } catch {
             taskMessage = "更新任务失败：\(error.localizedDescription)"
         }
@@ -384,12 +383,27 @@ private struct TodayStartupCard: View {
                     Text("主攻科目")
                         .font(.subheadline.weight(.semibold))
 
-                    TextField("例如：数学", text: $mainSubject)
-                        .textFieldStyle(.roundedBorder)
-                        .accessibilityLabel("主攻科目")
+                    Picker("主攻科目", selection: subjectSelection) {
+                        ForEach(LearningSubject.allCases) { subject in
+                            Text(subject.displayName).tag(subject.storageValue)
+                        }
+                    }
+                    .pickerStyle(.menu)
+                    .accessibilityLabel("主攻科目")
                 }
             }
         }
+    }
+
+    private var subjectSelection: Binding<String> {
+        Binding(
+            get: {
+                LearningSubject.from(mainSubject).storageValue
+            },
+            set: { newValue in
+                mainSubject = LearningSubject.from(newValue).storageValue
+            }
+        )
     }
 }
 
@@ -574,7 +588,7 @@ private struct PlanTaskPreviewRow: View {
 
                 HStack(spacing: 8) {
                     SmallTag(text: item.parsedTask.sourceTitle)
-                    SmallTag(text: item.parsedTask.category)
+                    SmallTag(text: StudyTaskCategory.from(item.parsedTask.category).displayName)
                     if item.alreadyExists {
                         Text("将跳过")
                             .font(.caption)
@@ -710,17 +724,17 @@ private struct TodayTaskRowView: View {
             }
             .buttonStyle(.plain)
             .disabled(!task.canToggleInStage3A)
-            .accessibilityLabel(task.status == ModelDefaults.StudyTaskStatus.done ? "撤回待做" : "标记完成")
+            .accessibilityLabel(task.todayStatus == .done ? "撤回待做" : "标记完成")
 
             VStack(alignment: .leading, spacing: 7) {
                 Text(task.title.isEmpty ? "未命名任务" : task.title)
                     .font(.subheadline.weight(.semibold))
-                    .strikethrough(task.status == ModelDefaults.StudyTaskStatus.done)
-                    .foregroundStyle(task.status == ModelDefaults.StudyTaskStatus.done ? .secondary : .primary)
+                    .strikethrough(task.todayStatus == .done)
+                    .foregroundStyle(task.todayStatus == .done ? .secondary : .primary)
 
                 HStack(spacing: 8) {
-                    SmallTag(text: task.subject.isEmpty ? "未设科目" : task.subject)
-                    SmallTag(text: task.category.isEmpty ? "未分类" : task.category)
+                    SmallTag(text: task.todaySubjectText)
+                    SmallTag(text: task.todayCategoryText)
                     Text(task.statusDisplayText)
                         .font(.caption)
                         .foregroundStyle(.secondary)
@@ -822,12 +836,10 @@ private struct TodayQuickAddTaskSheet: View {
     let onSaved: () -> Void
 
     @State private var title = ""
-    @State private var subject: String
-    @State private var category = "做题"
+    @State private var subject: LearningSubject
+    @State private var category = StudyTaskCategory.exercise
     @State private var estimatedMinutes = 25
     @State private var errorMessage: String?
-
-    private let categories = ["做题", "预习", "复盘", "背诵", "整理", "其他"]
 
     init(
         dayKey: String,
@@ -839,7 +851,7 @@ private struct TodayQuickAddTaskSheet: View {
         self.dayPlanID = dayPlanID
         self.defaultSubject = defaultSubject
         self.onSaved = onSaved
-        _subject = State(initialValue: defaultSubject)
+        _subject = State(initialValue: LearningSubject.from(defaultSubject))
     }
 
     var body: some View {
@@ -849,12 +861,15 @@ private struct TodayQuickAddTaskSheet: View {
                     TextField("具体要做什么？", text: $title)
                         .accessibilityLabel("任务标题")
 
-                    TextField("科目", text: $subject)
-                        .accessibilityLabel("科目")
+                    Picker("科目", selection: $subject) {
+                        ForEach(LearningSubject.allCases) { subject in
+                            Text(subject.displayName).tag(subject)
+                        }
+                    }
 
                     Picker("类型", selection: $category) {
-                        ForEach(categories, id: \.self) { category in
-                            Text(category).tag(category)
+                        ForEach(StudyTaskCategory.allCases) { category in
+                            Text(category.displayName).tag(category)
                         }
                     }
 
@@ -903,7 +918,7 @@ private struct TodayQuickAddTaskSheet: View {
             let task = try StudyTaskStore.createTask(
                 dayKey: dayKey,
                 title: cleanTitle,
-                subject: subject.trimmingCharacters(in: .whitespacesAndNewlines),
+                subject: subject.storageValue,
                 category: category,
                 estimatedMinutes: estimatedMinutes,
                 in: modelContext
@@ -913,8 +928,8 @@ private struct TodayQuickAddTaskSheet: View {
             try modelContext.save()
 
             title = ""
-            subject = defaultSubject
-            category = categories[0]
+            subject = LearningSubject.from(defaultSubject)
+            category = .exercise
             estimatedMinutes = 25
             errorMessage = nil
             onSaved()
@@ -1040,49 +1055,54 @@ private struct SmallTag: View {
 }
 
 private extension StudyTask {
+    var todayStatus: StudyTaskStatus {
+        StudyTaskStatus.from(status)
+    }
+
     var canToggleInStage3A: Bool {
-        status == ModelDefaults.StudyTaskStatus.pending || status == ModelDefaults.StudyTaskStatus.done
+        todayStatus == .pending || todayStatus == .done
     }
 
     var statusDisplayText: String {
-        switch status {
-        case ModelDefaults.StudyTaskStatus.pending:
-            return "待做"
-        case ModelDefaults.StudyTaskStatus.inProgress:
-            return "进行中"
-        case ModelDefaults.StudyTaskStatus.done:
-            return "已完成"
-        case ModelDefaults.StudyTaskStatus.skipped:
-            return "已跳过"
-        default:
-            return status
-        }
+        todayStatus.displayName
     }
 
     var statusIconName: String {
-        switch status {
-        case ModelDefaults.StudyTaskStatus.done:
+        switch todayStatus {
+        case .done:
             return "checkmark.circle.fill"
-        case ModelDefaults.StudyTaskStatus.inProgress:
+        case .inProgress:
             return "circle.lefthalf.filled"
-        case ModelDefaults.StudyTaskStatus.skipped:
+        case .skipped:
             return "minus.circle"
-        default:
+        case .pending:
             return "circle"
         }
     }
 
     var statusIconColor: Color {
-        switch status {
-        case ModelDefaults.StudyTaskStatus.done:
+        switch todayStatus {
+        case .done:
             return .green
-        case ModelDefaults.StudyTaskStatus.inProgress:
+        case .inProgress:
             return .blue
-        case ModelDefaults.StudyTaskStatus.skipped:
+        case .skipped:
             return .secondary
-        default:
+        case .pending:
             return .secondary
         }
+    }
+
+    var todaySubjectText: String {
+        subject.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+            ? "未设科目"
+            : LearningSubject.from(subject).displayName
+    }
+
+    var todayCategoryText: String {
+        category.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+            ? "未分类"
+            : StudyTaskCategory.from(category).displayName
     }
 }
 

@@ -30,13 +30,13 @@ final class MistakeRecord {
         questionImagePath: String = "",
         mySolution: String = "",
         correctSolution: String = "",
-        mistakeType: String = ModelDefaults.MistakeType.concept,
+        mistakeType: String = MistakeType.concept.storageValue,
         rootCause: String = "",
         questionSignal: String = "",
         correctModel: String = "",
         variantTask: String = "",
         nextReminder: Date? = nil,
-        reviewStatus: String = ModelDefaults.ReviewStatus.new,
+        reviewStatus: String = ReviewStatus.new.storageValue,
         createdAt: Date = .now,
         updatedAt: Date = .now
     ) {

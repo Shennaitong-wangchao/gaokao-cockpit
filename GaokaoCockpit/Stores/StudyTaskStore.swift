@@ -18,7 +18,7 @@ enum StudyTaskStore {
             return try fetchTasks(for: dayKey, in: context)
         }
 
-        let selectedStatus = status
+        let selectedStatus = StudyTaskStatus.from(status).storageValue
         let descriptor = FetchDescriptor<StudyTask>(
             predicate: #Predicate<StudyTask> { task in
                 task.dayKey == dayKey && task.status == selectedStatus
@@ -36,7 +36,7 @@ enum StudyTaskStore {
         category: String,
         estimatedMinutes: Int?,
         actualMinutes: Int? = nil,
-        status: String = ModelDefaults.StudyTaskStatus.pending,
+        status: String = StudyTaskStatus.pending.storageValue,
         outputNote: String = "",
         dayPlanId: UUID? = nil,
         in context: ModelContext
@@ -62,6 +62,32 @@ enum StudyTaskStore {
         return task
     }
 
+    static func createTask(
+        dayKey: String,
+        title: String,
+        subject: String,
+        category: StudyTaskCategory,
+        estimatedMinutes: Int?,
+        actualMinutes: Int? = nil,
+        status: StudyTaskStatus = .pending,
+        outputNote: String = "",
+        dayPlanId: UUID? = nil,
+        in context: ModelContext
+    ) throws -> StudyTask {
+        try createTask(
+            dayKey: dayKey,
+            title: title,
+            subject: subject,
+            category: category.storageValue,
+            estimatedMinutes: estimatedMinutes,
+            actualMinutes: actualMinutes,
+            status: status.storageValue,
+            outputNote: outputNote,
+            dayPlanId: dayPlanId,
+            in: context
+        )
+    }
+
     static func createTasksFromPlan(
         dayPlan: DayPlan,
         parsedTasks: [ParsedPlanTask],
@@ -75,8 +101,8 @@ enum StudyTaskStore {
         var createdCount = 0
         var skippedCount = 0
         let subject = dayPlan.mainSubject.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
-            ? "其他"
-            : dayPlan.mainSubject.trimmingCharacters(in: .whitespacesAndNewlines)
+            ? LearningSubject.other.storageValue
+            : LearningSubject.from(dayPlan.mainSubject).storageValue
 
         for parsedTask in parsedTasks {
             let titleKey = PlanTaskParser.normalizedTitleKey(parsedTask.title)
@@ -91,9 +117,9 @@ enum StudyTaskStore {
                 dayKey: dayPlan.dayKey,
                 title: parsedTask.title,
                 subject: subject,
-                category: parsedTask.category,
+                category: StudyTaskCategory.from(parsedTask.category).storageValue,
                 estimatedMinutes: 25,
-                status: ModelDefaults.StudyTaskStatus.pending,
+                status: StudyTaskStatus.pending.storageValue,
                 outputNote: "From Today \(parsedTask.source) plan",
                 createdAt: now,
                 updatedAt: now
@@ -119,7 +145,7 @@ enum StudyTaskStore {
     }
 
     static func countCompletedTasks(for dayKey: String, in context: ModelContext) throws -> Int {
-        let completedStatus = ModelDefaults.StudyTaskStatus.done
+        let completedStatus = StudyTaskStatus.done.storageValue
         let descriptor = FetchDescriptor<StudyTask>(
             predicate: #Predicate<StudyTask> { task in
                 task.dayKey == dayKey && task.status == completedStatus
@@ -130,7 +156,7 @@ enum StudyTaskStore {
     }
 
     static func countSkippedTasks(for dayKey: String, in context: ModelContext) throws -> Int {
-        let skippedStatus = ModelDefaults.StudyTaskStatus.skipped
+        let skippedStatus = StudyTaskStatus.skipped.storageValue
         let descriptor = FetchDescriptor<StudyTask>(
             predicate: #Predicate<StudyTask> { task in
                 task.dayKey == dayKey && task.status == skippedStatus

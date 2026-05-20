@@ -535,7 +535,43 @@
 - 不引入第三方依赖。
 - 不做数据模型迁移。
 
-## Stage 16：未来扩展：AI API、RAG、GoodNotes/NotebookLM 索引、macOS 端、云同步
+## Stage 16：State Type Safety / String Value Consolidation / 状态类型安全化与字符串状态收敛
+
+当前进度：Stage 16 已完成。
+
+### 目标
+
+在不修改 SwiftData `@Model` 字段类型、不做模型迁移、不改变备份格式的前提下，把业务层常见状态值、类型值、分类值和科目候选从裸字符串收敛到类型安全 enum wrapper。
+
+### 已完成内容
+
+- 新增 `ModelValueTypes.swift`，提供 `StudyTaskStatus`、`StudyTaskCategory`、`MistakeType`、`ReviewStatus`、`PromptCategory`、`LearningSubject` 和 `ResourceStatus`。
+- `ModelDefaults` 保留旧字符串常量，并提示新代码优先使用 enum wrapper。
+- Store 层任务状态计数、错题复习状态计数、Prompt 分类筛选和计划转任务默认值改用 enum storage。
+- Tasks、Today、Focus、Mistakes 和 Prompt 主要 Picker/Menu 改用 enum cases 与 `displayName`。
+- 兼容已有中文 category、subject、Prompt seed 分类读取。
+- 备份导出、导入 dry-run、restore plan 和 fixture schema 不变。
+
+### 验收标准
+
+- SwiftData 字段仍为 `String`，不触发迁移。
+- 旧中文任务分类、Prompt 分类和科目数据仍能显示。
+- 任务状态切换、错题复习状态筛选、Prompt 分类筛选仍正常。
+- 备份导出和 dry-run/restore plan 不受影响。
+- Debug / Release 构建通过。
+
+### 不做什么
+
+- 不改 SwiftData 字段类型。
+- 不做数据模型迁移。
+- 不改变备份 schema 或 `exportVersion`。
+- 不做真实导入恢复。
+- 不接 AI API。
+- 不做云同步或账号。
+- 不引入第三方依赖。
+- 不做大型 UI 或架构重构。
+
+## Stage 17：未来扩展：AI API、RAG、GoodNotes/NotebookLM 索引、macOS 端、云同步
 
 ### 目标
 

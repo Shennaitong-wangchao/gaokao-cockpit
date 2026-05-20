@@ -10,7 +10,7 @@
 4. 确认 UI 能解析文件，并显示 incoming summary、local summary、冲突摘要、图片恢复摘要和“未来恢复计划预览”。
 5. 再选择 `fixtures/backups/duplicate-conflict-backup.json`，确认冲突摘要和 restore plan skipped counts 能显示。
 6. 再选择 `fixtures/backups/invalid-reference-backup.json`，确认 `referenceRepairSummary` 区域显示：StudyTask 缺失 DayPlan、FocusSession 缺失 Task、DailyReview 缺失 Mistake，且 planned insert counts 不因 invalid references 而扣减。
-6. 再选择 `fixtures/backups/invalid-reference-backup.json`，确认 invalid references 显示在“需要处理的引用”区域，而不是 skipped。
+7. 再选择 `fixtures/backups/invalid-reference-backup.json`，确认 invalid references 显示在“需要处理的引用”区域，而不是 skipped。
 
 ## minimal-valid-backup 预期
 

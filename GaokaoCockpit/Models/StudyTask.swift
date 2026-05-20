@@ -25,7 +25,7 @@ final class StudyTask {
         category: String = "",
         estimatedMinutes: Int? = nil,
         actualMinutes: Int? = nil,
-        status: String = ModelDefaults.StudyTaskStatus.pending,
+        status: String = StudyTaskStatus.pending.storageValue,
         outputNote: String = "",
         createdAt: Date = .now,
         updatedAt: Date = .now

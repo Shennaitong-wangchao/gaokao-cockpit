@@ -31,7 +31,7 @@ enum ReviewAggregationStore {
     }
 
     static func weekCompletedTaskCount(start: Date, end: Date, in context: ModelContext) throws -> Int {
-        let doneStatus = ModelDefaults.StudyTaskStatus.done
+        let doneStatus = StudyTaskStatus.done.storageValue
         let tasks = try fetchTasks(start: start, end: end, in: context)
         return tasks.filter { $0.status == doneStatus }.count
     }
@@ -43,7 +43,7 @@ enum ReviewAggregationStore {
     static func weekMistakeTypeBreakdownText(start: Date, end: Date, in context: ModelContext) throws -> String {
         let mistakes = try fetchMistakes(start: start, end: end, in: context)
         let counts = mistakes.reduce(into: [String: Int]()) { result, mistake in
-            let type = normalizedLabel(mistake.mistakeType, fallback: "未分类")
+            let type = normalizedMistakeTypeLabel(mistake.mistakeType)
             result[type, default: 0] += 1
         }
 
@@ -58,7 +58,7 @@ enum ReviewAggregationStore {
                 return
             }
 
-            let subject = normalizedLabel(session.subject, fallback: "未设科目")
+            let subject = normalizedSubjectLabel(session.subject, fallback: "未设科目")
             result[subject, default: 0] += minutes
         }
 
@@ -73,7 +73,7 @@ enum ReviewAggregationStore {
                 return
             }
 
-            let subject = normalizedLabel(task.subject, fallback: "未设科目")
+            let subject = normalizedSubjectLabel(task.subject, fallback: "未设科目")
             result[subject, default: 0] += minutes
         }
 
@@ -82,7 +82,7 @@ enum ReviewAggregationStore {
         }
 
         let taskCounts = tasks.reduce(into: [String: Int]()) { result, task in
-            let subject = normalizedLabel(task.subject, fallback: "未设科目")
+            let subject = normalizedSubjectLabel(task.subject, fallback: "未设科目")
             result[subject, default: 0] += 1
         }
 
@@ -129,6 +129,16 @@ enum ReviewAggregationStore {
     private static func normalizedLabel(_ value: String, fallback: String) -> String {
         let trimmed = value.trimmingCharacters(in: .whitespacesAndNewlines)
         return trimmed.isEmpty ? fallback : trimmed
+    }
+
+    private static func normalizedSubjectLabel(_ value: String, fallback: String) -> String {
+        let trimmed = normalizedLabel(value, fallback: "")
+        return trimmed.isEmpty ? fallback : LearningSubject.from(trimmed).displayName
+    }
+
+    private static func normalizedMistakeTypeLabel(_ value: String) -> String {
+        let trimmed = normalizedLabel(value, fallback: "")
+        return trimmed.isEmpty ? "未分类" : MistakeType.from(trimmed).displayName
     }
 
     private static func formatMinuteBreakdown(_ values: [String: Int], emptyText: String) -> String {

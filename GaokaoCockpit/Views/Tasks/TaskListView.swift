@@ -151,7 +151,7 @@ struct TaskListView: View {
     private func refreshTaskDataThrowing() throws {
         let fetchedTasks = try StudyTaskStore.fetchTasks(
             for: todayKey,
-            status: selectedFilter.status,
+            status: selectedFilter.status?.storageValue,
             in: modelContext
         )
 
@@ -163,17 +163,17 @@ struct TaskListView: View {
         skippedTaskCount = try StudyTaskStore.countSkippedTasks(for: todayKey, in: modelContext)
     }
 
-    private func updateTaskStatus(_ task: StudyTask, to status: String) {
-        guard task.status != status else {
+    private func updateTaskStatus(_ task: StudyTask, to status: StudyTaskStatus) {
+        guard StudyTaskStatus.from(task.status) != status else {
             return
         }
 
         do {
-            task.status = status
+            task.status = status.storageValue
             StudyTaskStore.updateTaskTimestamp(task)
             try modelContext.save()
             try refreshTaskDataThrowing()
-            statusMessage = "已更新状态：\(TaskStatusOption.title(for: status))。"
+            statusMessage = "已更新状态：\(status.displayName)。"
         } catch {
             statusMessage = "更新状态失败，请重试。"
         }
@@ -201,14 +201,14 @@ private enum TaskFilter: String, CaseIterable, Identifiable {
         }
     }
 
-    var status: String? {
+    var status: StudyTaskStatus? {
         switch self {
         case .all, .unfinished:
             return nil
         case .done:
-            return ModelDefaults.StudyTaskStatus.done
+            return .done
         case .skipped:
-            return ModelDefaults.StudyTaskStatus.skipped
+            return .skipped
         }
     }
 
@@ -230,7 +230,7 @@ private enum TaskFilter: String, CaseIterable, Identifiable {
         case .all:
             return "还没有任务。可以从 Today 生成，或在这里手动添加。"
         case .unfinished:
-            return "当前筛选下没有 pending 或 inProgress 任务。"
+            return "当前筛选下没有未开始或进行中任务。"
         case .done:
             return "完成任务后会出现在这里。"
         case .skipped:
@@ -354,7 +354,7 @@ private struct TaskRowView: View {
     let task: StudyTask
     let onTap: () -> Void
     let onFocusFinished: () -> Void
-    let onChangeStatus: (String) -> Void
+    let onChangeStatus: (StudyTaskStatus) -> Void
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
@@ -372,13 +372,13 @@ private struct TaskRowView: View {
                         VStack(alignment: .leading, spacing: 8) {
                             Text(task.title.isEmpty ? "未命名任务" : task.title)
                                 .font(.headline)
-                                .foregroundStyle(task.status == ModelDefaults.StudyTaskStatus.done ? .secondary : .primary)
-                                .strikethrough(task.status == ModelDefaults.StudyTaskStatus.done)
+                                .foregroundStyle(task.taskListStatus == .done ? .secondary : .primary)
+                                .strikethrough(task.taskListStatus == .done)
                                 .lineLimit(2)
 
                             HStack(spacing: 8) {
-                                TaskTag(text: task.subject.isEmpty ? "未设科目" : task.subject)
-                                TaskTag(text: task.category.isEmpty ? "未分类" : task.category)
+                                TaskTag(text: task.taskListSubjectText)
+                                TaskTag(text: task.taskListCategoryText)
                             }
 
                             Text(task.taskListMinutesText)
@@ -466,17 +466,14 @@ private struct TaskEditorSheet: View {
     let onChanged: (String) -> Void
 
     @State private var title: String
-    @State private var subject: String
-    @State private var category: String
+    @State private var subject: LearningSubject
+    @State private var category: StudyTaskCategory
     @State private var estimatedMinutesText: String
     @State private var actualMinutesText: String
-    @State private var status: String
+    @State private var status: StudyTaskStatus
     @State private var outputNote: String
     @State private var errorMessage: String?
     @State private var showingDeleteConfirmation = false
-
-    private let subjects = ["数学", "语文", "英语", "物理", "化学", "生物", "其他"]
-    private let categories = ["做题", "预习", "复盘", "背诵", "整理", "其他"]
 
     init(
         mode: TaskEditorMode,
@@ -492,19 +489,19 @@ private struct TaskEditorSheet: View {
         switch mode {
         case .add:
             _title = State(initialValue: "")
-            _subject = State(initialValue: "数学")
-            _category = State(initialValue: "做题")
+            _subject = State(initialValue: .math)
+            _category = State(initialValue: .exercise)
             _estimatedMinutesText = State(initialValue: "25")
             _actualMinutesText = State(initialValue: "")
-            _status = State(initialValue: ModelDefaults.StudyTaskStatus.pending)
+            _status = State(initialValue: .pending)
             _outputNote = State(initialValue: "")
         case .edit(let task):
             _title = State(initialValue: task.title)
-            _subject = State(initialValue: task.subject.isEmpty ? "其他" : task.subject)
-            _category = State(initialValue: task.category.isEmpty ? "其他" : task.category)
+            _subject = State(initialValue: LearningSubject.from(task.subject))
+            _category = State(initialValue: StudyTaskCategory.from(task.category))
             _estimatedMinutesText = State(initialValue: task.estimatedMinutes.map(String.init) ?? "")
             _actualMinutesText = State(initialValue: task.actualMinutes.map(String.init) ?? "")
-            _status = State(initialValue: task.status)
+            _status = State(initialValue: StudyTaskStatus.from(task.status))
             _outputNote = State(initialValue: task.outputNote)
         }
     }
@@ -517,14 +514,14 @@ private struct TaskEditorSheet: View {
                         .accessibilityLabel("任务标题")
 
                     Picker("科目", selection: $subject) {
-                        ForEach(pickerOptions(defaults: subjects, current: subject), id: \.self) { subject in
-                            Text(subject).tag(subject)
+                        ForEach(LearningSubject.allCases) { subject in
+                            Text(subject.displayName).tag(subject)
                         }
                     }
 
                     Picker("类型", selection: $category) {
-                        ForEach(pickerOptions(defaults: categories, current: category), id: \.self) { category in
-                            Text(category).tag(category)
+                        ForEach(StudyTaskCategory.allCases) { category in
+                            Text(category.displayName).tag(category)
                         }
                     }
                 }
@@ -539,8 +536,8 @@ private struct TaskEditorSheet: View {
                         .accessibilityLabel("实际分钟")
 
                     Picker("状态", selection: $status) {
-                        ForEach(TaskStatusOption.all) { option in
-                            Text(option.title).tag(option.status)
+                        ForEach(StudyTaskStatus.allCases) { status in
+                            Text(status.displayName).tag(status)
                         }
                     }
                 }
@@ -618,7 +615,7 @@ private struct TaskEditorSheet: View {
                 _ = try StudyTaskStore.createTask(
                     dayKey: dayKey,
                     title: cleanTitle,
-                    subject: subject,
+                    subject: subject.storageValue,
                     category: category,
                     estimatedMinutes: minutes.estimated,
                     actualMinutes: minutes.actual,
@@ -631,11 +628,11 @@ private struct TaskEditorSheet: View {
 
             case .edit(let task):
                 task.title = cleanTitle
-                task.subject = subject
-                task.category = category
+                task.subject = subject.storageValue
+                task.category = category.storageValue
                 task.estimatedMinutes = minutes.estimated
                 task.actualMinutes = minutes.actual
-                task.status = status
+                task.status = status.storageValue
                 task.outputNote = outputNote.trimmingCharacters(in: .whitespacesAndNewlines)
                 if task.dayPlanId == nil {
                     task.dayPlanId = dayPlanID
@@ -691,14 +688,6 @@ private struct TaskEditorSheet: View {
         return .some(value)
     }
 
-    private func pickerOptions(defaults: [String], current: String) -> [String] {
-        let cleanCurrent = current.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard !cleanCurrent.isEmpty, !defaults.contains(cleanCurrent) else {
-            return defaults
-        }
-
-        return defaults + [cleanCurrent]
-    }
 }
 
 private struct TaskListCard<Content: View>: View {
@@ -718,47 +707,52 @@ private struct TaskListCard<Content: View>: View {
 }
 
 private struct TaskStatusOption: Identifiable {
-    let status: String
-    let title: String
+    let status: StudyTaskStatus
     let systemImage: String
 
-    var id: String { status }
+    var id: String { status.rawValue }
+
+    var title: String { status.displayName }
 
     static let all: [TaskStatusOption] = [
         TaskStatusOption(
-            status: ModelDefaults.StudyTaskStatus.pending,
-            title: "待做",
+            status: .pending,
             systemImage: "circle"
         ),
         TaskStatusOption(
-            status: ModelDefaults.StudyTaskStatus.inProgress,
-            title: "进行中",
+            status: .inProgress,
             systemImage: "circle.lefthalf.filled"
         ),
         TaskStatusOption(
-            status: ModelDefaults.StudyTaskStatus.done,
-            title: "已完成",
+            status: .done,
             systemImage: "checkmark.circle.fill"
         ),
         TaskStatusOption(
-            status: ModelDefaults.StudyTaskStatus.skipped,
-            title: "已跳过",
+            status: .skipped,
             systemImage: "minus.circle"
         )
     ]
 
     static func title(for status: String) -> String {
-        all.first { $0.status == status }?.title ?? status
+        StudyTaskStatus.from(status).displayName
     }
 
     static func systemImage(for status: String) -> String {
+        systemImage(for: StudyTaskStatus.from(status))
+    }
+
+    static func systemImage(for status: StudyTaskStatus) -> String {
         all.first { $0.status == status }?.systemImage ?? "circle"
     }
 }
 
 private extension StudyTask {
+    var taskListStatus: StudyTaskStatus {
+        StudyTaskStatus.from(status)
+    }
+
     var isTaskListUnfinished: Bool {
-        status == ModelDefaults.StudyTaskStatus.pending || status == ModelDefaults.StudyTaskStatus.inProgress
+        taskListStatus == .pending || taskListStatus == .inProgress
     }
 
     var taskListStatusTitle: String {
@@ -770,16 +764,28 @@ private extension StudyTask {
     }
 
     var taskListStatusIconColor: Color {
-        switch status {
-        case ModelDefaults.StudyTaskStatus.done:
+        switch taskListStatus {
+        case .done:
             return .green
-        case ModelDefaults.StudyTaskStatus.inProgress:
+        case .inProgress:
             return .blue
-        case ModelDefaults.StudyTaskStatus.skipped:
+        case .skipped:
             return .secondary
-        default:
+        case .pending:
             return .orange
         }
+    }
+
+    var taskListSubjectText: String {
+        subject.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+            ? "未设科目"
+            : LearningSubject.from(subject).displayName
+    }
+
+    var taskListCategoryText: String {
+        category.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+            ? "未分类"
+            : StudyTaskCategory.from(category).displayName
     }
 
     var taskListMinutesText: String {
@@ -795,7 +801,7 @@ private extension StudyTask {
     let dayPlan = DayPlan(
         dayKey: DateKey.todayKey(),
         date: DateKey.startOfDay(for: Date()),
-        mainSubject: "数学"
+        mainSubject: LearningSubject.math.storageValue
     )
 
     context.insert(dayPlan)
@@ -804,11 +810,11 @@ private extension StudyTask {
             dayPlanId: dayPlan.id,
             dayKey: dayPlan.dayKey,
             title: "函数导数压轴题 6 道",
-            subject: "数学",
-            category: "做题",
+            subject: LearningSubject.math.storageValue,
+            category: StudyTaskCategory.exercise.storageValue,
             estimatedMinutes: 45,
             actualMinutes: 50,
-            status: ModelDefaults.StudyTaskStatus.inProgress,
+            status: StudyTaskStatus.inProgress.storageValue,
             outputNote: "已完成前 4 道，第 5 道参数分类需要复盘。"
         )
     )
@@ -817,10 +823,10 @@ private extension StudyTask {
             dayPlanId: dayPlan.id,
             dayKey: dayPlan.dayKey,
             title: "英语阅读 C 篇精读",
-            subject: "英语",
-            category: "复盘",
+            subject: LearningSubject.english.storageValue,
+            category: StudyTaskCategory.review.storageValue,
             estimatedMinutes: 25,
-            status: ModelDefaults.StudyTaskStatus.done,
+            status: StudyTaskStatus.done.storageValue,
             outputNote: "整理了 6 个长难句触发信号。"
         )
     )
