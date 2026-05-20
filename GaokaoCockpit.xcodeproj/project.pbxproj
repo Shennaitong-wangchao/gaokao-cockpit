@@ -44,6 +44,7 @@
 		A00000000000000000000134 /* PromptRenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000265 /* PromptRenderer.swift */; };
 		A00000000000000000000135 /* PromptLibraryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000266 /* PromptLibraryView.swift */; };
 		A00000000000000000000136 /* PromptTemplateDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000267 /* PromptTemplateDetailView.swift */; };
+		BE241703A3BF48AD8AAFCF08 /* PromptTemplateEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A9D66CB75FB43EA8DC8E240 /* PromptTemplateEditorView.swift */; };
 		A00000000000000000000137 /* WeeklyReviewStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000268 /* WeeklyReviewStore.swift */; };
 		A00000000000000000000138 /* ReviewAggregationStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000269 /* ReviewAggregationStore.swift */; };
 		A00000000000000000000139 /* ReviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000271 /* ReviewView.swift */; };
@@ -137,6 +138,7 @@
 		A00000000000000000000265 /* PromptRenderer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PromptRenderer.swift; sourceTree = "<group>"; };
 		A00000000000000000000266 /* PromptLibraryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PromptLibraryView.swift; sourceTree = "<group>"; };
 		A00000000000000000000267 /* PromptTemplateDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PromptTemplateDetailView.swift; sourceTree = "<group>"; };
+		1A9D66CB75FB43EA8DC8E240 /* PromptTemplateEditorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PromptTemplateEditorView.swift; sourceTree = "<group>"; };
 		A00000000000000000000268 /* WeeklyReviewStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeeklyReviewStore.swift; sourceTree = "<group>"; };
 		A00000000000000000000269 /* ReviewAggregationStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReviewAggregationStore.swift; sourceTree = "<group>"; };
 		A00000000000000000000270 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -299,6 +301,7 @@
 				A00000000000000000000266 /* PromptLibraryView.swift */,
 				A00000000000000000000418 /* Components */,
 				A00000000000000000000267 /* PromptTemplateDetailView.swift */,
+				1A9D66CB75FB43EA8DC8E240 /* PromptTemplateEditorView.swift */,
 				A00000000000000000000207 /* PromptLibraryPlaceholderView.swift */,
 			);
 			path = Prompts;
@@ -559,6 +562,7 @@
 				A00000000000000000000178 /* PromptVariableInputSection.swift in Sources */,
 				A00000000000000000000179 /* PromptPreviewSection.swift in Sources */,
 				A00000000000000000000136 /* PromptTemplateDetailView.swift in Sources */,
+				BE241703A3BF48AD8AAFCF08 /* PromptTemplateEditorView.swift in Sources */,
 				A00000000000000000000107 /* PromptLibraryPlaceholderView.swift in Sources */,
 				A00000000000000000000139 /* ReviewView.swift in Sources */,
 				A00000000000000000000169 /* ReviewHeaderSection.swift in Sources */,

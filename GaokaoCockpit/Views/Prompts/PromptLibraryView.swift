@@ -13,6 +13,8 @@ struct PromptLibraryView: View {
     @State private var statusMessage: String?
     @State private var selectedTemplate: PromptTemplate?
     @State private var recentEntries: [RecentPromptEntry] = []
+    @State private var showCreateEditor = false
+    @State private var templateFilter: TemplateFilter = .all
 
     var body: some View {
         ScrollView {
@@ -24,7 +26,22 @@ struct PromptLibraryView: View {
                     totalUsageCount: totalUsageCount
                 )
 
+                HStack(spacing: 12) {
+                    Button {
+                        showCreateEditor = true
+                    } label: {
+                        Label("新建模板", systemImage: "plus.circle.fill")
+                            .font(.subheadline.weight(.semibold))
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, 10)
+                    }
+                    .buttonStyle(.borderedProminent)
+                    .accessibilityLabel("新建自定义模板")
+                }
+
                 PromptCategoryFilterBar(selectedCategory: $selectedCategory)
+
+                PromptTemplateFilterBar(selectedFilter: $templateFilter)
 
                 PromptSearchBar(searchText: $searchText)
 
@@ -95,6 +112,9 @@ struct PromptLibraryView: View {
         .onChange(of: selectedCategory) {
             refreshTemplates()
         }
+        .onChange(of: templateFilter) {
+            refreshTemplates()
+        }
         .onChange(of: searchText) {
             refreshTemplates()
         }
@@ -106,6 +126,11 @@ struct PromptLibraryView: View {
                 refreshTemplates()
                 refreshRecentEntries()
                 statusMessage = message
+            }
+        }
+        .sheet(isPresented: $showCreateEditor) {
+            PromptTemplateEditorView(mode: .create) {
+                refreshTemplates()
             }
         }
     }
@@ -177,6 +202,16 @@ struct PromptLibraryView: View {
             category: selectedCategory == .all ? nil : selectedCategory.storageValue,
             in: modelContext
         )
+
+        // 应用模板类型筛选
+        switch templateFilter {
+        case .all:
+            break
+        case .builtIn:
+            results = results.filter { $0.isBuiltIn }
+        case .custom:
+            results = results.filter { !$0.isBuiltIn }
+        }
 
         let query = searchText.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
         if !query.isEmpty {
@@ -358,7 +393,14 @@ private struct PromptTemplateRow: View {
 
                     Spacer(minLength: 8)
 
-                    PromptTag(text: PromptCategory.from(template.category).displayName)
+                    HStack(spacing: 6) {
+                        if template.isBuiltIn {
+                            PromptTag(text: "内置")
+                        } else {
+                            PromptTag(text: "自定义", tint: .blue)
+                        }
+                        PromptTag(text: PromptCategory.from(template.category).displayName)
+                    }
                 }
 
                 Text(template.templateDescription.isEmpty ? "没有模板说明。" : template.templateDescription)
@@ -390,11 +432,12 @@ private struct PromptTemplateRow: View {
 
 private struct PromptTag: View {
     let text: String
+    var tint: Color = .secondary
 
     var body: some View {
         Text(text.isEmpty ? "未分类" : text)
             .font(.caption.weight(.semibold))
-            .foregroundStyle(.secondary)
+            .foregroundStyle(tint)
             .lineLimit(1)
             .padding(.horizontal, 7)
             .padding(.vertical, 3)
@@ -532,6 +575,55 @@ private struct PromptRecentSection: View {
             let formatter = DateFormatter()
             formatter.dateFormat = "MM-dd"
             return formatter.string(from: date)
+        }
+    }
+}
+
+private struct PromptTemplateFilterBar: View {
+    @Binding var selectedFilter: TemplateFilter
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text("模板类型")
+                .font(.headline)
+
+            HStack(spacing: 8) {
+                ForEach(TemplateFilter.allCases) { filter in
+                    Button {
+                        selectedFilter = filter
+                    } label: {
+                        Text(filter.displayName)
+                            .font(.subheadline.weight(.semibold))
+                            .lineLimit(1)
+                            .padding(.horizontal, 12)
+                            .padding(.vertical, 7)
+                    }
+                    .buttonStyle(.plain)
+                    .foregroundStyle(selectedFilter == filter ? Color.white : Color.primary)
+                    .background(selectedFilter == filter ? Color.accentColor : Color(.secondarySystemBackground))
+                    .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+                }
+            }
+            .accessibilityLabel("模板类型筛选")
+        }
+    }
+}
+
+enum TemplateFilter: String, CaseIterable, Identifiable {
+    case all
+    case builtIn
+    case custom
+
+    var id: String { rawValue }
+
+    var displayName: String {
+        switch self {
+        case .all:
+            return "全部"
+        case .builtIn:
+            return "内置"
+        case .custom:
+            return "自定义"
         }
     }
 }

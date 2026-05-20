@@ -694,7 +694,56 @@
 - 不改变 exportVersion。
 - RecentPromptStore 不纳入备份导出。
 
-## Stage 20：未来扩展：AI API、RAG、GoodNotes/NotebookLM 索引、macOS 端、云同步
+## Stage 20：Custom Prompt Templates / 自定义 Prompt 模板增强
+
+当前进度：Stage 20 已完成。
+
+### 目标
+
+让用户能够创建、编辑、删除自己的 Prompt 模板，并能从内置模板复制一份进行修改。内置模板仍由 seeder upsert 管理，用户自定义模板绝不被 upsert 覆盖。
+
+### 已完成内容
+
+- PromptTemplateStore 新增 `createCustomTemplate`、`updateCustomTemplate`、`deleteCustomTemplate`、`duplicateBuiltInTemplate`、`fetchCustomTemplates` 和 `extractVariablesFromTemplate`。
+- 新增 `PromptTemplateEditorView`，支持新建、编辑、复制自定义模板。
+- 编辑器支持从模板正文自动提取 `{{variableName}}` 变量。
+- 编辑器支持删除自定义模板，删除前有确认提示。
+- PromptLibraryView 新增"新建模板"按钮。
+- PromptLibraryView 新增"模板类型"筛选（全部/内置/自定义）。
+- 模板列表显示"内置"或"自定义"标签。
+- PromptTemplateDetailView 内置模板显示"复制为自定义模板"按钮。
+- PromptTemplateDetailView 自定义模板显示"编辑模板"按钮。
+- 自定义模板参与搜索、分类筛选、常用 Prompt、最近使用和 usageCount 排序。
+- 自定义模板会随 PromptTemplate 一起导出到本地备份。
+
+### 验收标准
+
+- 用户能新建自定义模板。
+- 用户能从内置模板复制为自定义模板。
+- 用户能编辑自定义模板。
+- 用户能删除自定义模板，删除前有确认。
+- 内置模板不能直接编辑或删除。
+- 自定义模板不会被 built-in upsert 覆盖。
+- 自定义模板能搜索、筛选、生成 Prompt 和复制。
+- 自定义模板能被备份导出。
+- 备份 schema 和 exportVersion 不变。
+- Debug / Release 构建通过。
+
+### 不做什么
+
+- 不接 AI API。
+- 不做聊天窗口。
+- 不保存 AI 返回。
+- 不做模型选择器。
+- 不做云同步或账号。
+- 不引入第三方依赖。
+- 不改 SwiftData 模型字段类型。
+- 不改变备份 schema。
+- 不改变 exportVersion。
+- 不做复杂模板语法校验。
+- 不做 AI 生成模板。
+
+## Stage 21：未来扩展：AI API、RAG、GoodNotes/NotebookLM 索引、macOS 端、云同步
 
 ### 目标
 

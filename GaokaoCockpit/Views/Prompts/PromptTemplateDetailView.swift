@@ -12,6 +12,8 @@ struct PromptTemplateDetailView: View {
     @State private var values: [String: String]
     @State private var generatedPrompt: String
     @State private var statusMessage: String?
+    @State private var showEditor = false
+    @State private var editorMode: PromptTemplateEditorView.EditorMode?
 
     init(
         template: PromptTemplate,
@@ -38,10 +40,30 @@ struct PromptTemplateDetailView: View {
 
                             Spacer(minLength: 8)
 
-                            Text(template.category.isEmpty ? "未分类" : template.category)
-                                .font(.caption.weight(.semibold))
-                                .foregroundStyle(.secondary)
-                                .lineLimit(1)
+                            HStack(spacing: 6) {
+                                if template.isBuiltIn {
+                                    Text("内置")
+                                        .font(.caption.weight(.semibold))
+                                        .foregroundStyle(.secondary)
+                                        .padding(.horizontal, 6)
+                                        .padding(.vertical, 2)
+                                        .background(Color(.tertiarySystemBackground))
+                                        .clipShape(RoundedRectangle(cornerRadius: 4, style: .continuous))
+                                } else {
+                                    Text("自定义")
+                                        .font(.caption.weight(.semibold))
+                                        .foregroundStyle(.blue)
+                                        .padding(.horizontal, 6)
+                                        .padding(.vertical, 2)
+                                        .background(Color(.tertiarySystemBackground))
+                                        .clipShape(RoundedRectangle(cornerRadius: 4, style: .continuous))
+                                }
+
+                                Text(template.category.isEmpty ? "未分类" : template.category)
+                                    .font(.caption.weight(.semibold))
+                                    .foregroundStyle(.secondary)
+                                    .lineLimit(1)
+                            }
                         }
 
                         Text(template.templateDescription.isEmpty ? "没有模板说明。" : template.templateDescription)
@@ -91,6 +113,24 @@ struct PromptTemplateDetailView: View {
                     .disabled(values.values.allSatisfy { clean($0).isEmpty })
                 }
 
+                if template.isBuiltIn {
+                    Section {
+                        Button {
+                            duplicateTemplate()
+                        } label: {
+                            Label("复制为自定义模板", systemImage: "doc.on.doc.fill")
+                        }
+                    }
+                } else {
+                    Section {
+                        Button {
+                            editTemplate()
+                        } label: {
+                            Label("编辑模板", systemImage: "pencil")
+                        }
+                    }
+                }
+
                 PromptPreviewSection(generatedPrompt: generatedPrompt)
 
                 if let statusMessage {
@@ -108,6 +148,11 @@ struct PromptTemplateDetailView: View {
                     Button("关闭") {
                         dismiss()
                     }
+                }
+            }
+            .sheet(item: $editorMode) { mode in
+                PromptTemplateEditorView(mode: mode) {
+                    onCopied("模板已保存")
                 }
             }
         }
@@ -157,6 +202,19 @@ struct PromptTemplateDetailView: View {
         value.trimmingCharacters(in: .whitespacesAndNewlines)
     }
 
+    private func duplicateTemplate() {
+        do {
+            let duplicated = try PromptTemplateStore.duplicateBuiltInTemplate(template, in: modelContext)
+            editorMode = .edit(duplicated)
+        } catch {
+            statusMessage = "复制失败：\(error.localizedDescription)"
+        }
+    }
+
+    private func editTemplate() {
+        editorMode = .edit(template)
+    }
+
     private static func parseVariables(_ variablesText: String) -> [String] {
         var seenVariables = Set<String>()
         var parsedVariables: [String] = []
@@ -182,6 +240,19 @@ struct PromptTemplateDetailView: View {
             }
 
             result[key] = pair.value
+        }
+    }
+}
+
+extension PromptTemplateEditorView.EditorMode: Identifiable {
+    var id: String {
+        switch self {
+        case .create:
+            return "create"
+        case .edit(let template):
+            return "edit-\(template.id.uuidString)"
+        case .duplicate(let template):
+            return "duplicate-\(template.id.uuidString)"
         }
     }
 }
