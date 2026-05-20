@@ -14,6 +14,7 @@ struct BackupImportDryRunResult: Codable {
     let localSummary: BackupRecordSummary?
     let conflictSummary: BackupConflictSummary
     let imageRestoreSummary: BackupImageRestoreSummary
+    let restorePlan: BackupRestorePlan?
     let recommendation: String
 }
 
@@ -29,6 +30,8 @@ struct BackupConflictSummary: Codable {
     let duplicateDayKeys: Int
     let duplicateTaskTitlesToday: Int
     let duplicateMistakeFingerprints: Int
+    let duplicateDailyReviewDayKeys: Int
+    let duplicateWeeklyReviewStartKeys: Int
 
     static let empty = BackupConflictSummary(
         duplicateDayPlanIds: 0,
@@ -41,7 +44,9 @@ struct BackupConflictSummary: Codable {
         duplicateWeeklyReviewIds: 0,
         duplicateDayKeys: 0,
         duplicateTaskTitlesToday: 0,
-        duplicateMistakeFingerprints: 0
+        duplicateMistakeFingerprints: 0,
+        duplicateDailyReviewDayKeys: 0,
+        duplicateWeeklyReviewStartKeys: 0
     )
 
     var totalIDConflicts: Int {
@@ -128,7 +133,7 @@ enum BackupImportDryRunStore {
             imageRestoreSummary: imageRestoreSummary
         )
 
-        return BackupImportDryRunResult(
+        let resultWithoutPlan = BackupImportDryRunResult(
             fileName: fileName,
             isReadable: true,
             schemaName: envelope.schemaName,
@@ -141,7 +146,29 @@ enum BackupImportDryRunStore {
             localSummary: localSummary,
             conflictSummary: conflictSummary,
             imageRestoreSummary: imageRestoreSummary,
+            restorePlan: nil,
             recommendation: recommendation
+        )
+        let restorePlan = BackupRestorePlanBuilder.buildPlan(
+            envelope: envelope,
+            dryRun: resultWithoutPlan
+        )
+
+        return BackupImportDryRunResult(
+            fileName: resultWithoutPlan.fileName,
+            isReadable: resultWithoutPlan.isReadable,
+            schemaName: resultWithoutPlan.schemaName,
+            exportVersion: resultWithoutPlan.exportVersion,
+            exportSchemaVersion: resultWithoutPlan.exportSchemaVersion,
+            exportedAt: resultWithoutPlan.exportedAt,
+            validationWarnings: resultWithoutPlan.validationWarnings,
+            validationErrors: resultWithoutPlan.validationErrors,
+            incomingSummary: resultWithoutPlan.incomingSummary,
+            localSummary: resultWithoutPlan.localSummary,
+            conflictSummary: resultWithoutPlan.conflictSummary,
+            imageRestoreSummary: resultWithoutPlan.imageRestoreSummary,
+            restorePlan: restorePlan,
+            recommendation: resultWithoutPlan.recommendation
         )
     }
 
@@ -163,6 +190,7 @@ enum BackupImportDryRunStore {
             localSummary: nil,
             conflictSummary: .empty,
             imageRestoreSummary: .empty,
+            restorePlan: nil,
             recommendation: "不建议恢复：备份文件无法完成读取或解析。请重新选择有效的 Gaokao Cockpit JSON 备份；本阶段不会写入 SwiftData 或恢复图片。"
         )
     }
@@ -217,6 +245,16 @@ enum BackupImportDryRunStore {
             return localMistakeFingerprints.contains(fingerprint) ? count + 1 : count
         }
 
+        let localDailyReviewDayKeys = Set(localData.dailyReviews.map { normalizedKey($0.dayKey) })
+        let duplicateDailyReviewDayKeys = envelope.dailyReviews.reduce(0) { count, review in
+            localDailyReviewDayKeys.contains(normalizedKey(review.dayKey)) ? count + 1 : count
+        }
+
+        let localWeeklyReviewStartKeys = Set(localData.weeklyReviews.map { normalizedKey($0.weekStartKey) })
+        let duplicateWeeklyReviewStartKeys = envelope.weeklyReviews.reduce(0) { count, review in
+            localWeeklyReviewStartKeys.contains(normalizedKey(review.weekStartKey)) ? count + 1 : count
+        }
+
         return BackupConflictSummary(
             duplicateDayPlanIds: duplicateCount(incoming: envelope.dayPlans.map(\.id), local: localDayPlanIds),
             duplicateStudyTaskIds: duplicateCount(incoming: envelope.studyTasks.map(\.id), local: localStudyTaskIds),
@@ -228,7 +266,9 @@ enum BackupImportDryRunStore {
             duplicateWeeklyReviewIds: duplicateCount(incoming: envelope.weeklyReviews.map(\.id), local: localWeeklyReviewIds),
             duplicateDayKeys: duplicateDayKeys,
             duplicateTaskTitlesToday: duplicateTaskTitlesToday,
-            duplicateMistakeFingerprints: duplicateMistakeFingerprints
+            duplicateMistakeFingerprints: duplicateMistakeFingerprints,
+            duplicateDailyReviewDayKeys: duplicateDailyReviewDayKeys,
+            duplicateWeeklyReviewStartKeys: duplicateWeeklyReviewStartKeys
         )
     }
 
@@ -282,6 +322,14 @@ enum BackupImportDryRunStore {
 
         if conflictSummary.duplicateMistakeFingerprints > 0 {
             recommendations.append("检测到疑似重复错题，恢复时应允许逐条跳过、合并或保留副本。")
+        }
+
+        if conflictSummary.duplicateDailyReviewDayKeys > 0 {
+            recommendations.append("检测到同 dayKey 每日复盘，恢复时应默认跳过，避免覆盖本地复盘。")
+        }
+
+        if conflictSummary.duplicateWeeklyReviewStartKeys > 0 {
+            recommendations.append("检测到同 weekStartKey 周复盘，恢复时应默认跳过，避免覆盖本地复盘。")
         }
 
         if imageRestoreSummary.missingBase64Count > 0 {

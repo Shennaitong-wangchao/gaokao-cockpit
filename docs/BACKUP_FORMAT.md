@@ -1,6 +1,8 @@
 # Gaokao Cockpit 备份格式说明
 
-当前备份格式用于本地 JSON 导出，目标是让学习数据可保存、可阅读、可校验。Stage 13 支持导出、结构验证和导入 Dry-run 预检；不支持真正导入恢复，不会写入 SwiftData，也不会覆盖现有数据。
+当前备份格式用于本地 JSON 导出，目标是让学习数据可保存、可阅读、可校验。Stage 14 支持导出、结构验证、导入 Dry-run 预检和未来恢复计划预览；仍不支持真正导入恢复，不会写入 SwiftData，也不会覆盖现有数据。
+
+恢复策略另见 [RESTORE_STRATEGY.md](RESTORE_STRATEGY.md)。Restore plan 验证说明另见 [RESTORE_PLAN_TESTS.md](RESTORE_PLAN_TESTS.md)。
 
 ## 文件形态
 
@@ -68,9 +70,9 @@
 
 因此，checksum 表示“checksum 字段为空时的备份内容”的 SHA256，用于检测导出流程是否稳定、文件内容是否与记录的 hash 匹配。它不是加密签名，不能证明文件来源，也不能防止人为篡改。
 
-## 导入 Dry-run 策略
+## 导入 Dry-run 与 Restore Plan 策略
 
-Stage 13 的导入预检只做只读 dry-run。用户选择一个备份 JSON 后，App 会读取文件、解析 `GaokaoBackupEnvelope`，并复用本地校验逻辑检查 schema、version、checksum 和 record summary 是否合理。
+Stage 14 的导入预检只做只读 dry-run。用户选择一个备份 JSON 后，App 会读取文件、解析 `GaokaoBackupEnvelope`，并复用本地校验逻辑检查 schema、version、checksum 和 record summary 是否合理。
 
 Dry-run 会比较备份数据与当前本地数据：
 
@@ -78,13 +80,25 @@ Dry-run 会比较备份数据与当前本地数据：
 - 检查 `DayPlan.dayKey` 是否与本地已有日期计划冲突。
 - 检查 `StudyTask` 是否存在同 `dayKey + title` 的疑似重复。
 - 检查错题 fingerprint 是否疑似重复。fingerprint 使用 `subject + chapter + source + questionText 前 80 字`。
+- 检查 `DailyReview.dayKey` 和 `WeeklyReview.weekStartKey` 是否与本地复盘冲突。
 - 检查 `mistakeImages` 中有多少图片带有 base64、缺失 base64，以及预计可恢复的图片字节数。
 
-Dry-run 不会调用 `context.insert`、`context.delete` 或 `context.save`，不会写入 SwiftData，不会恢复图片文件，也不会覆盖现有数据。未来真正恢复建议优先使用 `merge-with-new-ids`，而不是原 ID 覆盖；同日计划、同名任务和疑似重复错题应提供跳过、合并或保留副本策略。
+Dry-run 后会生成一个纯结构 `BackupRestorePlan` 预览。该 plan 默认策略为 `merge-with-new-ids`，只统计 incoming、planned inserts、skipped、ID mapping 和 image plan，不生成真实新 UUID，不写文件，也不访问 `ModelContext`。
+
+Dry-run 和 restore plan 不会调用 `context.insert`、`context.delete` 或 `context.save`，不会写入 SwiftData，不会恢复图片文件，也不会覆盖现有数据。未来真正恢复建议优先使用 `merge-with-new-ids`，而不是原 ID 覆盖；同日计划、同名任务、疑似重复错题和重复复盘应默认跳过或进入人工确认。
+
+## Fixture 说明
+
+Stage 14 新增小规模 fixture，用于结构解析、dry-run 和 restore plan 人工验证：
+
+- `fixtures/backups/minimal-valid-backup.json`：包含 1 个 DayPlan、2 个 StudyTask、1 个 FocusSession、1 个 MistakeRecord、1 个 DailyReview 和 1 个 mistakeImage。
+- `fixtures/backups/duplicate-conflict-backup.json`：包含容易与本地样本冲突的 dayKey、任务标题、错题 fingerprint、复盘 key，以及一个内置 PromptTemplate。
+
+Fixture 文件保持很小，错题图片使用极小 base64 占位。Fixture 的 checksum 字段可为空或占位，仅用于结构测试，不代表真实导出文件的完整性保证。
 
 ## 当前限制
 
-- 支持导出、结构验证和导入 Dry-run 预检，不支持真正导入恢复。
+- 支持导出、结构验证、导入 Dry-run 预检和 restore plan 预览，不支持真正导入恢复。
 - 只支持验证 Gaokao Cockpit 本地 JSON 备份文件结构。
 - 不写入 SwiftData。
 - 不恢复错题图片文件。

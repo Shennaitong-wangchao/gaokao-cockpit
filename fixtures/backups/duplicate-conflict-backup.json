@@ -1,0 +1,168 @@
+{
+  "appName": "Gaokao Cockpit",
+  "appVersion": "1.0 (fixture)",
+  "exportVersion": 1,
+  "schemaName": "GaokaoCockpitBackup",
+  "exportSchemaVersion": 1,
+  "exportedAt": "2026-05-20T09:00:00Z",
+  "notes": "Stage 14 duplicate fixture for dry-run conflict and restore plan skipped-count checks. Checksum fields are intentionally empty for fixture use.",
+  "recordSummary": {
+    "dayPlanCount": 1,
+    "studyTaskCount": 2,
+    "focusSessionCount": 1,
+    "mistakeRecordCount": 1,
+    "promptTemplateCount": 1,
+    "resourceItemCount": 0,
+    "dailyReviewCount": 1,
+    "weeklyReviewCount": 1,
+    "mistakeImageCount": 1
+  },
+  "integrity": {
+    "jsonPayloadSHA256": "",
+    "payloadWithoutChecksumSHA256": "",
+    "imageTotalBytes": 3,
+    "missingImageCount": 0,
+    "warningCount": 0
+  },
+  "warnings": [],
+  "dayPlans": [
+    {
+      "id": "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
+      "dayKey": "2026-05-20",
+      "date": "2026-05-20T00:00:00Z",
+      "wakeTime": "2026-05-20T06:20:00Z",
+      "stateScore": 3,
+      "mainSubject": "数学",
+      "topTasksText": "数学压轴题整理",
+      "baselineTasksText": "英语阅读 1 篇",
+      "bonusTasksText": "物理错题复盘",
+      "tomorrowFirstAction": "先改错题 fingerprint 样本",
+      "createdAt": "2026-05-20T06:30:00Z",
+      "updatedAt": "2026-05-20T06:35:00Z"
+    }
+  ],
+  "studyTasks": [
+    {
+      "id": "bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbb1",
+      "dayPlanId": "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
+      "dayKey": "2026-05-20",
+      "title": "数学压轴题整理",
+      "subject": "数学",
+      "category": "top",
+      "estimatedMinutes": 50,
+      "actualMinutes": null,
+      "status": "pending",
+      "outputNote": "",
+      "createdAt": "2026-05-20T06:45:00Z",
+      "updatedAt": "2026-05-20T06:45:00Z"
+    },
+    {
+      "id": "bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbb2",
+      "dayPlanId": "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
+      "dayKey": "2026-05-20",
+      "title": "物理错题复盘",
+      "subject": "物理",
+      "category": "bonus",
+      "estimatedMinutes": 30,
+      "actualMinutes": null,
+      "status": "pending",
+      "outputNote": "",
+      "createdAt": "2026-05-20T06:46:00Z",
+      "updatedAt": "2026-05-20T06:46:00Z"
+    }
+  ],
+  "focusSessions": [
+    {
+      "id": "cccccccc-cccc-cccc-cccc-cccccccccccc",
+      "taskId": "bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbb1",
+      "dayKey": "2026-05-20",
+      "subject": "数学",
+      "startTime": "2026-05-20T07:00:00Z",
+      "endTime": "2026-05-20T07:30:00Z",
+      "plannedMinutes": 50,
+      "actualMinutes": 30,
+      "distractionCount": 2,
+      "completionScore": 3,
+      "sessionNote": "fixture conflict sample",
+      "nextAction": "确认重复任务跳过。",
+      "createdAt": "2026-05-20T07:00:00Z"
+    }
+  ],
+  "mistakeRecords": [
+    {
+      "id": "dddddddd-dddd-dddd-dddd-dddddddddddd",
+      "subject": "数学",
+      "chapter": "导数",
+      "source": "fixture",
+      "questionText": "已知函数 f(x) 含参数 a，讨论单调性并求极值。",
+      "questionImagePath": "MistakeImages/fixture-duplicate.jpg",
+      "mySolution": "重复样本：仍然漏掉边界。",
+      "correctSolution": "按导函数零点和边界分类。",
+      "mistakeType": "concept",
+      "rootCause": "分类讨论不完整。",
+      "questionSignal": "参数出现在导函数中。",
+      "correctModel": "先找临界点，再检查边界。",
+      "variantTask": "重做同类导数题。",
+      "nextReminder": null,
+      "reviewStatus": "new",
+      "createdAt": "2026-05-20T08:10:00Z",
+      "updatedAt": "2026-05-20T08:20:00Z"
+    }
+  ],
+  "promptTemplates": [
+    {
+      "id": "eeeeeeee-eeee-eeee-eeee-eeeeeeeeeeee",
+      "title": "内置错题手术 Prompt",
+      "category": "mistake",
+      "templateDescription": "Built-in fixture prompt that restore plan should skip.",
+      "templateText": "请帮我分析这道错题。",
+      "variablesText": "subject,question",
+      "usageCount": 0,
+      "isBuiltIn": true,
+      "createdAt": "2026-05-20T08:30:00Z",
+      "updatedAt": "2026-05-20T08:30:00Z"
+    }
+  ],
+  "resourceItems": [],
+  "dailyReviews": [
+    {
+      "id": "ffffffff-ffff-ffff-ffff-ffffffffffff",
+      "dayKey": "2026-05-20",
+      "date": "2026-05-20T00:00:00Z",
+      "completedSummary": "重复复盘样本。",
+      "unfinishedSummary": "",
+      "biggestProblem": "用于测试 dayKey 冲突。",
+      "bestMistakeId": "dddddddd-dddd-dddd-dddd-dddddddddddd",
+      "stateScoreEnd": 3,
+      "tomorrowFirstAction": "确认重复复盘跳过。",
+      "createdAt": "2026-05-20T12:00:00Z",
+      "updatedAt": "2026-05-20T12:05:00Z"
+    }
+  ],
+  "weeklyReviews": [
+    {
+      "id": "99999999-9999-9999-9999-999999999999",
+      "weekStartKey": "2026-05-18",
+      "weekEndKey": "2026-05-24",
+      "weekStartDate": "2026-05-18T00:00:00Z",
+      "weekEndDate": "2026-05-24T00:00:00Z",
+      "totalStudyMinutes": 30,
+      "subjectBreakdownText": "数学 30",
+      "completedTaskCount": 1,
+      "mistakeCount": 1,
+      "mistakeTypeBreakdownText": "concept 1",
+      "keyProblemsText": "重复周复盘样本。",
+      "nextWeekFocusText": "确认 weekStartKey 冲突。",
+      "createdAt": "2026-05-20T12:10:00Z",
+      "updatedAt": "2026-05-20T12:10:00Z"
+    }
+  ],
+  "mistakeImages": [
+    {
+      "relativePath": "MistakeImages/fixture-duplicate.jpg",
+      "fileName": "fixture-duplicate.jpg",
+      "base64JPEG": "AQID",
+      "byteCount": 3
+    }
+  ]
+}

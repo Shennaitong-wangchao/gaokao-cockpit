@@ -1,0 +1,66 @@
+# Restore Plan 测试说明
+
+当前项目没有测试 target。Stage 14 不为了 restore plan 新增测试 target，避免扩大 Xcode 工程复杂度；验证重点放在 fixture、导入 dry-run UI 和纯函数 `BackupRestorePlanBuilder` 的构建结果。
+
+## 手动验证 fixture
+
+1. 运行 App Debug 构建。
+2. 进入 Reviews 页面底部的“数据与备份”。
+3. 在“导入预检（Dry-run）”中选择 `fixtures/backups/minimal-valid-backup.json`。
+4. 确认 UI 能解析文件，并显示 incoming summary、local summary、冲突摘要、图片恢复摘要和“未来恢复计划预览”。
+5. 再选择 `fixtures/backups/duplicate-conflict-backup.json`，确认冲突摘要和 restore plan skipped counts 能显示。
+
+## minimal-valid-backup 预期
+
+`minimal-valid-backup.json` 包含：
+
+- 1 个 `DayPlan`
+- 2 个 `StudyTask`
+- 1 个 `FocusSession`
+- 1 个 `MistakeRecord`
+- 1 个 `DailyReview`
+- 1 个 `mistakeImage`
+
+在没有本地重复数据时，dry-run 应显示这些 incoming counts。Restore plan 应显示：
+
+- 策略为 `merge-with-new-ids`
+- `DayPlans` 预计插入 1
+- `StudyTasks` 预计插入 2
+- `FocusSessions` 预计插入 1
+- `Mistakes` 预计插入 1
+- `Reviews` 预计插入 1
+- `Images` 预计恢复 1
+- 内置 Prompt 跳过 0
+
+fixture 的 checksum 可用于结构测试，不作为正式备份完整性保证。如果 checksum 与当前编码策略不匹配，dry-run 仍应显示 validation error，并且 restore plan 的 `isSafeToProceed` 应为“否”。
+
+## duplicate-conflict-backup 预期
+
+`duplicate-conflict-backup.json` 使用容易与本地样本冲突的 `dayKey`、任务标题和错题 fingerprint。若本地已有相同日期计划、同日同名任务或相同错题内容，dry-run 应显示：
+
+- `dayKey` 冲突数量增加。
+- `同日同名任务` 冲突数量增加。
+- `错题 fingerprint` 冲突数量增加。
+- Restore plan 中重复 DayPlan、重复任务、重复错题的 skipped counts 增加。
+
+如果本地没有对应样本，fixture 仍可解析，但冲突数量可能为 0。这是 dry-run 与当前本地数据比较的正常结果。
+
+## 不写入验证
+
+Stage 14 不写入 SwiftData，也不恢复图片。验证方式：
+
+- Dry-run 前记录导出页显示的 local summary。
+- 选择 fixture 完成 dry-run。
+- 再次导出或重新进入 dry-run，确认本地 DayPlan、StudyTask、FocusSession、MistakeRecord、Review 数量没有变化。
+- 检查 `Application Support/MistakeImages/` 不会因为 dry-run 生成新图片文件。
+
+## Restore Plan 关键逻辑
+
+`BackupRestorePlanBuilder.buildPlan(envelope:dryRun:)` 是纯函数：
+
+- 不访问 `ModelContext`。
+- 不写 SwiftData。
+- 不写图片文件。
+- 不生成真实 UUID。
+- 基于 incoming summary、dry-run conflict summary 和 image summary 生成 planned/skipped/mapping/image 统计。
+- 如果 `dryRun.validationErrors` 非空，`isSafeToProceed` 为 `false`，errors 原样带入 plan。

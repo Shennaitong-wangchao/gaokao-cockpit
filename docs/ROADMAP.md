@@ -461,7 +461,44 @@
 - 不做数据模型迁移。
 - 不接 AI API。
 
-## Stage 14：未来扩展：AI API、RAG、GoodNotes/NotebookLM 索引、macOS 端、云同步
+## Stage 14：Restore Strategy / Fixture Tests / 恢复策略与小规模 Fixture 测试
+
+当前进度：Stage 14 已完成。
+
+### 目标
+
+为未来真正导入恢复做准备，但本阶段仍不写入 SwiftData、不恢复图片、不覆盖用户数据。
+
+### 已完成内容
+
+- 新增 `docs/RESTORE_STRATEGY.md`，说明推荐 `merge-with-new-ids`、ID 映射、冲突决策、图片恢复和恢复前后对账策略。
+- 新增纯结构 `BackupRestorePlan`，包含 incoming、planned、skipped、ID mapping、image plan、warnings/errors 和 `isSafeToProceed`。
+- 新增 `BackupRestorePlanBuilder`，基于 `GaokaoBackupEnvelope` 与 dry-run 结果生成 restore plan，不访问 `ModelContext`，不写文件。
+- Dry-run UI 新增“未来恢复计划预览”，显示策略、是否建议继续、预计插入、预计跳过、warnings/errors，并明确本阶段不会写入数据。
+- Dry-run 冲突摘要补充 `DailyReview.dayKey` 和 `WeeklyReview.weekStartKey`。
+- 新增 `fixtures/backups/minimal-valid-backup.json` 与 `fixtures/backups/duplicate-conflict-backup.json`。
+- 新增 `docs/RESTORE_PLAN_TESTS.md`，说明 fixture 手动验证路径和预期结果。
+
+### 验收标准
+
+- Restore plan 默认策略为 `merge-with-new-ids`。
+- Restore plan 只做统计，不生成真实 UUID，不写 SwiftData，不恢复图片文件。
+- Dry-run 后能看到 planned/skipped counts。
+- Fixture JSON 可解析并用于手动验证 summary、冲突和 skipped counts。
+- Debug / Release 构建通过。
+
+### 不做什么
+
+- 不做真正导入恢复 UI。
+- 不写入 SwiftData 主库。
+- 不恢复图片到真实 `MistakeImages` 目录。
+- 不覆盖任何用户数据。
+- 不接 AI API。
+- 不做云同步、账号、加密、zip。
+- 不引入第三方依赖。
+- 不做数据模型迁移。
+
+## Stage 15：未来扩展：AI API、RAG、GoodNotes/NotebookLM 索引、macOS 端、云同步
 
 ### 目标
 

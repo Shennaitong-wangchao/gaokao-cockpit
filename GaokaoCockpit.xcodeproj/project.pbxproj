@@ -57,6 +57,8 @@
 		A00000000000000000000148 /* BackupValidationStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000279 /* BackupValidationStore.swift */; };
 		A00000000000000000000149 /* BackupImportDryRunStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000280 /* BackupImportDryRunStore.swift */; };
 		A00000000000000000000150 /* DocumentPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000281 /* DocumentPicker.swift */; };
+		A00000000000000000000151 /* BackupRestorePlan.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000282 /* BackupRestorePlan.swift */; };
+		A00000000000000000000152 /* BackupRestorePlanBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000283 /* BackupRestorePlanBuilder.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -120,6 +122,8 @@
 		A00000000000000000000279 /* BackupValidationStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackupValidationStore.swift; sourceTree = "<group>"; };
 		A00000000000000000000280 /* BackupImportDryRunStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackupImportDryRunStore.swift; sourceTree = "<group>"; };
 		A00000000000000000000281 /* DocumentPicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DocumentPicker.swift; sourceTree = "<group>"; };
+		A00000000000000000000282 /* BackupRestorePlan.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackupRestorePlan.swift; sourceTree = "<group>"; };
+		A00000000000000000000283 /* BackupRestorePlanBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackupRestorePlanBuilder.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -280,6 +284,8 @@
 				A00000000000000000000276 /* BackupExportStore.swift */,
 				A00000000000000000000279 /* BackupValidationStore.swift */,
 				A00000000000000000000280 /* BackupImportDryRunStore.swift */,
+				A00000000000000000000282 /* BackupRestorePlan.swift */,
+				A00000000000000000000283 /* BackupRestorePlanBuilder.swift */,
 				A00000000000000000000255 /* PromptTemplateStore.swift */,
 				A00000000000000000000265 /* PromptRenderer.swift */,
 				A00000000000000000000256 /* DailyReviewStore.swift */,
@@ -432,6 +438,8 @@
 				A00000000000000000000145 /* BackupExportStore.swift in Sources */,
 				A00000000000000000000148 /* BackupValidationStore.swift in Sources */,
 				A00000000000000000000149 /* BackupImportDryRunStore.swift in Sources */,
+				A00000000000000000000151 /* BackupRestorePlan.swift in Sources */,
+				A00000000000000000000152 /* BackupRestorePlanBuilder.swift in Sources */,
 				A00000000000000000000124 /* PromptTemplateStore.swift in Sources */,
 				A00000000000000000000134 /* PromptRenderer.swift in Sources */,
 				A00000000000000000000125 /* DailyReviewStore.swift in Sources */,
