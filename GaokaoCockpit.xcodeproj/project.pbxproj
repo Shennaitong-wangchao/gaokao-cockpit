@@ -60,6 +60,32 @@
 		A00000000000000000000150 /* DocumentPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000281 /* DocumentPicker.swift */; };
 		A00000000000000000000151 /* BackupRestorePlan.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000282 /* BackupRestorePlan.swift */; };
 		A00000000000000000000152 /* BackupRestorePlanBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000283 /* BackupRestorePlanBuilder.swift */; };
+		A00000000000000000000154 /* TodayHeaderSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000285 /* TodayHeaderSection.swift */; };
+		A00000000000000000000155 /* TodayLowEnergyBanner.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000286 /* TodayLowEnergyBanner.swift */; };
+		A00000000000000000000156 /* TodayPlanSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000287 /* TodayPlanSection.swift */; };
+		A00000000000000000000157 /* TodayPlanToTaskSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000288 /* TodayPlanToTaskSheet.swift */; };
+		A00000000000000000000158 /* TodayTaskSummarySection.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000289 /* TodayTaskSummarySection.swift */; };
+		A00000000000000000000159 /* TodayTaskListPreviewSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000290 /* TodayTaskListPreviewSection.swift */; };
+		A00000000000000000000160 /* TodayTomorrowActionSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000291 /* TodayTomorrowActionSection.swift */; };
+		A00000000000000000000161 /* TodayUIPrimitives.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000292 /* TodayUIPrimitives.swift */; };
+		A00000000000000000000162 /* TaskSummaryCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000293 /* TaskSummaryCard.swift */; };
+		A00000000000000000000163 /* TaskFilterBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000294 /* TaskFilterBar.swift */; };
+		A00000000000000000000164 /* TaskRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000295 /* TaskRowView.swift */; };
+		A00000000000000000000165 /* TaskEditorSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000296 /* TaskEditorSheet.swift */; };
+		A00000000000000000000166 /* MistakeSummaryCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000297 /* MistakeSummaryCard.swift */; };
+		A00000000000000000000167 /* MistakeFilterBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000298 /* MistakeFilterBar.swift */; };
+		A00000000000000000000168 /* MistakeRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000299 /* MistakeRowView.swift */; };
+		A00000000000000000000169 /* ReviewHeaderSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000700 /* ReviewHeaderSection.swift */; };
+		A00000000000000000000170 /* DailyReviewSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000701 /* DailyReviewSection.swift */; };
+		A00000000000000000000171 /* WeeklyReviewSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000702 /* WeeklyReviewSection.swift */; };
+		A00000000000000000000172 /* BackupEntrySection.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000703 /* BackupEntrySection.swift */; };
+		A00000000000000000000173 /* ReviewSummaryCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000704 /* ReviewSummaryCard.swift */; };
+		A00000000000000000000174 /* BackupExportSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000705 /* BackupExportSection.swift */; };
+		A00000000000000000000175 /* BackupDryRunSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000706 /* BackupDryRunSection.swift */; };
+		A00000000000000000000176 /* BackupRestorePlanPreviewSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000707 /* BackupRestorePlanPreviewSection.swift */; };
+		A00000000000000000000177 /* BackupSummaryRows.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000708 /* BackupSummaryRows.swift */; };
+		A00000000000000000000178 /* PromptVariableInputSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000709 /* PromptVariableInputSection.swift */; };
+		A00000000000000000000179 /* PromptPreviewSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000710 /* PromptPreviewSection.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -126,6 +152,32 @@
 		A00000000000000000000281 /* DocumentPicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DocumentPicker.swift; sourceTree = "<group>"; };
 		A00000000000000000000282 /* BackupRestorePlan.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackupRestorePlan.swift; sourceTree = "<group>"; };
 		A00000000000000000000283 /* BackupRestorePlanBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackupRestorePlanBuilder.swift; sourceTree = "<group>"; };
+		A00000000000000000000285 /* TodayHeaderSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodayHeaderSection.swift; sourceTree = "<group>"; };
+		A00000000000000000000286 /* TodayLowEnergyBanner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodayLowEnergyBanner.swift; sourceTree = "<group>"; };
+		A00000000000000000000287 /* TodayPlanSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodayPlanSection.swift; sourceTree = "<group>"; };
+		A00000000000000000000288 /* TodayPlanToTaskSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodayPlanToTaskSheet.swift; sourceTree = "<group>"; };
+		A00000000000000000000289 /* TodayTaskSummarySection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodayTaskSummarySection.swift; sourceTree = "<group>"; };
+		A00000000000000000000290 /* TodayTaskListPreviewSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodayTaskListPreviewSection.swift; sourceTree = "<group>"; };
+		A00000000000000000000291 /* TodayTomorrowActionSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodayTomorrowActionSection.swift; sourceTree = "<group>"; };
+		A00000000000000000000292 /* TodayUIPrimitives.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodayUIPrimitives.swift; sourceTree = "<group>"; };
+		A00000000000000000000293 /* TaskSummaryCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskSummaryCard.swift; sourceTree = "<group>"; };
+		A00000000000000000000294 /* TaskFilterBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskFilterBar.swift; sourceTree = "<group>"; };
+		A00000000000000000000295 /* TaskRowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskRowView.swift; sourceTree = "<group>"; };
+		A00000000000000000000296 /* TaskEditorSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskEditorSheet.swift; sourceTree = "<group>"; };
+		A00000000000000000000297 /* MistakeSummaryCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MistakeSummaryCard.swift; sourceTree = "<group>"; };
+		A00000000000000000000298 /* MistakeFilterBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MistakeFilterBar.swift; sourceTree = "<group>"; };
+		A00000000000000000000299 /* MistakeRowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MistakeRowView.swift; sourceTree = "<group>"; };
+		A00000000000000000000700 /* ReviewHeaderSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReviewHeaderSection.swift; sourceTree = "<group>"; };
+		A00000000000000000000701 /* DailyReviewSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DailyReviewSection.swift; sourceTree = "<group>"; };
+		A00000000000000000000702 /* WeeklyReviewSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeeklyReviewSection.swift; sourceTree = "<group>"; };
+		A00000000000000000000703 /* BackupEntrySection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackupEntrySection.swift; sourceTree = "<group>"; };
+		A00000000000000000000704 /* ReviewSummaryCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReviewSummaryCard.swift; sourceTree = "<group>"; };
+		A00000000000000000000705 /* BackupExportSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackupExportSection.swift; sourceTree = "<group>"; };
+		A00000000000000000000706 /* BackupDryRunSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackupDryRunSection.swift; sourceTree = "<group>"; };
+		A00000000000000000000707 /* BackupRestorePlanPreviewSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackupRestorePlanPreviewSection.swift; sourceTree = "<group>"; };
+		A00000000000000000000708 /* BackupSummaryRows.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackupSummaryRows.swift; sourceTree = "<group>"; };
+		A00000000000000000000709 /* PromptVariableInputSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PromptVariableInputSection.swift; sourceTree = "<group>"; };
+		A00000000000000000000710 /* PromptPreviewSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PromptPreviewSection.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -181,6 +233,7 @@
 			isa = PBXGroup;
 			children = (
 				A00000000000000000000278 /* BackupExportView.swift */,
+				A00000000000000000000421 /* Components */,
 			);
 			path = Backup;
 			sourceTree = "<group>";
@@ -198,6 +251,7 @@
 			isa = PBXGroup;
 			children = (
 				A00000000000000000000257 /* TodayCockpitView.swift */,
+				A00000000000000000000415 /* Components */,
 				A00000000000000000000203 /* TodayCockpitPlaceholderView.swift */,
 				A00000000000000000000252 /* Stage2DebugPersistenceView.swift */,
 			);
@@ -208,6 +262,7 @@
 			isa = PBXGroup;
 			children = (
 				A00000000000000000000258 /* TaskListView.swift */,
+				A00000000000000000000416 /* Components */,
 				A00000000000000000000204 /* TaskListPlaceholderView.swift */,
 			);
 			path = Tasks;
@@ -227,6 +282,7 @@
 			isa = PBXGroup;
 			children = (
 				A00000000000000000000263 /* MistakeSurgeryView.swift */,
+				A00000000000000000000417 /* Components */,
 				A00000000000000000000264 /* MistakeEditorView.swift */,
 				A00000000000000000000275 /* MistakeImagePreviewView.swift */,
 				A00000000000000000000274 /* CameraImagePicker.swift */,
@@ -239,6 +295,7 @@
 			isa = PBXGroup;
 			children = (
 				A00000000000000000000266 /* PromptLibraryView.swift */,
+				A00000000000000000000418 /* Components */,
 				A00000000000000000000267 /* PromptTemplateDetailView.swift */,
 				A00000000000000000000207 /* PromptLibraryPlaceholderView.swift */,
 			);
@@ -249,6 +306,7 @@
 			isa = PBXGroup;
 			children = (
 				A00000000000000000000271 /* ReviewView.swift */,
+				A00000000000000000000419 /* Components */,
 				A00000000000000000000208 /* ReviewPlaceholderView.swift */,
 			);
 			path = Reviews;
@@ -328,6 +386,74 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
+		A00000000000000000000415 /* Components */ = {
+			isa = PBXGroup;
+			children = (
+				A00000000000000000000285 /* TodayHeaderSection.swift */,
+				A00000000000000000000286 /* TodayLowEnergyBanner.swift */,
+				A00000000000000000000287 /* TodayPlanSection.swift */,
+				A00000000000000000000288 /* TodayPlanToTaskSheet.swift */,
+				A00000000000000000000289 /* TodayTaskSummarySection.swift */,
+				A00000000000000000000290 /* TodayTaskListPreviewSection.swift */,
+				A00000000000000000000291 /* TodayTomorrowActionSection.swift */,
+				A00000000000000000000292 /* TodayUIPrimitives.swift */,
+			);
+			path = Components;
+			sourceTree = "<group>";
+		};
+		A00000000000000000000416 /* Components */ = {
+			isa = PBXGroup;
+			children = (
+				A00000000000000000000293 /* TaskSummaryCard.swift */,
+				A00000000000000000000294 /* TaskFilterBar.swift */,
+				A00000000000000000000295 /* TaskRowView.swift */,
+				A00000000000000000000296 /* TaskEditorSheet.swift */,
+			);
+			path = Components;
+			sourceTree = "<group>";
+		};
+		A00000000000000000000417 /* Components */ = {
+			isa = PBXGroup;
+			children = (
+				A00000000000000000000297 /* MistakeSummaryCard.swift */,
+				A00000000000000000000298 /* MistakeFilterBar.swift */,
+				A00000000000000000000299 /* MistakeRowView.swift */,
+			);
+			path = Components;
+			sourceTree = "<group>";
+		};
+		A00000000000000000000418 /* Components */ = {
+			isa = PBXGroup;
+			children = (
+				A00000000000000000000709 /* PromptVariableInputSection.swift */,
+				A00000000000000000000710 /* PromptPreviewSection.swift */,
+			);
+			path = Components;
+			sourceTree = "<group>";
+		};
+		A00000000000000000000419 /* Components */ = {
+			isa = PBXGroup;
+			children = (
+				A00000000000000000000700 /* ReviewHeaderSection.swift */,
+				A00000000000000000000701 /* DailyReviewSection.swift */,
+				A00000000000000000000702 /* WeeklyReviewSection.swift */,
+				A00000000000000000000703 /* BackupEntrySection.swift */,
+				A00000000000000000000704 /* ReviewSummaryCard.swift */,
+			);
+			path = Components;
+			sourceTree = "<group>";
+		};
+		A00000000000000000000421 /* Components */ = {
+			isa = PBXGroup;
+			children = (
+				A00000000000000000000705 /* BackupExportSection.swift */,
+				A00000000000000000000706 /* BackupDryRunSection.swift */,
+				A00000000000000000000707 /* BackupRestorePlanPreviewSection.swift */,
+				A00000000000000000000708 /* BackupSummaryRows.swift */,
+			);
+			path = Components;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -400,23 +526,49 @@
 				A00000000000000000000101 /* GaokaoCockpitApp.swift in Sources */,
 				A00000000000000000000102 /* AppRootView.swift in Sources */,
 				A00000000000000000000126 /* TodayCockpitView.swift in Sources */,
+				A00000000000000000000154 /* TodayHeaderSection.swift in Sources */,
+				A00000000000000000000155 /* TodayLowEnergyBanner.swift in Sources */,
+				A00000000000000000000156 /* TodayPlanSection.swift in Sources */,
+				A00000000000000000000157 /* TodayPlanToTaskSheet.swift in Sources */,
+				A00000000000000000000158 /* TodayTaskSummarySection.swift in Sources */,
+				A00000000000000000000159 /* TodayTaskListPreviewSection.swift in Sources */,
+				A00000000000000000000160 /* TodayTomorrowActionSection.swift in Sources */,
+				A00000000000000000000161 /* TodayUIPrimitives.swift in Sources */,
 				A00000000000000000000103 /* TodayCockpitPlaceholderView.swift in Sources */,
 				A00000000000000000000127 /* TaskListView.swift in Sources */,
+				A00000000000000000000162 /* TaskSummaryCard.swift in Sources */,
+				A00000000000000000000163 /* TaskFilterBar.swift in Sources */,
+				A00000000000000000000164 /* TaskRowView.swift in Sources */,
+				A00000000000000000000165 /* TaskEditorSheet.swift in Sources */,
 				A00000000000000000000104 /* TaskListPlaceholderView.swift in Sources */,
 				A00000000000000000000129 /* FocusSessionView.swift in Sources */,
 				A00000000000000000000130 /* FocusSessionFinishSheet.swift in Sources */,
 				A00000000000000000000105 /* FocusSessionPlaceholderView.swift in Sources */,
 				A00000000000000000000132 /* MistakeSurgeryView.swift in Sources */,
+				A00000000000000000000166 /* MistakeSummaryCard.swift in Sources */,
+				A00000000000000000000167 /* MistakeFilterBar.swift in Sources */,
+				A00000000000000000000168 /* MistakeRowView.swift in Sources */,
 				A00000000000000000000133 /* MistakeEditorView.swift in Sources */,
 				A00000000000000000000144 /* MistakeImagePreviewView.swift in Sources */,
 				A00000000000000000000143 /* CameraImagePicker.swift in Sources */,
 				A00000000000000000000106 /* MistakeSurgeryPlaceholderView.swift in Sources */,
 				A00000000000000000000135 /* PromptLibraryView.swift in Sources */,
+				A00000000000000000000178 /* PromptVariableInputSection.swift in Sources */,
+				A00000000000000000000179 /* PromptPreviewSection.swift in Sources */,
 				A00000000000000000000136 /* PromptTemplateDetailView.swift in Sources */,
 				A00000000000000000000107 /* PromptLibraryPlaceholderView.swift in Sources */,
 				A00000000000000000000139 /* ReviewView.swift in Sources */,
+				A00000000000000000000169 /* ReviewHeaderSection.swift in Sources */,
+				A00000000000000000000170 /* DailyReviewSection.swift in Sources */,
+				A00000000000000000000171 /* WeeklyReviewSection.swift in Sources */,
+				A00000000000000000000172 /* BackupEntrySection.swift in Sources */,
+				A00000000000000000000173 /* ReviewSummaryCard.swift in Sources */,
 				A00000000000000000000108 /* ReviewPlaceholderView.swift in Sources */,
 				A00000000000000000000147 /* BackupExportView.swift in Sources */,
+				A00000000000000000000174 /* BackupExportSection.swift in Sources */,
+				A00000000000000000000175 /* BackupDryRunSection.swift in Sources */,
+				A00000000000000000000176 /* BackupRestorePlanPreviewSection.swift in Sources */,
+				A00000000000000000000177 /* BackupSummaryRows.swift in Sources */,
 				A00000000000000000000146 /* ShareSheet.swift in Sources */,
 				A00000000000000000000150 /* DocumentPicker.swift in Sources */,
 				A00000000000000000000109 /* ModelDefaults.swift in Sources */,

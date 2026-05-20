@@ -571,7 +571,49 @@
 - 不引入第三方依赖。
 - 不做大型 UI 或架构重构。
 
-## Stage 17：未来扩展：AI API、RAG、GoodNotes/NotebookLM 索引、macOS 端、云同步
+## Stage 17：View Componentization / File Slimming / 长 View 文件拆分与组件化瘦身
+
+当前进度：Stage 17 已完成。
+
+### 目标
+
+在功能闭环和备份策略稳定后，降低主要 SwiftUI View 文件的维护成本。只做 UI 文件拆分、组件化和轻量命名整理，不改变业务行为、不改数据模型、不改备份格式。
+
+### 已完成内容
+
+- Today 页面拆出 Components 目录，承接 header、低状态提示、计划区、计划转任务 sheet、任务摘要、任务预览、明日动作和 UI primitives。
+- Tasks 页面拆出任务摘要、筛选条、任务行、任务编辑 sheet。
+- Mistakes 页面拆出列表页摘要、筛选条、错题行，并把列表使用的状态/类型展示 helper 从编辑页移出。
+- Reviews 页面拆出 header、每日复盘 section、周复盘 section、备份入口和复盘通用卡片/统计组件。
+- Backup 页面拆出导出结果、校验结果、dry-run 结果、restore plan 预览和 summary rows。
+- Prompt 详情页拆出变量输入和 Prompt 预览组件。
+- Xcode project 已登记新增组件文件，Debug / Release 构建通过。
+
+### 验收标准
+
+- Today 可保存计划并生成 Tasks。
+- Tasks 可新增、编辑、删除和切换状态。
+- Focus 入口和结束流程不受影响。
+- Mistakes 可新增、编辑、筛选、图片预览和生成 Prompt。
+- Prompts 可填写变量、生成并复制 Prompt。
+- Reviews 可保存每日/周复盘，并打开备份入口。
+- Backup 可导出、验证、dry-run 并预览 restore plan。
+- 不改 SwiftData `@Model`，不触发数据迁移。
+- 不改变备份 schema、`exportVersion` 或 restore plan 语义。
+
+### 不做什么
+
+- 不新增业务功能。
+- 不改 SwiftData `@Model`。
+- 不做数据模型迁移。
+- 不改变备份 schema。
+- 不做真实导入恢复。
+- 不接 AI API。
+- 不做云同步或账号。
+- 不引入第三方依赖。
+- 不大改 Store/helper。
+
+## Stage 18：未来扩展：AI API、RAG、GoodNotes/NotebookLM 索引、macOS 端、云同步
 
 ### 目标
 

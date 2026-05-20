@@ -132,6 +132,8 @@
 
 ## 9. 构建
 
+- [ ] Stage 17 后 Today / Tasks / Focus / Mistakes / Prompts / Reviews / Backup 主流程均完成一次冒烟回归。
+- [ ] Stage 17 后新增 Components 文件均已加入 Xcode target。
 - [ ] `xcodebuild -project GaokaoCockpit.xcodeproj -scheme GaokaoCockpit -configuration Debug -destination 'generic/platform=iOS Simulator' build` 通过。
 - [ ] `xcodebuild -project GaokaoCockpit.xcodeproj -scheme GaokaoCockpit -configuration Debug -destination 'platform=iOS Simulator,name=iPhone 17' build` 通过。
 - [ ] `xcodebuild -project GaokaoCockpit.xcodeproj -scheme GaokaoCockpit -configuration Release -destination 'generic/platform=iOS Simulator' build` 通过。
