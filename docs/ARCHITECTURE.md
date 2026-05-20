@@ -1,16 +1,16 @@
-# Architecture
+# 架构说明 / Architecture
 
-Gaokao Cockpit is a single-target SwiftUI iOS app built around a local-first learning loop. The app uses SwiftData for persistence, small store/helper types for data access, and feature-oriented SwiftUI screens.
+高考驾驶舱是一个单 target 的 SwiftUI iOS App，围绕本地优先的学习闭环构建。当前使用 SwiftData 做本地持久化，用小型 Store/helper 承接数据访问和纯逻辑，用按功能拆分的 SwiftUI 页面承接交互。
 
-## Goals
+## 架构目标
 
-- Keep the core learning loop usable offline.
-- Keep data ownership on the device.
-- Avoid backend, account, and sync complexity in the MVP.
-- Keep SwiftUI views understandable by splitting long screens into components.
-- Keep backup and restore planning conservative, inspectable, and reversible.
+- 核心学习闭环离线可用。
+- 数据所有权尽量留在设备本地。
+- MVP 阶段避免后端、账号和同步复杂度。
+- 长 SwiftUI 页面拆成可维护的小组件。
+- 备份与恢复计划保持保守、可检查、可回滚。
 
-## High-Level Structure
+## 顶层结构
 
 ```text
 GaokaoCockpitApp
@@ -24,80 +24,80 @@ GaokaoCockpitApp
       -> ReviewView
 ```
 
-The root navigation is a `TabView` with five user-facing areas:
+根导航是一个 `TabView`，包含五个主要区域：
 
-- Today: daily plan, state, task summary, plan-to-task conversion.
-- Tasks: concrete study tasks and status management.
-- Mistakes: mistake surgery records and optional local images.
-- Prompt: built-in and custom prompt templates.
-- Reviews: daily/weekly reviews and backup entry point.
+- 今日：今日计划、状态、任务摘要、计划转任务。
+- 任务：具体学习任务和状态管理。
+- 错题：错题手术记录和可选本地题图。
+- Prompt：内置和自定义 Prompt 模板。
+- 复盘：每日/周复盘，以及数据备份入口。
 
-## Persistence
+## 持久化策略
 
-SwiftData models live in `GaokaoCockpit/Models`.
+SwiftData 模型位于 `GaokaoCockpit/Models`。
 
-The app intentionally stores simple values such as `UUID`, `String`, `Date`, and day keys instead of relying heavily on SwiftData relationships. This keeps backup export, dry-run validation, and future merge restore easier to reason about.
+项目刻意使用相对简单的值类型字段，例如 `UUID`、`String`、`Date` 和 day key，而不是大量依赖 SwiftData relationship。这样做是为了让备份导出、导入 Dry-run 和未来 merge restore 更容易检查。
 
-Common patterns:
+常见模式：
 
-- Date-based lookup uses stable `yyyy-MM-dd` day keys.
-- Optional cross-model references use stored UUID values.
-- User-visible status/category values are wrapped by enum helpers while SwiftData storage remains `String`.
-- Backup Codable snapshots are separate from SwiftData `@Model` types.
+- 按日期查询使用稳定的 `yyyy-MM-dd` day key。
+- 跨模型可选引用使用存储的 UUID。
+- 用户可见的状态/分类在 UI 和 Store 层用 enum wrapper 收敛，但 SwiftData 中仍保存 `String`。
+- 备份使用独立 Codable snapshot，不让 SwiftData `@Model` 直接承担备份格式。
 
-## Stores And Helpers
+## Stores 与 Helpers
 
-Store/helper types live in `GaokaoCockpit/Stores`.
+Store/helper 位于 `GaokaoCockpit/Stores`。
 
-They are deliberately small and feature-specific:
+这些类型刻意保持小而具体：
 
-- `DayPlanStore`, `StudyTaskStore`, `FocusSessionStore`, `MistakeRecordStore`, `DailyReviewStore`, and `WeeklyReviewStore` handle focused SwiftData fetch/create/update patterns.
-- `PromptTemplateSeeder` safely upserts built-in prompt templates without overwriting custom templates.
-- `PromptTemplateStore`, `PromptRenderer`, and `RecentPromptStore` support template discovery, rendering, usage counts, and recent prompt shortcuts.
-- `BackupExportStore`, `BackupValidationStore`, `BackupImportDryRunStore`, `BackupRestorePlan`, and `BackupRestorePlanBuilder` support export, validation, dry-run, and safe future restore planning.
+- `DayPlanStore`、`StudyTaskStore`、`FocusSessionStore`、`MistakeRecordStore`、`DailyReviewStore`、`WeeklyReviewStore` 负责聚焦的 SwiftData 查询、创建和更新。
+- `PromptTemplateSeeder` 负责安全 upsert 内置模板，不覆盖用户自定义模板。
+- `PromptTemplateStore`、`PromptRenderer`、`RecentPromptStore` 支持模板查询、渲染、使用次数和最近使用。
+- `BackupExportStore`、`BackupValidationStore`、`BackupImportDryRunStore`、`BackupRestorePlan`、`BackupRestorePlanBuilder` 支持导出、校验、Dry-run 和未来恢复计划预览。
 
-Views should prefer these helpers over repeating predicates and save logic inline.
+SwiftUI 页面应优先复用这些 helper，避免重复写 predicate、排序和保存逻辑。
 
-## Backup And Restore Boundary
+## 备份与恢复边界
 
-Current behavior:
+当前已经支持：
 
-- Export writes a local JSON backup envelope.
-- Validation checks schema, versions, summary counts, and checksum strategy.
-- Import dry-run reads a backup without modifying SwiftData.
-- Restore-plan preview estimates inserts, skipped duplicates, reference repairs, and image recovery.
+- 导出本地 JSON 备份。
+- 校验 schema、version、数量摘要和 checksum 策略。
+- 选择备份文件做导入 Dry-run，但不写入 SwiftData。
+- 生成 restore plan 预览，估算 planned inserts、skipped duplicates、reference repairs 和 image recovery。
 
-Current non-behavior:
+当前不支持：
 
-- No true import restore.
-- No overwrite restore.
-- No image write-back during dry-run.
-- No cloud sync.
-- No encryption layer.
+- 真正导入恢复。
+- 覆盖式恢复。
+- Dry-run 阶段写回图片文件。
+- 云同步。
+- 加密层。
 
-Any future restore feature should remain `merge-with-new-ids` by default and require a fresh backup before writing local data.
+未来如果做真正恢复，默认策略应继续保持 `merge-with-new-ids`，并在写入前要求用户先导出一份当前备份。
 
-## Prompt System
+## Prompt 系统
 
-The prompt system is local rendering only:
+Prompt 系统只做本地渲染：
 
-- Built-in templates are seeded and upserted.
-- Custom templates are user-created SwiftData records.
-- Template variables use `{{variableName}}`.
-- Rendering replaces missing values with `未提供`.
-- Copying increments usage count and records recent prompt metadata.
+- 内置模板由 seeder 初始化和 upsert。
+- 自定义模板是用户创建的 SwiftData 记录。
+- 模板变量使用 `{{variableName}}`。
+- 渲染时缺失变量会写成 `未提供`。
+- 复制 Prompt 后会增加使用次数，并记录最近使用元数据。
 
-The app does not call an AI API and does not store AI responses.
+App 当前不调用 AI API，也不保存 AI 返回内容。
 
-## Images
+## 图片策略
 
-Mistake images are app-local files managed through `MistakeImageStore`. SwiftData records store relative image paths rather than binary blobs. Backup export can embed images as base64 in JSON; dry-run can estimate image recoverability without restoring files.
+错题图片由 `MistakeImageStore` 管理为 App 本地文件。SwiftData 记录只保存相对路径，不直接存二进制图片。备份导出可以把图片 base64 嵌入 JSON；Dry-run 只估算图片可恢复性，不恢复文件。
 
-## Manual QA
+## QA 策略
 
-The project currently relies on manual QA rather than an XCTest target. Use [QA_CHECKLIST.md](QA_CHECKLIST.md) before release or public milestone work.
+当前项目还没有 XCTest target，主要依赖手动 QA。发布或重要里程碑前，请使用 [QA_CHECKLIST.md](QA_CHECKLIST.md)。
 
-Suggested command-line build:
+建议的命令行构建：
 
 ```bash
 xcodebuild \
@@ -109,10 +109,10 @@ xcodebuild \
   build
 ```
 
-## Design Constraints
+## 设计约束
 
-- Do not add a backend for MVP convenience.
-- Do not make AI API access a hard dependency for core flows.
-- Do not commit real student data or exported personal backups.
-- Do not change backup schema or SwiftData model semantics without updating docs and QA.
-- Do not introduce broad refactors when a focused feature-level change is enough.
+- 不为了 MVP 便利而引入后端。
+- 不让 AI API 成为核心流程的硬依赖。
+- 不提交真实学生数据或个人导出备份。
+- 不在未更新文档和 QA 的情况下改变备份 schema 或 SwiftData 模型语义。
+- 能做聚焦改动时，不做大范围重构。

@@ -1,27 +1,27 @@
-# Contributing
+# 贡献指南 / Contributing
 
-Thanks for helping improve Gaokao Cockpit. The project is intentionally small, local-first, and focused on the daily study loop. Contributions should preserve that shape.
+谢谢你愿意改进高考驾驶舱。这个项目刻意保持小而克制：本地优先、隐私优先，服务每日学习闭环。贡献也应该尽量保持这个方向。
 
-## Good First Contributions
+## 适合入手的贡献
 
-- Fix clear SwiftUI bugs.
-- Improve copy, empty states, accessibility labels, or documentation.
-- Add focused manual QA notes.
-- Improve backup validation, dry-run clarity, or restore-plan safety.
-- Refine prompt-template usability without introducing network dependencies.
+- 修复明确的 SwiftUI bug。
+- 优化文案、空状态、可访问性标签或文档。
+- 补充聚焦的手动 QA 记录。
+- 改进备份校验、导入 Dry-run 提示或 restore plan 安全性。
+- 在不引入网络依赖的前提下，改进 Prompt 模板体验。
 
-## Before You Start
+## 开始之前
 
-1. Read [README.md](README.md).
-2. Read [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
-3. Check [docs/ROADMAP.md](docs/ROADMAP.md) for current scope.
-4. Keep changes small and focused.
+1. 阅读 [README.md](README.md)。
+2. 阅读 [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)。
+3. 查看 [docs/ROADMAP.md](docs/ROADMAP.md)，确认当前范围。
+4. 尽量保持改动小、清晰、可回滚。
 
-## Development Setup
+## 本地开发
 
-Open `GaokaoCockpit.xcodeproj` in Xcode and run the `GaokaoCockpit` scheme on an iOS Simulator.
+用 Xcode 打开 `GaokaoCockpit.xcodeproj`，选择 `GaokaoCockpit` scheme，在 iOS Simulator 上运行。
 
-Command-line build:
+命令行构建：
 
 ```bash
 xcodebuild \
@@ -33,47 +33,47 @@ xcodebuild \
   build
 ```
 
-## Pull Request Checklist
+## Pull Request 检查清单
 
-- The change is focused and has a clear user or maintainer benefit.
-- SwiftData model changes are documented in `docs/DATA_MODEL.md`.
-- Backup format or restore-plan changes are documented in `docs/BACKUP_FORMAT.md` and `docs/RESTORE_STRATEGY.md`.
-- User-facing behavior changes are reflected in `docs/QA_CHECKLIST.md`.
-- `git diff --check` passes.
-- A Debug simulator build passes, or the PR explains why it could not be run.
-- No private data, exported personal backups, signing files, tokens, local databases, or real study records are included.
+- 改动聚焦，并且有明确的用户价值或维护价值。
+- 如果改了 SwiftData 模型，同步更新 `docs/DATA_MODEL.md`。
+- 如果改了备份格式或恢复计划，同步更新 `docs/BACKUP_FORMAT.md` 和 `docs/RESTORE_STRATEGY.md`。
+- 如果改了用户可见行为，同步更新 `docs/QA_CHECKLIST.md`。
+- `git diff --check` 通过。
+- Debug simulator build 通过；如果没跑，请在 PR 里说明原因。
+- 没有提交私有数据、真实备份、签名文件、token、本地数据库或真实学习记录。
 
-## Code Style
+## 代码风格
 
-- Follow the existing SwiftUI style.
-- Prefer small feature-specific components over large view files.
-- Prefer existing store/helper patterns over new architecture layers.
-- Keep comments sparse and useful.
-- Do not introduce third-party dependencies without a clear discussion.
+- 跟随现有 SwiftUI 写法。
+- 优先拆出小的业务组件，避免继续堆大 View 文件。
+- 优先复用现有 Store/helper，不轻易引入新架构层。
+- 注释保持少而有用。
+- 不要在没有充分讨论的情况下引入第三方依赖。
 
-## Privacy And Safety
+## 隐私与安全
 
-Do not commit:
+不要提交：
 
-- Real exported backup JSON files.
-- Screenshots with private learner data.
-- SwiftData sqlite/store files.
-- `.env` files.
-- API keys, tokens, certificates, provisioning profiles, or private keys.
-- Logs that include private records or local device paths.
+- 真实导出的备份 JSON。
+- 含真实学习记录的截图。
+- SwiftData sqlite/store 文件。
+- `.env` 文件。
+- API key、token、证书、provisioning profile 或私钥。
+- 含私有记录或本地设备路径的日志。
 
-Use synthetic fixture data for tests and examples.
+测试和示例请使用合成数据。
 
-## Scope Boundaries
+## 需要先讨论的范围
 
-Please open a design discussion before working on:
+以下方向风险更高，动手前请先开 issue 或设计讨论：
 
-- True import restore.
-- AI API integration.
-- OCR or automatic grading.
-- Cloud sync.
-- Account systems.
-- macOS or web ports.
-- Backup schema version changes.
+- 真正导入恢复。
+- AI API 接入。
+- OCR 或自动批改。
+- 云同步。
+- 账号系统。
+- macOS / Web 端。
+- 备份 schema 版本变化。
 
-These areas can be valuable, but they carry larger privacy and data-integrity risks.
+这些方向可能有价值，但会带来更高的数据一致性、隐私和维护风险。

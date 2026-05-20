@@ -1,42 +1,42 @@
 ---
-name: Bug report
-about: Report a reproducible problem in Gaokao Cockpit
+name: Bug 反馈
+about: 反馈一个可以复现的问题
 title: "[Bug]: "
 labels: bug
 assignees: ""
 ---
 
-## Summary
+## 问题概述
 
-Describe the problem clearly.
+请清楚描述遇到的问题。
 
-## Steps To Reproduce
+## 复现步骤
 
 1. 
 2. 
 3. 
 
-## Expected Behavior
+## 预期表现
 
-What should have happened?
+你原本期望发生什么？
 
-## Actual Behavior
+## 实际表现
 
-What happened instead?
+实际发生了什么？
 
-## Environment
+## 环境信息
 
-- Device or simulator:
-- iOS version:
-- Xcode version:
-- App commit:
+- 设备或模拟器：
+- iOS 版本：
+- Xcode 版本：
+- App commit：
 
-## Screenshots Or Logs
+## 截图或日志
 
-Attach screenshots only if they do not contain private study records. Redact learner data before sharing.
+只有在不包含真实学习记录和隐私信息时，才附截图或日志。请先打码。
 
-## Privacy Check
+## 隐私检查
 
-- [ ] I did not include real exported backups.
-- [ ] I did not include private learner data.
-- [ ] I did not include tokens, signing files, or local databases.
+- [ ] 我没有附上真实导出备份。
+- [ ] 我没有附上私有学习数据。
+- [ ] 我没有附上 token、签名文件或本地数据库。

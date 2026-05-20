@@ -1,43 +1,43 @@
-# Security Policy
+# 安全策略 / Security Policy
 
-Gaokao Cockpit is local-first and currently has no backend, account system, cloud sync, or AI API integration. The highest-risk data in this project is user-created local study data and exported backup files.
+高考驾驶舱是本地优先 App。当前没有后端、账号系统、云同步或 AI API 接入。项目里最需要保护的是用户本地创建的学习数据、错题图片和导出的备份文件。
 
-## Supported Versions
+## 支持版本
 
-This repository is early-stage. Security fixes should target the `main` branch unless a release branch is created later.
+项目仍处于早期阶段。除非之后创建 release branch，安全修复默认进入 `main` 分支。
 
-## Reporting A Vulnerability
+## 如何报告安全问题
 
-If the repository is hosted on GitHub, please use GitHub Security Advisories when available. If advisories are not available, open a public issue with a high-level description only and avoid including sensitive details.
+如果仓库启用了 GitHub Security Advisories，请优先使用 GitHub Security Advisories。若暂时不可用，可以开公开 issue，但只描述高层问题，不要贴敏感细节。
 
-Do not post:
+请不要公开发布：
 
-- Real student or learner data.
-- Exported backup JSON files.
-- Mistake images from real study records.
-- Tokens, API keys, certificates, provisioning profiles, or private keys.
-- Device-specific local database files.
+- 真实学生或学习者数据。
+- 导出的备份 JSON。
+- 真实错题图片。
+- token、API key、证书、provisioning profile 或私钥。
+- 设备本地数据库文件。
 
-If you need to describe a problem, use synthetic data and redact private paths or identifiers.
+如果需要说明问题，请使用合成数据，并打码本地路径或标识符。
 
-## Security-Relevant Areas
+## 重点安全区域
 
-- Backup export and validation.
-- Import dry-run and restore-plan preview.
-- Future true restore support.
-- Local image storage and relative image paths.
-- Any future AI API, cloud sync, account, or encryption work.
+- 备份导出与校验。
+- 导入 Dry-run 与 restore plan 预览。
+- 未来真正导入恢复。
+- 本地图片存储与相对路径。
+- 未来任何 AI API、云同步、账号或加密功能。
 
-## Current Boundaries
+## 当前边界
 
-The app currently:
+当前 App：
 
-- Stores core data locally through SwiftData.
-- Stores mistake images as local app files.
-- Exports readable JSON backups.
-- Can embed images in backup JSON as base64.
-- Does not perform true import restore.
-- Does not call remote AI services.
-- Does not include server-side authentication or authorization.
+- 通过 SwiftData 本地保存核心数据。
+- 把错题图片保存为 App 本地文件。
+- 导出可读 JSON 备份。
+- 可以把图片以 base64 嵌入备份 JSON。
+- 不执行真正导入恢复。
+- 不调用远程 AI 服务。
+- 不包含服务端认证或鉴权逻辑。
 
-Because exported backups are readable JSON and may contain embedded images, users should treat backup files as private.
+因为导出的备份是可读 JSON，并且可能包含图片，用户应把备份文件视为私有数据。

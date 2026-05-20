@@ -1,31 +1,31 @@
 ---
-name: Feature request
-about: Suggest a focused improvement
+name: 功能建议
+about: 提出一个聚焦的改进想法
 title: "[Feature]: "
 labels: enhancement
 assignees: ""
 ---
 
-## Problem
+## 要解决的问题
 
-What study workflow problem does this solve?
+这个建议想解决哪个学习流程问题？
 
-## Proposed Solution
+## 建议方案
 
-Describe the smallest useful version.
+请描述最小可用版本，不需要一开始就设计成大功能。
 
-## Alternatives Considered
+## 考虑过的替代方案
 
-What else could solve the problem?
+还有哪些更简单或更安全的做法？
 
-## Scope And Privacy
+## 范围与隐私影响
 
-- Does this require network access?
-- Does this change SwiftData models?
-- Does this change backup schema or restore behavior?
-- Could this expose private learner data?
+- 是否需要网络访问？
+- 是否会改 SwiftData 模型？
+- 是否会改备份 schema 或恢复逻辑？
+- 是否可能暴露私有学习数据？
 
-## Acceptance Criteria
+## 验收标准
 
 - [ ] 
 - [ ] 

@@ -1,26 +1,26 @@
-# Code Of Conduct
+# 行为准则 / Code Of Conduct
 
-Gaokao Cockpit should be a calm, practical, and respectful project space.
+高考驾驶舱希望保持一个平和、实用、互相尊重的项目空间。
 
-## Expected Behavior
+## 鼓励的行为
 
-- Be respectful and constructive.
-- Assume good intent, especially across language and cultural context.
-- Keep feedback specific and actionable.
-- Prefer clear explanations over sarcasm or pile-ons.
-- Respect privacy. Do not request, expose, or quote private learner data.
-- Stay focused on the project goal: a local-first study workflow app.
+- 尊重他人，给出建设性反馈。
+- 在跨语言、跨背景交流时默认善意。
+- 反馈尽量具体、可执行。
+- 用清楚解释代替嘲讽或情绪化围攻。
+- 尊重隐私，不索要、不暴露、不引用他人的私有学习数据。
+- 聚焦项目目标：本地优先的学习流程工具。
 
-## Unacceptable Behavior
+## 不接受的行为
 
-- Harassment, insults, threats, or discriminatory remarks.
-- Publishing private information without consent.
-- Pressuring people to share credentials, tokens, private backups, or personal study records.
-- Dismissing safety or privacy concerns around student data.
-- Repeatedly derailing issues or pull requests away from the project scope.
+- 骚扰、侮辱、威胁或歧视性言论。
+- 未经同意公开他人隐私信息。
+- 要求他人分享凭据、token、私有备份或真实学习记录。
+- 无视围绕学生数据的安全和隐私担忧。
+- 反复把 issue 或 PR 带离项目范围。
 
-## Enforcement
+## 执行方式
 
-Maintainers may edit, hide, or remove comments; close issues; reject pull requests; or block participation when behavior harms the project or its contributors.
+维护者可以编辑、隐藏或删除评论，关闭 issue，拒绝 PR，或在必要时限制参与。
 
-If you see a problem, report it to the maintainers with links, screenshots, or a concise description. Do not include private learner data in reports.
+如果你发现问题，请用链接、截图或简短描述报告给维护者。报告中不要包含私有学习数据。

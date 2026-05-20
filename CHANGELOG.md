@@ -1,49 +1,51 @@
-# Changelog
+# 更新日志 / Changelog
 
-All notable public-facing changes should be recorded here.
+这里记录对公开用户和贡献者有意义的变化。
 
-This project follows a pragmatic changelog format while it is pre-1.0.
+项目仍处于 pre-1.0 阶段，更新日志采用实用格式，不严格绑定某个发布规范。
 
 ## Unreleased
 
-### Added
+### 新增
 
-- Open-source README with project status, setup instructions, documentation links, privacy notes, and contribution entry points.
-- Documentation index and architecture overview.
-- MIT license, contributing guide, security policy, code of conduct, and GitHub issue/PR templates.
-- Expanded `.gitignore` for Xcode artifacts, local app data, exported backups, signing material, logs, and secrets.
-- Open-source release checklist items in `docs/QA_CHECKLIST.md`.
+- 中文优先的公开首页和社区文档。
+- 开源 README：包含项目状态、运行方式、文档入口、隐私说明和贡献入口。
+- 文档索引与架构说明。
+- MIT 许可证、贡献指南、安全策略、行为准则和 GitHub issue / PR 模板。
+- 更完整的 `.gitignore`，覆盖 Xcode 产物、本地数据、导出备份、签名材料、日志和密钥文件。
+- `docs/QA_CHECKLIST.md` 中的开源发布前检查项。
 
-### Changed
+### 调整
 
-- Updated documentation language to be suitable for a public repository.
-- Aligned docs around the current checkpoint: Stage 20 complete; Stage 21 remains future scope.
-- Generalized product positioning to avoid private learner-specific assumptions.
+- 文档语言改为更适合公开仓库阅读。
+- 文档状态统一到当前检查点：Stage 20 已完成，Stage 21 仍是未来范围。
+- 产品描述去掉过于私人化的假设，改成面向公开读者的表述。
 
-## Stage 20 - Custom Prompt Templates
+## Stage 20 - 自定义 Prompt 模板
 
-### Added
+### 新增
 
-- Custom prompt template creation, editing, deletion, and duplication from built-in templates.
-- Variable extraction from `{{variableName}}` template placeholders.
-- Template type filtering for all, built-in, and custom templates.
-- Backup export coverage for custom prompt templates.
+- 支持新建、编辑、删除自定义 Prompt 模板。
+- 支持从内置模板复制为自定义模板。
+- 支持从 `{{variableName}}` 占位符自动提取变量。
+- 支持按模板类型筛选：全部、内置、自定义。
+- 自定义模板可随本地备份导出。
 
-## Stage 19 - Prompt Library Daily Usability
+## Stage 19 - Prompt 仓库日用体验增强
 
-### Added
+### 新增
 
-- Frequent prompts based on usage count.
-- Recent prompts based on local UserDefaults metadata.
-- Usage-sorted search and category results.
+- 基于使用次数的常用 Prompt。
+- 基于 UserDefaults 的最近使用 Prompt。
+- 搜索结果和分类结果按使用次数排序。
 
-## Stage 18 - Prompt Library Expansion
+## Stage 18 - 内置 Prompt 库扩容
 
-### Added
+### 新增
 
-- Expanded built-in prompt library to 51 templates across mistake analysis, math, physics, chemistry, biology, English, Chinese, review, diagnosis, and self-test workflows.
-- Safe built-in template upsert that preserves usage counts and avoids overwriting custom templates.
+- 内置 Prompt 扩展到 51 个，覆盖错题、数学、物理、化学、生物、英语、语文、复盘、诊断和自测等工作流。
+- 内置模板安全 upsert：更新内置模板内容，保留使用次数，不覆盖用户自定义模板。
 
-## Earlier Stages
+## 更早阶段
 
-Earlier stages established the SwiftUI/SwiftData app skeleton, Today cockpit, task management, focus sessions, mistake surgery, prompt rendering, reviews, local backup export, backup validation, import dry-run, restore-plan preview, state value wrappers, and view componentization.
+更早阶段完成了 SwiftUI / SwiftData 工程骨架、Today 驾驶舱、任务管理、专注记录、错题手术、Prompt 渲染、每日/周复盘、本地备份导出、备份校验、导入 Dry-run、restore plan 预览、状态类型 wrapper 和长 View 组件化拆分。

@@ -1,29 +1,29 @@
-## Summary
+## 改动概述
 
 - 
 
-## Type Of Change
+## 改动类型
 
-- [ ] Bug fix
-- [ ] Feature
-- [ ] Documentation
-- [ ] Refactor
-- [ ] Backup / restore safety
-- [ ] Other
+- [ ] Bug 修复
+- [ ] 新功能
+- [ ] 文档
+- [ ] 重构
+- [ ] 备份 / 恢复安全性
+- [ ] 其他
 
-## Validation
+## 验证
 
 - [ ] `git diff --check`
 - [ ] Debug simulator build
-- [ ] Manual QA from `docs/QA_CHECKLIST.md`
-- [ ] Not run; reason:
+- [ ] 按 `docs/QA_CHECKLIST.md` 做过手动 QA
+- [ ] 未运行；原因：
 
-## Data And Privacy
+## 数据与隐私
 
-- [ ] No real learner data, exported backups, local databases, tokens, signing files, or private paths are included.
-- [ ] Fixture data is synthetic.
-- [ ] Backup/data model docs were updated if relevant.
+- [ ] 没有包含真实学习数据、导出备份、本地数据库、token、签名文件或私有路径。
+- [ ] fixture 数据是合成数据。
+- [ ] 如果涉及备份或数据模型，相关文档已同步更新。
 
-## Notes
+## 备注
 
-Anything reviewers should know?
+有什么需要 reviewer 特别注意的？
