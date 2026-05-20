@@ -2,6 +2,12 @@
 
 第一版不接 AI API。Prompt 模板只负责生成完整提示词，并复制到剪贴板，由用户粘贴到自己使用的 AI 工具中。
 
+## 更新机制
+
+- 内置模板（isBuiltIn == true）采用 upsert 策略：每次启动时按 title 匹配，更新内容但保留 usageCount。
+- 用户自定义模板（isBuiltIn == false）永远不会被覆盖或删除。
+- 新版本新增的内置模板会自动插入。
+
 ## 模板设计原则
 
 - 每个 Prompt 都服务学习闭环。
@@ -10,403 +16,121 @@
 - AI 的角色是教练组，不是答案机。
 - Prompt 要引导用户暴露思路，而不是只索要答案。
 
-## 1. 错题手术 Prompt
-
-### 使用场景
-
-用户做错一道题后，希望 AI 帮助拆解错因、根因、题目信号、正确模型和变式任务。
-
-### 输入变量
-
-- subject：科目
-- chapter：章节或专题
-- question：题目
-- mySolution：我的原解法
-- correctAnswer：标准答案或参考解法，可选
-- currentConfusion：当前困惑，可选
-
-### Prompt 正文
-
-```text
-你是我的高考错题外科医生，不要只给答案。请帮我对下面这道题做“错题手术”。
-
-科目：{{subject}}
-章节/专题：{{chapter}}
-题目：{{question}}
-我的原解法：{{mySolution}}
-参考答案/正确解法：{{correctAnswer}}
-我现在的困惑：{{currentConfusion}}
-
-请按以下步骤分析：
-1. 先判断我错在哪里，不要泛泛说“粗心”。
-2. 找出真正根因：概念、模型、审题、计算、表达、时间分配，或其他。
-3. 指出题目中本应触发正确思路的关键信号。
-4. 给出正确模型或解题框架。
-5. 用高考学生能理解的方式解释关键步骤。
-6. 设计 1 个同型变式任务，不要直接给完整答案。
-7. 给我一句下次遇到同类题时要提醒自己的话。
-
-不要替我跳过思考。需要我补充信息时，先问我。
-```
-
-### 输出要求
-
-```text
-【错误位置】
-【真正根因】
-【题目信号】
-【正确模型】
-【关键步骤解释】
-【同型变式任务】
-【下次提醒】
-【建议回填到错题记录的字段】
-```
-
-## 2. 教材预习 Prompt
-
-### 使用场景
-
-用户学习新章节前，希望 AI 帮助建立预习框架和问题清单。
-
-### 输入变量
-
-- subject：科目
-- textbookSection：教材章节
-- examGoal：考试目标或分数目标
-- knownBase：已有基础，可选
-
-### Prompt 正文
-
-```text
-你是我的高考教材预习教练。请帮我预习下面这个章节，但不要把它讲成百科全书。
-
-科目：{{subject}}
-教材章节：{{textbookSection}}
-我的目标：{{examGoal}}
-我已有的基础：{{knownBase}}
-
-请你帮我完成：
-1. 这个章节在高考中的位置和价值。
-2. 我预习时必须抓住的 3 到 5 个核心问题。
-3. 容易混淆或误解的概念。
-4. 推荐的预习顺序。
-5. 读教材时要主动标记的题目信号。
-6. 预习后我应该能完成的最小输出。
-
-请保持面向高中生、面向提分、面向做题。
-```
-
-### 输出要求
-
-```text
-【章节价值】
-【核心问题】
-【易混点】
-【预习顺序】
-【题目信号】
-【最小输出】
-【预习后自测问题】
-```
-
-## 3. 课后整理 Prompt
-
-### 使用场景
-
-用户听课或自学后，需要把零散内容整理成可复习的结构。
-
-### 输入变量
-
-- subject：科目
-- lessonTopic：课程主题
-- rawNotes：原始笔记
-- unclearPoints：不懂的点，可选
-
-### Prompt 正文
-
-```text
-你是我的高考课后整理教练。请帮我把下面的课后内容整理成可复习、可做题、可追问的结构。
-
-科目：{{subject}}
-主题：{{lessonTopic}}
-原始笔记：{{rawNotes}}
-不懂的点：{{unclearPoints}}
-
-请你完成：
-1. 把内容整理成清晰层级。
-2. 标出本节最重要的概念、公式、模型或方法。
-3. 标出做题时会出现的题目信号。
-4. 标出我目前可能没有真正掌握的地方。
-5. 给出 3 个课后自测问题。
-6. 给出一个 20 分钟复习任务。
-
-不要添加太多课外内容，优先整理我已经学过的内容。
-```
-
-### 输出要求
-
-```text
-【整理后的笔记】
-【核心概念/模型】
-【题目信号】
-【掌握风险】
-【自测问题】
-【20 分钟复习任务】
-```
-
-## 4. 同型变式 Prompt
-
-### 使用场景
-
-用户完成错题手术后，需要围绕同一模型进行变式训练。
-
-### 输入变量
-
-- subject：科目
-- originalQuestion：原题
-- mistakeRootCause：错题根因
-- correctModel：正确模型
-- difficulty：难度
-
-### Prompt 正文
-
-```text
-你是我的高考同型变式训练教练。请基于下面这道错题，为我设计同型变式训练。
-
-科目：{{subject}}
-原题：{{originalQuestion}}
-我的错因：{{mistakeRootCause}}
-正确模型：{{correctModel}}
-目标难度：{{difficulty}}
-
-请生成 3 道同型变式题：
-1. 第 1 道保持核心模型不变，只换表述。
-2. 第 2 道改变条件呈现方式，训练识别题目信号。
-3. 第 3 道提高一点综合度，接近高考压轴或综合题思维。
-
-每道题请先只给题目和提示，不要直接给完整答案。最后给出检查标准。
-```
-
-### 输出要求
-
-```text
-【变式 1：模型不变】
-【变式 2：信号变化】
-【变式 3：综合提升】
-【每题提示】
-【完成后检查标准】
-【我做完后应该回传给你的内容】
-```
-
-## 5. 单元诊断 Prompt
-
-### 使用场景
-
-用户完成一个章节或专题后，希望诊断薄弱点和下阶段训练方向。
-
-### 输入变量
-
-- subject：科目
-- unitName：单元或专题
-- completedWork：已完成内容
-- mistakesSummary：错题摘要
-- selfRating：自评
-
-### Prompt 正文
-
-```text
-你是我的高考单元诊断教练。请根据我的学习记录，诊断这个单元目前的问题。
-
-科目：{{subject}}
-单元/专题：{{unitName}}
-已完成内容：{{completedWork}}
-错题摘要：{{mistakesSummary}}
-我的自评：{{selfRating}}
-
-请你分析：
-1. 我已经掌握的部分。
-2. 我看似会了但可能不稳的部分。
-3. 错题暴露出的知识漏洞和模型漏洞。
-4. 最需要优先补的 1 到 3 个点。
-5. 接下来 3 天的训练建议。
-6. 每天的最小保底任务。
-
-请避免空泛鼓励，直接给可执行诊断。
-```
-
-### 输出要求
-
-```text
-【已掌握】
-【不稳定】
-【知识漏洞】
-【模型漏洞】
-【优先补强点】
-【3 天训练建议】
-【每日保底任务】
-```
-
-## 6. 每日复盘 Prompt
-
-### 使用场景
-
-用户晚上完成每日复盘，需要把今天的学习转化为明天第一步。
-
-### 输入变量
-
-- date：日期
-- completedTasks：完成任务
-- unfinishedTasks：未完成任务
-- focusSummary：专注摘要
-- mistakeSummary：错题摘要
-- stateScoreEnd：晚间状态评分
-
-### Prompt 正文
-
-```text
-你是我的高考每日复盘教练。请帮我把今天的学习记录整理成明天可以继续执行的复盘。
-
-日期：{{date}}
-完成任务：{{completedTasks}}
-未完成任务：{{unfinishedTasks}}
-专注摘要：{{focusSummary}}
-错题摘要：{{mistakeSummary}}
-晚间状态评分：{{stateScoreEnd}}
-
-请你帮我完成：
-1. 总结今天真正完成的有效学习。
-2. 判断未完成任务的主要原因。
-3. 找出今天最大的一个问题。
-4. 选出最值得复盘的一条错题或一个卡点。
-5. 给出明天第一步，必须具体到能立刻开始。
-6. 如果我明天状态差，给出一个保底版本。
-
-请用短句，不要写鸡汤。
-```
-
-### 输出要求
-
-```text
-【今日有效学习】
-【未完成原因】
-【最大问题】
-【最佳复盘点】
-【明天第一步】
-【状态差保底版】
-```
-
-## 7. 周复盘 Prompt
-
-### 使用场景
-
-用户周末完成周复盘，需要从一周数据中找到结构性问题和下周重点。
-
-### 输入变量
-
-- weekRange：周范围
-- totalStudyMinutes：总学习分钟
-- subjectBreakdown：科目分布
-- completedTaskCount：完成任务数
-- mistakeTypeBreakdown：错题类型分布
-- keyDailyProblems：每日关键问题摘要
-
-### Prompt 正文
-
-```text
-你是我的高考周复盘教练。请根据本周记录，帮我找出结构性问题，并制定下周重点。
-
-周范围：{{weekRange}}
-总学习分钟：{{totalStudyMinutes}}
-科目分布：{{subjectBreakdown}}
-完成任务数：{{completedTaskCount}}
-错题类型分布：{{mistakeTypeBreakdown}}
-每日关键问题摘要：{{keyDailyProblems}}
-
-请你分析：
-1. 本周投入是否匹配我的提分目标。
-2. 哪个科目或专题投入不足。
-3. 错题类型暴露了什么底层问题。
-4. 下周最多只能抓 3 个重点，应该是什么。
-5. 每个重点对应的可执行动作。
-6. 下周状态差时的保底策略。
-
-请优先做取舍，不要给我一长串愿望清单。
-```
-
-### 输出要求
-
-```text
-【本周判断】
-【投入问题】
-【错题结构】
-【下周 3 个重点】
-【对应动作】
-【保底策略】
-【需要砍掉或推迟的事情】
-```
-
-## 8. 拍图自测 Prompt
-
-### 使用场景
-
-用户拍下教材、笔记或错题后，希望 AI 基于图片内容进行追问式自测。
-
-### 输入变量
-
-- subject：科目
-- imageContent：图片内容描述或直接上传图片后补充说明
-- testGoal：自测目标
-- currentLevel：当前掌握程度
-
-### Prompt 正文
-
-```text
-你是我的高考拍图自测教练。请根据我上传或描述的图片内容，对我进行追问式自测。
-
-科目：{{subject}}
-图片内容说明：{{imageContent}}
-自测目标：{{testGoal}}
-当前掌握程度：{{currentLevel}}
-
-请你按以下方式进行：
-1. 先概括图片中最重要的知识点或题目结构。
-2. 不要直接讲完整答案，先问我 3 个递进问题。
-3. 每个问题都要能暴露一个关键理解点。
-4. 如果我回答错，请指出错因并给一个更小的提示。
-5. 最后给我一个 10 分钟巩固任务。
-
-请像教练一样追问，而不是像答案书一样输出。
-```
-
-### 输出要求
-
-```text
-【图片核心内容】
-【追问 1】
-【追问 2】
-【追问 3】
-【回答后的反馈规则】
-【10 分钟巩固任务】
-```
-
-## Prompt 模板分类建议
-
-MVP 可先内置以下分类：
-
-- 错题
-- 预习
-- 整理
-- 变式
-- 诊断
-- 复盘
-- 自测
+## 模板分类
+
+| 分类 | storageValue | 说明 |
+|------|-------------|------|
+| 错题 | mistake | 错题分析、错因归类、变式训练 |
+| 预习 | preview | 新章节预习框架 |
+| 整理 | organize | 课后整理、题型归纳、表达升级 |
+| 变式 | variant | 同型变式训练 |
+| 诊断 | diagnosis | 单元诊断、薄弱点分析 |
+| 复盘 | review | 每日/周复盘、考后复盘 |
+| 自测 | selfTest | 追问式自测、陷阱识别 |
+| 其他 | other | 未归类模板 |
+
+## 内置模板清单 (51 个)
+
+### 错题类
+
+| # | title | category | 使用场景 | variables |
+|---|-------|----------|----------|-----------|
+| 1 | 错题手术 | 错题 | 做错一道题后拆解错因 | subject, chapter, question, mySolution, correctAnswer, currentConfusion |
+| 2 | 错因归类 | 错题 | 对多道错题做错因分类 | subject, mistakeList, timeRange |
+| 3 | 同型变式 | 变式 | 围绕同一模型设计变式训练 | subject, originalQuestion, mistakeRootCause, correctModel, difficulty |
+| 4 | 二刷检测 | 错题 | 验证已复习错题是否真正掌握 | subject, question, lastMistakeReason, correctModel, mySolution |
+| 5 | 错题压缩成模型 | 错题 | 把同类错题压缩成可复用模型 | subject, chapter, mistakeList, commonRootCause |
+| 6 | 只给提示不讲答案 | 错题 | 卡题时只给思路提示 | subject, question, myThinking, stuckPoint |
+| 7 | 错题回填字段生成 | 错题 | 生成可回填到错题记录的字段 | subject, chapter, question, myAnalysis |
+
+### 数学类
+
+| # | title | category | 使用场景 | variables |
+|---|-------|----------|----------|-----------|
+| 8 | 数学概念预习 | 预习 | 数学新章节预习 | chapter, examGoal, knownBase |
+| 9 | 数学题型归纳 | 整理 | 归纳某专题的常见题型 | chapter, questionSummary, difficulty |
+| 10 | 函数题突破 | 错题 | 函数类题目专项突破 | question, mySolution, stuckPoint |
+| 11 | 三角函数题突破 | 错题 | 三角函数题专项突破 | question, mySolution, stuckPoint |
+| 12 | 向量题突破 | 错题 | 向量题专项突破 | question, mySolution, stuckPoint |
+| 13 | 导数题突破 | 错题 | 导数题专项突破 | question, mySolution, stuckPoint |
+| 14 | 解析几何题突破 | 错题 | 解析几何题专项突破 | question, mySolution, stuckPoint |
+| 15 | 数列题突破 | 错题 | 数列题专项突破 | question, mySolution, stuckPoint |
+| 16 | 数学压轴题分层提示 | 错题 | 压轴题分层引导 | question, myProgress, stuckPoint |
+| 17 | 数学计算失误复盘 | 复盘 | 复盘计算失误模式 | calculationErrors, questionTypes, timePressure |
+
+### 物理类
+
+| # | title | category | 使用场景 | variables |
+|---|-------|----------|----------|-----------|
+| 18 | 物理过程分析 | 错题 | 拆解物理题的过程 | question, myAnalysis, stuckPoint |
+| 19 | 物理模型识别 | 错题 | 识别经典物理模型 | question, myGuess |
+| 20 | 受力分析教练 | 错题 | 检查受力分析 | question, myForces, confusion |
+| 21 | 电磁学题目拆解 | 错题 | 拆解电磁学综合题 | question, mySolution, stuckPoint |
+| 22 | 物理实验题误差分析 | 错题 | 分析实验误差 | experimentName, question, myAnswer |
+| 23 | 物理图像题分析 | 错题 | 分析物理图像题 | question, imageDescription, myUnderstanding |
+
+### 化学类
+
+| # | title | category | 使用场景 | variables |
+|---|-------|----------|----------|-----------|
+| 24 | 化学概念辨析 | 错题 | 辨析混淆概念 | concepts, myUnderstanding, confusion |
+| 25 | 化学方程式审查 | 错题 | 审查方程式书写 | reactionDescription, myEquation, requirement |
+| 26 | 化学实验题拆解 | 错题 | 拆解实验题 | question, myAnswer, uncertainty |
+| 27 | 化学工艺流程题分析 | 错题 | 分析工艺流程题 | question, myAnalysis, confusingSteps |
+| 28 | 化学计算题步骤检查 | 错题 | 检查计算步骤 | question, myCalculation |
+
+### 生物类
+
+| # | title | category | 使用场景 | variables |
+|---|-------|----------|----------|-----------|
+| 29 | 生物概念边界辨析 | 错题 | 辨析概念边界 | concept, myUnderstanding, boundaryQuestion |
+| 30 | 生物图表题分析 | 错题 | 分析图表题 | question, chartDescription, myAnalysis |
+| 31 | 生物实验设计题分析 | 错题 | 分析实验设计题 | question, myDesign, uncertainty |
+| 32 | 细胞与分子专题复盘 | 复盘 | 必修一模块复盘 | completedContent, mistakeSummary, unstablePoints |
+| 33 | 生物选择题陷阱识别 | 自测 | 识别选择题陷阱 | question, options, myAnswer, correctAnswer |
+
+### 英语类
+
+| # | title | category | 使用场景 | variables |
+|---|-------|----------|----------|-----------|
+| 34 | 英语阅读精读 | 整理 | 精读阅读理解文章 | articleTopic, articleContent, wrongQuestions |
+| 35 | 长难句拆解 | 整理 | 拆解长难句结构 | sentence, myTranslation, confusingPart |
+| 36 | 完形七选五错因分析 | 错题 | 分析完形/七选五错因 | questionType, passage, wrongItems, answerComparison |
+| 37 | 作文表达升级 | 整理 | 升级作文表达 | essayTopic, myWriting, improvementGoal |
+| 38 | 读后续写情节推进 | 整理 | 训练读后续写 | originalSummary, paragraphStarters, myIdea |
+
+### 语文类
+
+| # | title | category | 使用场景 | variables |
+|---|-------|----------|----------|-----------|
+| 39 | 文言文翻译拆解 | 整理 | 拆解文言文翻译 | originalText, myTranslation, uncertainWords |
+| 40 | 古诗鉴赏答题模板 | 整理 | 训练古诗鉴赏答题 | poem, question, myAnswer |
+| 41 | 现代文阅读结构分析 | 整理 | 分析现代文结构 | articleType, articleContent, question, myAnswer |
+| 42 | 作文立意与素材整理 | 整理 | 训练审题立意 | prompt, myThesis, myMaterials |
+
+### 预习/整理/诊断/自测类
+
+| # | title | category | 使用场景 | variables |
+|---|-------|----------|----------|-----------|
+| 43 | 教材预习 | 预习 | 新章节预习框架 | subject, textbookSection, examGoal, knownBase |
+| 44 | 课后整理 | 整理 | 课后内容结构化 | subject, lessonTopic, rawNotes, unclearPoints |
+| 45 | 单元诊断 | 诊断 | 章节薄弱点诊断 | subject, unitName, completedWork, mistakesSummary, selfRating |
+| 46 | 拍图自测 | 自测 | 基于图片追问式自测 | subject, imageContent, testGoal, currentLevel |
+| 47 | 考后试卷复盘 | 复盘 | 考试后结构化复盘 | subject, examType, score, scoreBreakdown, mistakeSummary |
+
+### 复盘类
+
+| # | title | category | 使用场景 | variables |
+|---|-------|----------|----------|-----------|
+| 48 | 每日复盘 | 复盘 | 每日学习复盘 | date, completedTasks, unfinishedTasks, focusSummary, mistakeSummary, stateScoreEnd |
+| 49 | 周复盘 | 复盘 | 一周结构化回顾 | weekRange, totalStudyMinutes, subjectBreakdown, completedTaskCount, mistakeTypeBreakdown, keyDailyProblems |
+| 50 | 学习计划降载 | 复盘 | 状态差时降载计划 | stateScore, pendingTasks, availableTime, mainWorry |
+| 51 | 明日第一步生成 | 复盘 | 生成明天具体第一步 | todaySummary, biggestProblem, tomorrowTime, tomorrowExam |
 
 ## 变量填写策略
 
-第一版变量输入不要做复杂表单引擎。可以采用简单字段：
+变量输入根据变量名关键词自动判断输入控件：
+- 包含 question/solution/notes/summary/text/content/answer/confusion/raw/thinking/analysis/design/writing/translation/calculation/list/progress/breakdown/problems/items/comparison/description/forces/understanding/guess/materials/idea 的变量使用多行 TextEditor。
+- 其他变量使用单行 TextField。
 
-- 单行文本：科目、章节、难度。
-- 多行文本：题目、笔记、错题摘要。
-- 可选字段：困惑、自评、参考答案。
-
-生成 Prompt 时，如果变量为空，可以保留“未提供”，让 AI 知道信息缺失。
-
+生成 Prompt 时，如果变量为空，保留"未提供"，让 AI 知道信息缺失。

@@ -6,6 +6,7 @@ struct PromptLibraryView: View {
 
     @State private var templates: [PromptTemplate] = []
     @State private var selectedCategory: PromptCategory = .all
+    @State private var searchText = ""
     @State private var totalTemplateCount = 0
     @State private var totalUsageCount = 0
     @State private var isLoading = true
@@ -24,17 +25,28 @@ struct PromptLibraryView: View {
 
                 PromptCategoryFilterBar(selectedCategory: $selectedCategory)
 
+                PromptSearchBar(searchText: $searchText)
+
                 if isLoading {
                     ProgressView("正在加载 Prompt 模板")
                         .frame(maxWidth: .infinity, alignment: .center)
                         .padding(.vertical, 28)
                 } else if templates.isEmpty {
-                    ContentUnavailableView {
-                        Label("还没有 Prompt 模板", systemImage: "text.bubble")
-                    } description: {
-                        Text("还没有 Prompt 模板。请检查内置模板 seed 是否成功。")
+                    if searchText.isEmpty {
+                        ContentUnavailableView {
+                            Label("还没有 Prompt 模板", systemImage: "text.bubble")
+                        } description: {
+                            Text("还没有 Prompt 模板。请检查内置模板 seed 是否成功。")
+                        }
+                        .padding(.vertical, 12)
+                    } else {
+                        ContentUnavailableView {
+                            Label("没有找到匹配的 Prompt 模板", systemImage: "magnifyingglass")
+                        } description: {
+                            Text("没有找到匹配的 Prompt 模板。")
+                        }
+                        .padding(.vertical, 12)
                     }
-                    .padding(.vertical, 12)
                 } else {
                     VStack(spacing: 10) {
                         ForEach(templates, id: \.id) { template in
@@ -66,6 +78,9 @@ struct PromptLibraryView: View {
             }
         }
         .onChange(of: selectedCategory) {
+            refreshTemplates()
+        }
+        .onChange(of: searchText) {
             refreshTemplates()
         }
         .refreshable {
@@ -101,10 +116,21 @@ struct PromptLibraryView: View {
     }
 
     private func refreshTemplatesThrowing() throws {
-        templates = try PromptTemplateStore.fetchTemplates(
+        var results = try PromptTemplateStore.fetchTemplates(
             category: selectedCategory == .all ? nil : selectedCategory.storageValue,
             in: modelContext
         )
+
+        let query = searchText.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
+        if !query.isEmpty {
+            results = results.filter { template in
+                template.title.lowercased().contains(query)
+                    || template.templateDescription.lowercased().contains(query)
+                    || template.category.lowercased().contains(query)
+            }
+        }
+
+        templates = results
 
         let allTemplates = try PromptTemplateStore.fetchTemplates(category: nil, in: modelContext)
         totalTemplateCount = allTemplates.count
@@ -207,6 +233,35 @@ private struct PromptCategoryFilterBar: View {
             }
             .accessibilityLabel("Prompt 分类筛选")
         }
+    }
+}
+
+private struct PromptSearchBar: View {
+    @Binding var searchText: String
+
+    var body: some View {
+        HStack(spacing: 8) {
+            Image(systemName: "magnifyingglass")
+                .foregroundStyle(.secondary)
+
+            TextField("搜索 Prompt 模板", text: $searchText)
+                .textInputAutocapitalization(.never)
+                .autocorrectionDisabled()
+
+            if !searchText.isEmpty {
+                Button {
+                    searchText = ""
+                } label: {
+                    Image(systemName: "xmark.circle.fill")
+                        .foregroundStyle(.secondary)
+                }
+                .buttonStyle(.plain)
+            }
+        }
+        .padding(10)
+        .background(Color(.secondarySystemBackground))
+        .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+        .accessibilityLabel("搜索 Prompt 模板")
     }
 }
 

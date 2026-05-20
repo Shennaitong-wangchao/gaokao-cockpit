@@ -613,7 +613,44 @@
 - 不引入第三方依赖。
 - 不大改 Store/helper。
 
-## Stage 18：未来扩展：AI API、RAG、GoodNotes/NotebookLM 索引、macOS 端、云同步
+## Stage 18：Prompt Library Expansion / 内置 Prompt 库扩容
+
+当前进度：Stage 18 已完成。
+
+### 目标
+
+扩充内置 Prompt 模板库，改造 seed 机制为安全 upsert，增加搜索能力，让 Prompt 仓库能支撑真实高考学习工作流。
+
+### 已完成内容
+
+- 内置 Prompt 模板从 8 个扩充到 51 个，覆盖错题、数学、物理、化学、生物、英语、语文、复盘八大分类。
+- PromptTemplateSeeder 改造为安全 upsert：按 title + isBuiltIn 匹配，更新内容但保留 usageCount，不覆盖用户自定义模板。
+- PromptLibraryView 新增搜索框，支持按 title / description / category 搜索，与分类筛选叠加。
+- PromptVariableInput 改为关键词匹配判断长文本变量，支持新模板中的所有变量名。
+- 不接 AI API，不做聊天窗口，不保存 AI 返回。
+
+### 验收标准
+
+- 内置模板数量不少于 35。
+- 旧模板能 upsert 更新，usageCount 不丢失。
+- 用户自定义模板不被覆盖。
+- 搜索正常，分类筛选正常，组合正常。
+- 错题/复盘 Prompt 入口仍能找到对应模板。
+- 备份 schema 和 exportVersion 不变。
+- Debug / Release 构建通过。
+
+### 不做什么
+
+- 不接 AI API。
+- 不做聊天窗口。
+- 不保存 AI 返回。
+- 不做模型选择器。
+- 不做云同步或账号。
+- 不引入第三方依赖。
+- 不改 SwiftData 模型字段类型。
+- 不改变备份 schema。
+
+## Stage 19：未来扩展：AI API、RAG、GoodNotes/NotebookLM 索引、macOS 端、云同步
 
 ### 目标
 
