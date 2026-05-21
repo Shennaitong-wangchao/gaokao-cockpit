@@ -11,7 +11,7 @@ struct PromptLibraryView: View {
     @State private var totalUsageCount = 0
     @State private var isLoading = true
     @State private var statusMessage: String?
-    @State private var selectedTemplate: PromptTemplate?
+    @State private var activeTemplateDetail: PromptTemplateDetailRoute?
     @State private var recentEntries: [RecentPromptEntry] = []
     @State private var showCreateEditor = false
     @State private var templateFilter: TemplateFilter = .all
@@ -47,7 +47,7 @@ struct PromptLibraryView: View {
 
                 if searchText.isEmpty && selectedCategory == .all {
                     PromptFrequentSection(templates: frequentTemplates) { template in
-                        selectedTemplate = template
+                        openTemplate(template)
                     }
 
                     PromptRecentSection(
@@ -82,7 +82,7 @@ struct PromptLibraryView: View {
                     VStack(spacing: 10) {
                         ForEach(templates, id: \.id) { template in
                             PromptTemplateRow(template: template) {
-                                selectedTemplate = template
+                                openTemplate(template)
                             }
                         }
                     }
@@ -121,8 +121,8 @@ struct PromptLibraryView: View {
         .refreshable {
             refreshTemplates()
         }
-        .sheet(item: $selectedTemplate) { template in
-            PromptTemplateDetailView(template: template) { message in
+        .sheet(item: $activeTemplateDetail) { route in
+            PromptTemplateDetailSheet(route: route) { message in
                 refreshTemplates()
                 refreshRecentEntries()
                 statusMessage = message
@@ -146,17 +146,24 @@ struct PromptLibraryView: View {
         recentEntries = RecentPromptStore.recent(limit: 5)
     }
 
+    private func openTemplate(_ template: PromptTemplate) {
+        activeTemplateDetail = PromptTemplateDetailRoute(
+            templateID: template.id,
+            title: template.title
+        )
+    }
+
     private func handleRecentEntryTap(_ entry: RecentPromptEntry) {
         do {
             // 优先通过 templateId 查找
             if let template = try findTemplateById(entry.templateId) {
-                selectedTemplate = template
+                openTemplate(template)
                 return
             }
 
             // 如果找不到，再用 title 查找
             if let template = try PromptTemplateStore.fetchTemplate(title: entry.title, in: modelContext) {
-                selectedTemplate = template
+                openTemplate(template)
                 return
             }
 
@@ -337,6 +344,7 @@ private struct PromptCategoryFilterBar: View {
                         .foregroundStyle(selectedCategory == category ? Color.white : Color.primary)
                         .background(selectedCategory == category ? Color.accentColor : Color(.secondarySystemBackground))
                         .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+                        .accessibilityAddTraits(.isButton)
                     }
                 }
                 .padding(.vertical, 1)
@@ -415,7 +423,7 @@ private struct PromptTemplateRow: View {
 
                     Spacer(minLength: 8)
 
-                    Label("使用", systemImage: "text.bubble")
+                    Label("查看模板", systemImage: "text.bubble")
                         .font(.subheadline.weight(.semibold))
                 }
             }
@@ -426,7 +434,9 @@ private struct PromptTemplateRow: View {
             .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
-        .accessibilityLabel("使用 Prompt 模板 \(template.title)")
+        .accessibilityLabel("打开 Prompt 模板 \(template.title)")
+        .accessibilityHint("展示模板内容和变量填写表单")
+        .accessibilityAddTraits(.isButton)
     }
 }
 
@@ -509,6 +519,9 @@ private struct PromptFrequentSection: View {
                         .clipShape(RoundedRectangle(cornerRadius: 6, style: .continuous))
                     }
                     .buttonStyle(.plain)
+                    .accessibilityLabel("打开常用 Prompt 模板 \(template.title)")
+                    .accessibilityHint("展示模板内容和变量填写表单")
+                    .accessibilityAddTraits(.isButton)
                 }
             }
         }
@@ -552,6 +565,9 @@ private struct PromptRecentSection: View {
                         .clipShape(RoundedRectangle(cornerRadius: 6, style: .continuous))
                     }
                     .buttonStyle(.plain)
+                    .accessibilityLabel("打开最近使用 Prompt 模板 \(entry.title)")
+                    .accessibilityHint("展示模板内容和变量填写表单")
+                    .accessibilityAddTraits(.isButton)
                 }
             }
         }
@@ -602,6 +618,7 @@ private struct PromptTemplateFilterBar: View {
                     .foregroundStyle(selectedFilter == filter ? Color.white : Color.primary)
                     .background(selectedFilter == filter ? Color.accentColor : Color(.secondarySystemBackground))
                     .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+                    .accessibilityAddTraits(.isButton)
                 }
             }
             .accessibilityLabel("模板类型筛选")
@@ -624,6 +641,74 @@ enum TemplateFilter: String, CaseIterable, Identifiable {
             return "内置"
         case .custom:
             return "自定义"
+        }
+    }
+}
+
+private struct PromptTemplateDetailRoute: Identifiable {
+    let templateID: UUID
+    let title: String
+
+    var id: UUID { templateID }
+}
+
+private struct PromptTemplateDetailSheet: View {
+    @Environment(\.dismiss) private var dismiss
+    @Environment(\.modelContext) private var modelContext
+
+    let route: PromptTemplateDetailRoute
+    let onCopied: (String) -> Void
+
+    @State private var template: PromptTemplate?
+    @State private var errorMessage: String?
+
+    var body: some View {
+        Group {
+            if let template {
+                PromptTemplateDetailView(template: template, onCopied: onCopied)
+            } else {
+                NavigationStack {
+                    ContentUnavailableView {
+                        Label("没有找到这个 Prompt 模板", systemImage: "text.bubble")
+                    } description: {
+                        Text(errorMessage ?? "正在打开 \(route.title)。")
+                    } actions: {
+                        Button("关闭") {
+                            dismiss()
+                        }
+                        .buttonStyle(.borderedProminent)
+                    }
+                    .navigationTitle(route.title)
+                    .navigationBarTitleDisplayMode(.inline)
+                }
+            }
+        }
+        .onAppear {
+            loadTemplate()
+        }
+    }
+
+    private func loadTemplate() {
+        template = nil
+        errorMessage = nil
+
+        do {
+            let templateID = route.templateID
+            var descriptor = FetchDescriptor<PromptTemplate>(
+                predicate: #Predicate<PromptTemplate> { template in
+                    template.id == templateID
+                }
+            )
+            descriptor.fetchLimit = 1
+
+            guard let fetchedTemplate = try modelContext.fetch(descriptor).first else {
+                errorMessage = "这个模板可能已被删除或重命名。"
+                return
+            }
+
+            template = fetchedTemplate
+        } catch {
+            errorMessage = "打开模板失败：\(error.localizedDescription)"
         }
     }
 }

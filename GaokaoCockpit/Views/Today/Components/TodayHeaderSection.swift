@@ -58,12 +58,15 @@ struct TodayStartupCard: View {
                         .font(.subheadline.weight(.semibold))
 
                     Picker("主攻科目", selection: subjectSelection) {
+                        Text("先选主攻科目").tag("")
                         ForEach(LearningSubject.allCases) { subject in
                             Text(subject.displayName).tag(subject.storageValue)
                         }
                     }
                     .pickerStyle(.menu)
                     .accessibilityLabel("主攻科目")
+                    .accessibilityValue(mainSubject.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? "未选择" : LearningSubject.from(mainSubject).displayName)
+                    .accessibilityHint("选择今天主要投入的学科")
                 }
             }
         }
@@ -72,10 +75,15 @@ struct TodayStartupCard: View {
     private var subjectSelection: Binding<String> {
         Binding(
             get: {
-                LearningSubject.from(mainSubject).storageValue
+                let trimmedSubject = mainSubject.trimmingCharacters(in: .whitespacesAndNewlines)
+                guard !trimmedSubject.isEmpty else {
+                    return ""
+                }
+
+                return LearningSubject.from(trimmedSubject).storageValue
             },
             set: { newValue in
-                mainSubject = LearningSubject.from(newValue).storageValue
+                mainSubject = newValue.isEmpty ? "" : LearningSubject.from(newValue).storageValue
             }
         )
     }

@@ -25,6 +25,7 @@ struct TodayCockpitView: View {
 
     @State private var saveMessage: String?
     @State private var taskMessage: String?
+    @State private var planTaskMessage: String?
     @State private var planTaskGenerationResult: PlanTaskGenerationResult?
     @State private var isShowingQuickAddTask = false
     @State private var activePlanTaskGeneration: PlanTaskGenerationState?
@@ -86,17 +87,6 @@ struct TodayCockpitView: View {
                                 LowEnergyModeCard()
                             }
 
-                            TodayPlanTextCard(
-                                topTasksText: $topTasksText,
-                                baselineTasksText: $baselineTasksText,
-                                bonusTasksText: $bonusTasksText,
-                                isLowEnergyMode: isLowEnergyMode
-                            )
-
-                            PlanToTaskActionCard(
-                                onGenerate: preparePlanTaskGeneration
-                            )
-
                             TodayTaskSummaryCard(
                                 totalTaskCount: totalTaskCount,
                                 completedTaskCount: completedTaskCount,
@@ -115,16 +105,24 @@ struct TodayCockpitView: View {
                                 onViewTasks: viewGeneratedTasks
                             )
 
+                            TodayPlanTextCard(
+                                topTasksText: $topTasksText,
+                                baselineTasksText: $baselineTasksText,
+                                bonusTasksText: $bonusTasksText,
+                                isLowEnergyMode: isLowEnergyMode
+                            )
+
+                            PlanToTaskActionCard(
+                                message: planTaskMessage,
+                                onGenerate: preparePlanTaskGeneration
+                            )
+
                             TomorrowFirstActionCard(text: $tomorrowFirstAction)
 
                             SavePlanCard(
                                 saveMessage: saveMessage,
                                 onSave: saveTodayPlan
                             )
-
-                            #if DEBUG
-                            DeveloperDiagnosticsDisclosureCard()
-                            #endif
                         }
                         .padding()
                         .frame(maxWidth: .infinity, alignment: .leading)
@@ -144,6 +142,9 @@ struct TodayCockpitView: View {
             if loadState == .loaded {
                 refreshTaskData()
             }
+        }
+        .onReceive(NotificationCenter.default.publisher(for: StudyTaskStore.didChangeNotification)) { notification in
+            handleTaskStoreDidChange(notification)
         }
         .sheet(isPresented: $isShowingQuickAddTask) {
             TodayQuickAddTaskSheet(
@@ -167,6 +168,7 @@ struct TodayCockpitView: View {
         loadState = .loading
         saveMessage = nil
         taskMessage = nil
+        planTaskMessage = nil
         planTaskGenerationResult = nil
 
         do {
@@ -227,6 +229,7 @@ struct TodayCockpitView: View {
 
     private func preparePlanTaskGeneration() {
         taskMessage = nil
+        planTaskMessage = nil
         planTaskGenerationResult = nil
 
         let parsedTasks = PlanTaskParser.parsePlanSections(
@@ -236,7 +239,7 @@ struct TodayCockpitView: View {
         )
 
         guard !parsedTasks.isEmpty else {
-            taskMessage = "先在 Top / 保底 / 加分任务里写几行计划。"
+            planTaskMessage = "先在重点 / 保底 / 加分任务里写至少一行计划。"
             return
         }
 
@@ -275,6 +278,7 @@ struct TodayCockpitView: View {
             try refreshTaskDataThrowing(for: todayKey)
             saveMessage = "已保存今日计划。"
             planTaskGenerationResult = PlanTaskGenerationResult(created: result.created, skipped: result.skipped)
+            planTaskMessage = nil
             taskMessage = nil
         } catch {
             taskMessage = "生成今日任务失败：\(error.localizedDescription)"
@@ -313,11 +317,21 @@ struct TodayCockpitView: View {
                 : StudyTaskStatus.done.storageValue
             task.updatedAt = Date()
             try modelContext.save()
+            StudyTaskStore.postDidChange(dayKey: task.dayKey)
             try refreshTaskDataThrowing(for: todayKey)
             taskMessage = StudyTaskStatus.from(task.status) == .done ? "已标记完成。" : "已撤回待做。"
         } catch {
             taskMessage = "更新任务失败：\(error.localizedDescription)"
         }
+    }
+
+    private func handleTaskStoreDidChange(_ notification: Notification) {
+        let changedDayKey = notification.userInfo?[StudyTaskStore.dayKeyUserInfoKey] as? String
+        guard changedDayKey == nil || changedDayKey == todayKey else {
+            return
+        }
+
+        refreshTaskData()
     }
 }
 

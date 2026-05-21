@@ -20,6 +20,8 @@ struct TodayTaskListCard: View {
                         Label("快速新增", systemImage: "plus.circle")
                     }
                     .buttonStyle(.bordered)
+                    .accessibilityLabel("快速新增任务")
+                    .accessibilityHint("打开快速新增任务表单")
                 }
 
                 if tasks.isEmpty {
@@ -124,6 +126,7 @@ struct TodayTaskRowView: View {
             .frame(maxWidth: .infinity, alignment: .leading)
         }
         .contentShape(Rectangle())
+        .accessibilityElement(children: .contain)
     }
 }
 

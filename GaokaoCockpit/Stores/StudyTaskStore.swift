@@ -2,6 +2,9 @@ import Foundation
 import SwiftData
 
 enum StudyTaskStore {
+    static let didChangeNotification = Notification.Name("StudyTaskStore.didChangeNotification")
+    static let dayKeyUserInfoKey = "dayKey"
+
     static func fetchTasks(for dayKey: String, in context: ModelContext) throws -> [StudyTask] {
         let descriptor = FetchDescriptor<StudyTask>(
             predicate: #Predicate<StudyTask> { task in
@@ -58,6 +61,7 @@ enum StudyTaskStore {
 
         context.insert(task)
         try context.save()
+        postDidChange(dayKey: dayKey)
 
         return task
     }
@@ -131,6 +135,7 @@ enum StudyTaskStore {
         }
 
         try context.save()
+        postDidChange(dayKey: dayPlan.dayKey)
         return (created: createdCount, skipped: skippedCount)
     }
 
@@ -171,7 +176,17 @@ enum StudyTaskStore {
     }
 
     static func deleteTask(_ task: StudyTask, in context: ModelContext) throws {
+        let dayKey = task.dayKey
         context.delete(task)
         try context.save()
+        postDidChange(dayKey: dayKey)
+    }
+
+    static func postDidChange(dayKey: String) {
+        NotificationCenter.default.post(
+            name: didChangeNotification,
+            object: nil,
+            userInfo: [dayKeyUserInfoKey: dayKey]
+        )
     }
 }

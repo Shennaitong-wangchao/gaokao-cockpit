@@ -49,6 +49,8 @@ struct TaskListView: View {
                             Label("新增任务", systemImage: "plus.circle.fill")
                         }
                         .buttonStyle(.borderedProminent)
+                        .accessibilityLabel("新增任务")
+                        .accessibilityHint("打开任务编辑表单")
                     }
                     .padding(.vertical, 12)
                 } else {
@@ -71,13 +73,17 @@ struct TaskListView: View {
                     }
                 }
 
-                Button {
-                    activeEditor = .add
-                } label: {
-                    Label("新增任务", systemImage: "plus.circle.fill")
-                        .frame(maxWidth: .infinity)
+                if !isLoading && !tasks.isEmpty {
+                    Button {
+                        activeEditor = .add
+                    } label: {
+                        Label("新增任务", systemImage: "plus.circle.fill")
+                            .frame(maxWidth: .infinity)
+                    }
+                    .buttonStyle(.borderedProminent)
+                    .accessibilityLabel("新增任务")
+                    .accessibilityHint("打开任务编辑表单")
                 }
-                .buttonStyle(.borderedProminent)
 
                 if let statusMessage {
                     Text(statusMessage)
@@ -98,6 +104,9 @@ struct TaskListView: View {
             if !isLoading {
                 refreshTaskData()
             }
+        }
+        .onReceive(NotificationCenter.default.publisher(for: StudyTaskStore.didChangeNotification)) { notification in
+            handleTaskStoreDidChange(notification)
         }
         .onChange(of: selectedFilter) {
             refreshTaskData()
@@ -166,11 +175,21 @@ struct TaskListView: View {
             task.status = status.storageValue
             StudyTaskStore.updateTaskTimestamp(task)
             try modelContext.save()
+            StudyTaskStore.postDidChange(dayKey: task.dayKey)
             try refreshTaskDataThrowing()
             statusMessage = "已更新状态：\(status.displayName)。"
         } catch {
             statusMessage = "更新状态失败，请重试。"
         }
+    }
+
+    private func handleTaskStoreDidChange(_ notification: Notification) {
+        let changedDayKey = notification.userInfo?[StudyTaskStore.dayKeyUserInfoKey] as? String
+        guard changedDayKey == nil || changedDayKey == todayKey else {
+            return
+        }
+
+        refreshTaskData()
     }
 }
 

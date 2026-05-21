@@ -207,6 +207,7 @@ struct TaskEditorSheet: View {
                 }
                 StudyTaskStore.updateTaskTimestamp(task)
                 try modelContext.save()
+                StudyTaskStore.postDidChange(dayKey: task.dayKey)
                 onChanged("已保存任务。")
             }
 

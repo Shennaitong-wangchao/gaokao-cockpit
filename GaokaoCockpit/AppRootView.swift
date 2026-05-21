@@ -12,6 +12,8 @@ struct AppRootView: View {
             }
             .tabItem {
                 Label("今日", systemImage: "sun.max")
+                    .accessibilityLabel("今日标签页")
+                    .accessibilityIdentifier("tab.today")
             }
             .tag(AppTab.today)
 
@@ -20,6 +22,8 @@ struct AppRootView: View {
             }
             .tabItem {
                 Label("任务", systemImage: "checklist")
+                    .accessibilityLabel("任务标签页")
+                    .accessibilityIdentifier("tab.tasks")
             }
             .tag(AppTab.tasks)
 
@@ -28,6 +32,8 @@ struct AppRootView: View {
             }
             .tabItem {
                 Label("错题", systemImage: "cross.case")
+                    .accessibilityLabel("错题标签页")
+                    .accessibilityIdentifier("tab.mistakes")
             }
             .tag(AppTab.mistakes)
 
@@ -36,6 +42,8 @@ struct AppRootView: View {
             }
             .tabItem {
                 Label("Prompt", systemImage: "text.bubble")
+                    .accessibilityLabel("Prompt 标签页")
+                    .accessibilityIdentifier("tab.prompts")
             }
             .tag(AppTab.prompts)
 
@@ -44,9 +52,12 @@ struct AppRootView: View {
             }
             .tabItem {
                 Label("复盘", systemImage: "chart.line.uptrend.xyaxis")
+                    .accessibilityLabel("复盘标签页")
+                    .accessibilityIdentifier("tab.reviews")
             }
             .tag(AppTab.reviews)
         }
+        .accessibilityIdentifier("main.tab.view")
     }
 }
 

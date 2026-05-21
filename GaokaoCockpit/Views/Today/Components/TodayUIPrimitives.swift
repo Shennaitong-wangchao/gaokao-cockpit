@@ -75,6 +75,7 @@ struct SectionTitle: View {
     var body: some View {
         Label(title, systemImage: systemImage)
             .font(.headline)
+            .accessibilityAddTraits(.isHeader)
     }
 }
 
@@ -96,6 +97,8 @@ struct StatPill: View {
         .padding(.vertical, 10)
         .background(Color(.systemBackground))
         .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel("\(title)：\(value)")
     }
 }
 

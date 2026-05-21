@@ -47,7 +47,9 @@ struct TaskRowView: View {
                     .contentShape(Rectangle())
                 }
                 .buttonStyle(.plain)
-                .accessibilityLabel("编辑任务")
+                .accessibilityLabel("编辑任务 \(task.title.isEmpty ? "未命名任务" : task.title)")
+                .accessibilityHint("打开任务详情编辑")
+                .accessibilityAddTraits(.isButton)
 
                 Menu {
                     ForEach(TaskStatusOption.all) { option in
@@ -65,6 +67,7 @@ struct TaskRowView: View {
                         .frame(width: 32, height: 32)
                 }
                 .accessibilityLabel("切换任务状态")
+                .accessibilityValue(task.taskListStatusTitle)
             }
 
             HStack(spacing: 10) {

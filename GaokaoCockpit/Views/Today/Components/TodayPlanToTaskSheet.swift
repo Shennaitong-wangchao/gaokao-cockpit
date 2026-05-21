@@ -127,6 +127,10 @@ struct TodayQuickAddTaskSheet: View {
     @State private var estimatedMinutes = 25
     @State private var errorMessage: String?
 
+    private var isAddDisabled: Bool {
+        title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+    }
+
     init(
         dayKey: String,
         dayPlanID: UUID?,
@@ -173,6 +177,19 @@ struct TodayQuickAddTaskSheet: View {
                             .foregroundStyle(.red)
                     }
                 }
+
+                Section {
+                    Button {
+                        saveTask()
+                    } label: {
+                        Label("添加任务", systemImage: "plus.circle.fill")
+                            .frame(maxWidth: .infinity)
+                    }
+                    .buttonStyle(.borderedProminent)
+                    .disabled(isAddDisabled)
+                    .accessibilityLabel("添加任务")
+                    .accessibilityHint("保存到今日任务列表")
+                }
             }
             .navigationTitle("快速新增任务")
             .navigationBarTitleDisplayMode(.inline)
@@ -182,15 +199,11 @@ struct TodayQuickAddTaskSheet: View {
                         dismiss()
                     }
                 }
-
-                ToolbarItem(placement: .confirmationAction) {
-                    Button("保存") {
-                        saveTask()
-                    }
-                    .disabled(title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
-                }
             }
         }
+        .presentationDetents([.medium, .large])
+        .presentationDragIndicator(.visible)
+        .interactiveDismissDisabled(false)
     }
 
     private func saveTask() {
@@ -201,17 +214,15 @@ struct TodayQuickAddTaskSheet: View {
         }
 
         do {
-            let task = try StudyTaskStore.createTask(
+            _ = try StudyTaskStore.createTask(
                 dayKey: dayKey,
                 title: cleanTitle,
                 subject: subject.storageValue,
                 category: category,
                 estimatedMinutes: estimatedMinutes,
+                dayPlanId: dayPlanID,
                 in: modelContext
             )
-            task.dayPlanId = dayPlanID
-            task.updatedAt = Date()
-            try modelContext.save()
 
             title = ""
             subject = LearningSubject.from(defaultSubject)
