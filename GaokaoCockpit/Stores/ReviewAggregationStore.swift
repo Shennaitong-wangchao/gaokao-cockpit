@@ -19,8 +19,19 @@ enum ReviewAggregationStore {
     }
 
     static func todayMistakeCount(dayKey: String, in context: ModelContext) throws -> Int {
-        let mistakes = try fetchMistakes(in: context)
-        return mistakes.filter { DateKey.key(for: $0.createdAt) == dayKey }.count
+        guard let interval = DateKey.dateInterval(forKey: dayKey) else {
+            return 0
+        }
+
+        let start = interval.start
+        let end = interval.end
+        let descriptor = FetchDescriptor<MistakeRecord>(
+            predicate: #Predicate<MistakeRecord> { mistake in
+                mistake.createdAt >= start && mistake.createdAt < end
+            }
+        )
+
+        return try context.fetchCount(descriptor)
     }
 
     static func weekFocusMinutes(start: Date, end: Date, in context: ModelContext) throws -> Int {
@@ -90,39 +101,41 @@ enum ReviewAggregationStore {
     }
 
     private static func fetchFocusSessions(start: Date, end: Date, in context: ModelContext) throws -> [FocusSession] {
+        let rangeStart = start
+        let rangeEnd = DateKey.exclusiveEnd(after: end)
         let descriptor = FetchDescriptor<FocusSession>(
+            predicate: #Predicate<FocusSession> { session in
+                session.startTime >= rangeStart && session.startTime < rangeEnd
+            },
             sortBy: [SortDescriptor(\.startTime, order: .forward)]
         )
 
-        return try context.fetch(descriptor).filter { session in
-            session.startTime >= start && session.startTime <= end
-        }
+        return try context.fetch(descriptor)
     }
 
     private static func fetchTasks(start: Date, end: Date, in context: ModelContext) throws -> [StudyTask] {
         let startKey = DateKey.key(for: start)
         let endKey = DateKey.key(for: end)
         let descriptor = FetchDescriptor<StudyTask>(
+            predicate: #Predicate<StudyTask> { task in
+                task.dayKey >= startKey && task.dayKey <= endKey
+            },
             sortBy: [SortDescriptor(\.dayKey, order: .forward)]
         )
 
-        return try context.fetch(descriptor).filter { task in
-            task.dayKey >= startKey && task.dayKey <= endKey
-        }
+        return try context.fetch(descriptor)
     }
 
     private static func fetchMistakes(start: Date, end: Date, in context: ModelContext) throws -> [MistakeRecord] {
+        let rangeStart = start
+        let rangeEnd = DateKey.exclusiveEnd(after: end)
         let descriptor = FetchDescriptor<MistakeRecord>(
+            predicate: #Predicate<MistakeRecord> { mistake in
+                mistake.createdAt >= rangeStart && mistake.createdAt < rangeEnd
+            },
             sortBy: [SortDescriptor(\.createdAt, order: .forward)]
         )
 
-        return try context.fetch(descriptor).filter { mistake in
-            mistake.createdAt >= start && mistake.createdAt <= end
-        }
-    }
-
-    private static func fetchMistakes(in context: ModelContext) throws -> [MistakeRecord] {
-        let descriptor = FetchDescriptor<MistakeRecord>()
         return try context.fetch(descriptor)
     }
 

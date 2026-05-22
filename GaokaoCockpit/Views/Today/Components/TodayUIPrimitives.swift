@@ -22,6 +22,8 @@ struct LabeledTextEditor: View {
                     .frame(minHeight: minHeight)
                     .scrollContentBackground(.hidden)
                     .accessibilityLabel(title)
+                    .accessibilityHint(subtitle)
+                    .accessibilityValue(text.isEmpty ? "空" : text)
 
                 if text.isEmpty {
                     Text(placeholder)

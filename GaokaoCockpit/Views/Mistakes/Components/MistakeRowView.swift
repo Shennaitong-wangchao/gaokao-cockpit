@@ -105,49 +105,83 @@ struct MistakeQuestionThumbnail: View {
     let path: String
     let onTap: (String) -> Void
 
+    @State private var thumbnailImage: UIImage?
+    @State private var didFinishLoadingThumbnail = false
+
+    private var cleanPath: String {
+        path.trimmingCharacters(in: .whitespacesAndNewlines)
+    }
+
     var body: some View {
-        let cleanPath = path.trimmingCharacters(in: .whitespacesAndNewlines)
+        Group {
+            if !cleanPath.isEmpty, let image = thumbnailImage {
+                Button {
+                    onTap(cleanPath)
+                } label: {
+                    ZStack(alignment: .bottomTrailing) {
+                        Image(uiImage: image)
+                            .resizable()
+                            .scaledToFill()
+                            .frame(width: 58, height: 58)
+                            .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+                            .overlay {
+                                RoundedRectangle(cornerRadius: 8, style: .continuous)
+                                    .stroke(Color(.separator).opacity(0.35), lineWidth: 1)
+                            }
 
-        if let image = MistakeImageStore.loadImage(path: cleanPath) {
-            Button {
-                onTap(cleanPath)
-            } label: {
-                ZStack(alignment: .bottomTrailing) {
-                    Image(uiImage: image)
-                        .resizable()
-                        .scaledToFill()
-                        .frame(width: 58, height: 58)
-                        .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
-                        .overlay {
-                            RoundedRectangle(cornerRadius: 8, style: .continuous)
-                                .stroke(Color(.separator).opacity(0.35), lineWidth: 1)
-                        }
-
-                    Image(systemName: "magnifyingglass")
-                        .font(.caption2.weight(.bold))
-                        .foregroundStyle(.white)
-                        .padding(4)
-                        .background(Color.black.opacity(0.55))
-                        .clipShape(Circle())
-                        .padding(4)
+                        Image(systemName: "magnifyingglass")
+                            .font(.caption2.weight(.bold))
+                            .foregroundStyle(.white)
+                            .padding(4)
+                            .background(Color.black.opacity(0.55))
+                            .clipShape(Circle())
+                            .padding(4)
+                    }
                 }
-            }
-            .buttonStyle(.plain)
-            .accessibilityLabel("打开题图预览")
-        } else if !cleanPath.isEmpty {
-            Button {
-                onTap(cleanPath)
-            } label: {
-                Image(systemName: "photo.badge.exclamationmark")
-                    .font(.title3)
-                    .foregroundStyle(.secondary)
+                .buttonStyle(.plain)
+                .accessibilityLabel("打开题图预览")
+            } else if !cleanPath.isEmpty && didFinishLoadingThumbnail {
+                Button {
+                    onTap(cleanPath)
+                } label: {
+                    Image(systemName: "photo.badge.exclamationmark")
+                        .font(.title3)
+                        .foregroundStyle(.secondary)
+                        .frame(width: 58, height: 58)
+                        .background(Color(.tertiarySystemBackground))
+                        .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+                }
+                .buttonStyle(.plain)
+                .accessibilityLabel("题图读取失败，打开说明")
+            } else if !cleanPath.isEmpty {
+                ProgressView()
                     .frame(width: 58, height: 58)
                     .background(Color(.tertiarySystemBackground))
                     .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+                    .accessibilityLabel("正在读取题图缩略图")
             }
-            .buttonStyle(.plain)
-            .accessibilityLabel("题图读取失败，打开说明")
         }
+        .task(id: cleanPath) {
+            await loadThumbnail(path: cleanPath)
+        }
+    }
+
+    @MainActor
+    private func loadThumbnail(path: String) async {
+        guard !path.isEmpty else {
+            thumbnailImage = nil
+            didFinishLoadingThumbnail = false
+            return
+        }
+
+        didFinishLoadingThumbnail = false
+        let image = await MistakeImageStore.loadImageInBackground(path: path)
+        guard path == cleanPath else {
+            return
+        }
+
+        thumbnailImage = image
+        didFinishLoadingThumbnail = true
     }
 }
 

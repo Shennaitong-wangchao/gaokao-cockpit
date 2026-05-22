@@ -4,49 +4,37 @@ import UIKit
 
 struct MistakeSurgeryView: View {
     @Environment(\.modelContext) private var modelContext
-
-    @State private var mistakes: [MistakeRecord] = []
-    @State private var selectedSubjectFilter: LearningSubject?
-    @State private var selectedReviewFilter: ReviewStatus?
-    @State private var totalMistakeCount = 0
-    @State private var scheduledCount = 0
-    @State private var reviewedCount = 0
-    @State private var masteredCount = 0
-    @State private var isLoading = true
-    @State private var statusMessage: String?
-    @State private var activeEditor: MistakeEditorMode?
-    @State private var activePromptSheet: MistakePromptSheet?
-    @State private var activeImagePreview: MistakeImagePreviewItem?
+    @State private var model = MistakeSurgeryModel()
 
     var body: some View {
         ScrollView {
-            VStack(alignment: .leading, spacing: 14) {
+            LazyVStack(alignment: .leading, spacing: 14) {
                 MistakeSurgeryHeaderView()
 
                 MistakeSummaryCard(
-                    totalMistakeCount: totalMistakeCount,
-                    scheduledCount: scheduledCount,
-                    reviewedCount: reviewedCount,
-                    masteredCount: masteredCount
+                    totalMistakeCount: model.totalMistakeCount,
+                    scheduledCount: model.scheduledCount,
+                    reviewedCount: model.reviewedCount,
+                    masteredCount: model.masteredCount
                 )
 
                 MistakeFilterBar(
-                    selectedSubjectFilter: $selectedSubjectFilter,
-                    selectedReviewFilter: $selectedReviewFilter
+                    selectedSubjectFilter: $model.selectedSubjectFilter,
+                    selectedReviewFilter: $model.selectedReviewFilter
                 )
 
-                if isLoading {
+                if model.isLoading {
                     ProgressView("正在加载错题手术")
                         .frame(maxWidth: .infinity, alignment: .center)
                         .padding(.vertical, 28)
-                } else if mistakes.isEmpty {
+                } else if model.mistakes.isEmpty {
                     ContentUnavailableView {
                         Label("还没有错题", systemImage: "cross.case")
                     } description: {
                         Text("下一次做错题时，先拍题图，再拆错因。")
                     } actions: {
                         Button {
-                            activeEditor = .add
+                            model.activeEditor = .add
                         } label: {
                             Label("新增错题手术", systemImage: "plus.circle.fill")
                         }
@@ -54,21 +42,21 @@ struct MistakeSurgeryView: View {
                     }
                     .padding(.vertical, 12)
                 } else {
-                    VStack(spacing: 10) {
-                        ForEach(mistakes, id: \.id) { mistake in
+                    LazyVStack(spacing: 10) {
+                        ForEach(model.mistakes, id: \.id) { mistake in
                             MistakeRow(
                                 mistake: mistake,
                                 onTap: {
-                                    activeEditor = .edit(mistake)
+                                    model.activeEditor = .edit(mistake)
                                 },
                                 onPreviewImage: { path in
-                                    activeImagePreview = MistakeImagePreviewItem(path: path)
+                                    model.activeImagePreview = MistakeImagePreviewItem(path: path)
                                 },
                                 onGeneratePrompt: {
-                                    prepareMistakePrompt(for: mistake)
+                                    model.prepareMistakePrompt(in: modelContext, for: mistake)
                                 },
                                 onChangeStatus: { status in
-                                    updateReviewStatus(mistake, to: status)
+                                    model.updateReviewStatus(in: modelContext, mistake: mistake, to: status)
                                 }
                             )
                         }
@@ -76,14 +64,14 @@ struct MistakeSurgeryView: View {
                 }
 
                 Button {
-                    activeEditor = .add
+                    model.activeEditor = .add
                 } label: {
                     Label("新增错题手术", systemImage: "plus.circle.fill")
                         .frame(maxWidth: .infinity)
                 }
                 .buttonStyle(.borderedProminent)
 
-                if let statusMessage {
+                if let statusMessage = model.statusMessage {
                     Text(statusMessage)
                         .font(.footnote)
                         .foregroundStyle(.secondary)
@@ -96,117 +84,43 @@ struct MistakeSurgeryView: View {
         .navigationTitle("错题")
         .navigationBarTitleDisplayMode(.inline)
         .task {
-            loadMistakes()
+            model.loadMistakes(in: modelContext)
         }
         .onAppear {
-            if !isLoading {
-                refreshMistakeData()
+            if !model.isLoading {
+                model.refreshMistakeData(in: modelContext)
             }
         }
-        .onChange(of: selectedSubjectFilter) {
-            refreshMistakeData()
+        .onChange(of: model.selectedSubjectFilter) {
+            model.refreshMistakeData(in: modelContext)
         }
-        .onChange(of: selectedReviewFilter) {
-            refreshMistakeData()
+        .onChange(of: model.selectedReviewFilter) {
+            model.refreshMistakeData(in: modelContext)
         }
         .refreshable {
-            refreshMistakeData()
+            model.refreshMistakeData(in: modelContext)
         }
-        .sheet(item: $activeEditor) { editor in
+        .sheet(item: $model.activeEditor) { editor in
             MistakeEditorView(mode: editor) { message in
-                refreshMistakeData()
-                statusMessage = message
+                model.refreshMistakeData(in: modelContext)
+                model.statusMessage = message
             }
         }
-        .sheet(item: $activePromptSheet) { promptSheet in
+        .sheet(item: $model.activePromptSheet) { promptSheet in
             PromptTemplateDetailView(
                 template: promptSheet.template,
                 initialValues: promptSheet.values
             ) { message in
-                statusMessage = message
+                model.statusMessage = message
             }
         }
-        .sheet(item: $activeImagePreview) { item in
+        .sheet(item: $model.activeImagePreview) { item in
             MistakeImagePreviewView(path: item.path)
-        }
-    }
-
-    private func loadMistakes() {
-        isLoading = true
-        statusMessage = nil
-
-        do {
-            try refreshMistakeDataThrowing()
-            isLoading = false
-        } catch {
-            isLoading = false
-            statusMessage = "加载错题失败：\(error.localizedDescription)"
-        }
-    }
-
-    private func refreshMistakeData() {
-        do {
-            try refreshMistakeDataThrowing()
-        } catch {
-            statusMessage = "刷新错题失败：\(error.localizedDescription)"
-        }
-    }
-
-    private func refreshMistakeDataThrowing() throws {
-        mistakes = try MistakeRecordStore.fetchMistakes(
-            subject: selectedSubjectFilter?.storageValue,
-            reviewStatus: selectedReviewFilter?.storageValue,
-            in: modelContext
-        )
-        totalMistakeCount = try MistakeRecordStore.countMistakes(in: modelContext)
-        scheduledCount = try MistakeRecordStore.countMistakes(
-            reviewStatus: ReviewStatus.scheduled.storageValue,
-            in: modelContext
-        )
-        reviewedCount = try MistakeRecordStore.countMistakes(
-            reviewStatus: ReviewStatus.reviewed.storageValue,
-            in: modelContext
-        )
-        masteredCount = try MistakeRecordStore.countMistakes(
-            reviewStatus: ReviewStatus.mastered.storageValue,
-            in: modelContext
-        )
-    }
-
-    private func updateReviewStatus(_ mistake: MistakeRecord, to status: ReviewStatus) {
-        guard ReviewStatus.from(mistake.reviewStatus) != status else {
-            return
-        }
-
-        do {
-            mistake.reviewStatus = status.storageValue
-            MistakeRecordStore.updateMistakeTimestamp(mistake)
-            try modelContext.save()
-            try refreshMistakeDataThrowing()
-            statusMessage = "已更新复习状态：\(status.displayName)。"
-        } catch {
-            statusMessage = "更新复习状态失败：\(error.localizedDescription)"
-        }
-    }
-
-    private func prepareMistakePrompt(for mistake: MistakeRecord) {
-        do {
-            guard let template = try PromptTemplateStore.fetchTemplate(title: "错题手术", in: modelContext) else {
-                statusMessage = "找不到内置“错题手术”模板。请检查 Prompt seed 是否成功。"
-                return
-            }
-
-            activePromptSheet = MistakePromptSheet(
-                template: template,
-                values: mistake.promptValues
-            )
-        } catch {
-            statusMessage = "加载错题 Prompt 失败：\(error.localizedDescription)"
         }
     }
 }
 
-private struct MistakePromptSheet: Identifiable {
+struct MistakePromptSheet: Identifiable {
     let id = UUID()
     let template: PromptTemplate
     let values: [String: String]

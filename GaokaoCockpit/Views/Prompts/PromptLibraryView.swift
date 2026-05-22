@@ -3,32 +3,21 @@ import SwiftUI
 
 struct PromptLibraryView: View {
     @Environment(\.modelContext) private var modelContext
-
-    @State private var templates: [PromptTemplate] = []
-    @State private var selectedCategory: PromptCategory = .all
-    @State private var searchText = ""
-    @State private var totalTemplateCount = 0
-    @State private var totalUsageCount = 0
-    @State private var isLoading = true
-    @State private var statusMessage: String?
-    @State private var activeTemplateDetail: PromptTemplateDetailRoute?
-    @State private var recentEntries: [RecentPromptEntry] = []
-    @State private var showCreateEditor = false
-    @State private var templateFilter: TemplateFilter = .all
+    @State private var model = PromptLibraryModel()
 
     var body: some View {
         ScrollView {
-            VStack(alignment: .leading, spacing: 14) {
+            LazyVStack(alignment: .leading, spacing: 14) {
                 PromptLibraryHeaderView()
 
                 PromptSummaryCard(
-                    totalTemplateCount: totalTemplateCount,
-                    totalUsageCount: totalUsageCount
+                    totalTemplateCount: model.totalTemplateCount,
+                    totalUsageCount: model.totalUsageCount
                 )
 
                 HStack(spacing: 12) {
                     Button {
-                        showCreateEditor = true
+                        model.showCreateEditor = true
                     } label: {
                         Label("新建模板", systemImage: "plus.circle.fill")
                             .font(.subheadline.weight(.semibold))
@@ -39,31 +28,31 @@ struct PromptLibraryView: View {
                     .accessibilityLabel("新建自定义模板")
                 }
 
-                PromptCategoryFilterBar(selectedCategory: $selectedCategory)
+                PromptCategoryFilterBar(selectedCategory: $model.selectedCategory)
 
-                PromptTemplateFilterBar(selectedFilter: $templateFilter)
+                PromptTemplateFilterBar(selectedFilter: $model.templateFilter)
 
-                PromptSearchBar(searchText: $searchText)
+                PromptSearchBar(searchText: $model.searchText)
 
-                if searchText.isEmpty && selectedCategory == .all {
-                    PromptFrequentSection(templates: frequentTemplates) { template in
-                        openTemplate(template)
+                if model.searchText.isEmpty && model.selectedCategory == .all {
+                    PromptFrequentSection(templates: model.frequentTemplates) { template in
+                        model.openTemplate(template)
                     }
 
                     PromptRecentSection(
-                        recentEntries: recentEntries,
+                        recentEntries: model.recentEntries,
                         onSelect: { entry in
-                            handleRecentEntryTap(entry)
+                            model.handleRecentEntryTap(in: modelContext, entry: entry)
                         }
                     )
                 }
 
-                if isLoading {
+                if model.isLoading {
                     ProgressView("正在加载 Prompt 模板")
                         .frame(maxWidth: .infinity, alignment: .center)
                         .padding(.vertical, 28)
-                } else if templates.isEmpty {
-                    if searchText.isEmpty {
+                } else if model.templates.isEmpty {
+                    if model.searchText.isEmpty {
                         ContentUnavailableView {
                             Label("还没有 Prompt 模板", systemImage: "text.bubble")
                         } description: {
@@ -79,16 +68,16 @@ struct PromptLibraryView: View {
                         .padding(.vertical, 12)
                     }
                 } else {
-                    VStack(spacing: 10) {
-                        ForEach(templates, id: \.id) { template in
+                    LazyVStack(spacing: 10) {
+                        ForEach(model.templates, id: \.id) { template in
                             PromptTemplateRow(template: template) {
-                                openTemplate(template)
+                                model.openTemplate(template)
                             }
                         }
                     }
                 }
 
-                if let statusMessage {
+                if let statusMessage = model.statusMessage {
                     Text(statusMessage)
                         .font(.footnote)
                         .foregroundStyle(.secondary)
@@ -101,160 +90,51 @@ struct PromptLibraryView: View {
         .navigationTitle("Prompt")
         .navigationBarTitleDisplayMode(.inline)
         .task {
-            loadTemplates()
+            model.loadTemplates(in: modelContext)
         }
         .onAppear {
-            if !isLoading {
-                refreshTemplates()
+            if !model.isLoading {
+                model.refreshTemplates(in: modelContext)
             }
-            refreshRecentEntries()
+            model.refreshRecentEntries()
         }
-        .onChange(of: selectedCategory) {
-            refreshTemplates()
+        .onChange(of: model.selectedCategory) {
+            model.refreshTemplates(in: modelContext)
         }
-        .onChange(of: templateFilter) {
-            refreshTemplates()
+        .onChange(of: model.templateFilter) {
+            model.refreshTemplates(in: modelContext)
         }
-        .onChange(of: searchText) {
-            refreshTemplates()
+        .onChange(of: model.searchText) {
+            model.refreshTemplates(in: modelContext)
         }
         .refreshable {
-            refreshTemplates()
+            model.refreshTemplates(in: modelContext)
         }
-        .sheet(item: $activeTemplateDetail) { route in
+        .sheet(item: $model.activeTemplateDetail) { route in
             PromptTemplateDetailSheet(route: route) { message in
-                refreshTemplates()
-                refreshRecentEntries()
-                statusMessage = message
+                model.refreshTemplates(in: modelContext)
+                model.refreshRecentEntries()
+                model.statusMessage = message
             }
         }
-        .sheet(isPresented: $showCreateEditor) {
+        .sheet(isPresented: $model.showCreateEditor) {
             PromptTemplateEditorView(mode: .create) {
-                refreshTemplates()
+                model.refreshTemplates(in: modelContext)
             }
         }
-    }
-
-    private var frequentTemplates: [PromptTemplate] {
-        let allTemplates = templates
-        let used = allTemplates.filter { $0.usageCount > 0 }
-        let sorted = used.sorted { $0.usageCount > $1.usageCount }
-        return Array(sorted.prefix(5))
-    }
-
-    private func refreshRecentEntries() {
-        recentEntries = RecentPromptStore.recent(limit: 5)
-    }
-
-    private func openTemplate(_ template: PromptTemplate) {
-        activeTemplateDetail = PromptTemplateDetailRoute(
-            templateID: template.id,
-            title: template.title
-        )
-    }
-
-    private func handleRecentEntryTap(_ entry: RecentPromptEntry) {
-        do {
-            // 优先通过 templateId 查找
-            if let template = try findTemplateById(entry.templateId) {
-                openTemplate(template)
-                return
-            }
-
-            // 如果找不到，再用 title 查找
-            if let template = try PromptTemplateStore.fetchTemplate(title: entry.title, in: modelContext) {
-                openTemplate(template)
-                return
-            }
-
-            // 找不到则提示
-            statusMessage = "这个模板当前不存在，可能已被移除或重命名。"
-        } catch {
-            statusMessage = "查找模板失败：\(error.localizedDescription)"
-        }
-    }
-
-    private func findTemplateById(_ id: UUID) throws -> PromptTemplate? {
-        let descriptor = FetchDescriptor<PromptTemplate>(
-            predicate: #Predicate<PromptTemplate> { template in
-                template.id == id
-            }
-        )
-        return try modelContext.fetch(descriptor).first
-    }
-
-    private func loadTemplates() {
-        isLoading = true
-        statusMessage = nil
-
-        do {
-            try refreshTemplatesThrowing()
-            isLoading = false
-        } catch {
-            isLoading = false
-            statusMessage = "加载 Prompt 模板失败：\(error.localizedDescription)"
-        }
-    }
-
-    private func refreshTemplates() {
-        do {
-            try refreshTemplatesThrowing()
-        } catch {
-            statusMessage = "刷新 Prompt 模板失败：\(error.localizedDescription)"
-        }
-    }
-
-    private func refreshTemplatesThrowing() throws {
-        var results = try PromptTemplateStore.fetchTemplates(
-            category: selectedCategory == .all ? nil : selectedCategory.storageValue,
-            in: modelContext
-        )
-
-        // 应用模板类型筛选
-        switch templateFilter {
-        case .all:
-            break
-        case .builtIn:
-            results = results.filter { $0.isBuiltIn }
-        case .custom:
-            results = results.filter { !$0.isBuiltIn }
-        }
-
-        let query = searchText.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
-        if !query.isEmpty {
-            results = results.filter { template in
-                template.title.lowercased().contains(query)
-                    || template.templateDescription.lowercased().contains(query)
-                    || template.category.lowercased().contains(query)
-            }
-            // 搜索结果按 usageCount 降序排序
-            results.sort { lhs, rhs in
-                if lhs.usageCount != rhs.usageCount {
-                    return lhs.usageCount > rhs.usageCount
-                }
-                return lhs.title < rhs.title
-            }
-        } else {
-            // 无搜索时按 category + usageCount desc + title 排序
-            results.sort { lhs, rhs in
-                if lhs.category != rhs.category {
-                    return lhs.category < rhs.category
-                }
-                if lhs.usageCount != rhs.usageCount {
-                    return lhs.usageCount > rhs.usageCount
-                }
-                return lhs.title < rhs.title
-            }
-        }
-
-        templates = results
-
-        let allTemplates = try PromptTemplateStore.fetchTemplates(category: nil, in: modelContext)
-        totalTemplateCount = allTemplates.count
-        totalUsageCount = allTemplates.reduce(0) { $0 + $1.usageCount }
     }
 }
 
+#Preview {
+    let container = try! AppModelContainerFactory.make(inMemory: true)
+    let context = container.mainContext
+    try! PromptTemplateSeeder.seedIfNeeded(in: context)
+
+    return NavigationStack {
+        PromptLibraryView()
+    }
+    .modelContainer(container)
+}
 private struct PromptLibraryHeaderView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
@@ -626,32 +506,6 @@ private struct PromptTemplateFilterBar: View {
     }
 }
 
-enum TemplateFilter: String, CaseIterable, Identifiable {
-    case all
-    case builtIn
-    case custom
-
-    var id: String { rawValue }
-
-    var displayName: String {
-        switch self {
-        case .all:
-            return "全部"
-        case .builtIn:
-            return "内置"
-        case .custom:
-            return "自定义"
-        }
-    }
-}
-
-private struct PromptTemplateDetailRoute: Identifiable {
-    let templateID: UUID
-    let title: String
-
-    var id: UUID { templateID }
-}
-
 private struct PromptTemplateDetailSheet: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(\.modelContext) private var modelContext
@@ -722,4 +576,5 @@ private struct PromptTemplateDetailSheet: View {
         PromptLibraryView()
     }
     .modelContainer(container)
+
 }

@@ -71,6 +71,8 @@ struct PlanTaskGenerationSheet: View {
                     Button("取消") {
                         dismiss()
                     }
+                    .accessibilityHint("关闭生成今日任务确认页")
+                    .accessibilityAddTraits(.isButton)
                 }
 
                 ToolbarItem(placement: .confirmationAction) {
@@ -78,6 +80,8 @@ struct PlanTaskGenerationSheet: View {
                         onConfirm()
                         dismiss()
                     }
+                    .accessibilityHint("创建未重复的今日任务")
+                    .accessibilityAddTraits(.isButton)
                 }
             }
         }
@@ -109,6 +113,13 @@ struct PlanTaskPreviewRow: View {
                 }
             }
         }
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel(accessibilityLabel)
+    }
+
+    private var accessibilityLabel: String {
+        let duplicateSuffix = item.alreadyExists ? "，已存在，将跳过" : "，将创建"
+        return "\(item.parsedTask.title)，\(item.parsedTask.sourceTitle)，\(StudyTaskCategory.from(item.parsedTask.category).displayName)\(duplicateSuffix)"
     }
 }
 
@@ -150,24 +161,44 @@ struct TodayQuickAddTaskSheet: View {
                 Section {
                     TextField("具体要做什么？", text: $title)
                         .accessibilityLabel("任务标题")
+                        .accessibilityHint("填写一个可以立刻开始的今日任务")
 
                     Picker("科目", selection: $subject) {
                         ForEach(LearningSubject.allCases) { subject in
                             Text(subject.displayName).tag(subject)
                         }
                     }
+                    .accessibilityLabel("科目")
+                    .accessibilityValue(subject.displayName)
+                    .accessibilityHint("选择任务所属学科")
+                    .accessibilityAddTraits(.isButton)
 
                     Picker("类型", selection: $category) {
                         ForEach(StudyTaskCategory.allCases) { category in
                             Text(category.displayName).tag(category)
                         }
                     }
+                    .accessibilityLabel("类型")
+                    .accessibilityValue(category.displayName)
+                    .accessibilityHint("选择任务类型")
+                    .accessibilityAddTraits(.isButton)
 
                     Stepper(value: $estimatedMinutes, in: 5...180, step: 5) {
                         Text("预计 \(estimatedMinutes) 分钟")
                     }
                     .accessibilityLabel("预计分钟")
                     .accessibilityValue("\(estimatedMinutes) 分钟")
+                    .accessibilityHint("上滑或下滑按 5 分钟调整")
+                    .accessibilityAdjustableAction { direction in
+                        switch direction {
+                        case .increment:
+                            estimatedMinutes = min(estimatedMinutes + 5, 180)
+                        case .decrement:
+                            estimatedMinutes = max(estimatedMinutes - 5, 5)
+                        @unknown default:
+                            break
+                        }
+                    }
                 }
 
                 if let errorMessage {
@@ -189,6 +220,8 @@ struct TodayQuickAddTaskSheet: View {
                     .disabled(isAddDisabled)
                     .accessibilityLabel("添加任务")
                     .accessibilityHint("保存到今日任务列表")
+                    .accessibilityValue(isAddDisabled ? "任务标题为空，暂不可添加" : "可以添加")
+                    .accessibilityAddTraits(.isButton)
                 }
             }
             .navigationTitle("快速新增任务")
@@ -198,6 +231,8 @@ struct TodayQuickAddTaskSheet: View {
                     Button("取消") {
                         dismiss()
                     }
+                    .accessibilityHint("关闭快速新增任务表单")
+                    .accessibilityAddTraits(.isButton)
                 }
             }
         }

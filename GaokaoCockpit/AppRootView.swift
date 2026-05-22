@@ -1,63 +1,85 @@
 import SwiftUI
 
 struct AppRootView: View {
+    let startupWarning: String?
+
     @State private var selectedTab: AppTab = .today
 
+    init(startupWarning: String? = nil) {
+        self.startupWarning = startupWarning
+    }
+
     var body: some View {
-        TabView(selection: $selectedTab) {
-            NavigationStack {
-                TodayCockpitView {
-                    selectedTab = .tasks
+        ZStack {
+            TabView(selection: $selectedTab) {
+                NavigationStack {
+                    TodayCockpitView {
+                        selectedTab = .tasks
+                    }
+                }
+                .tabItem {
+                    Label("今日", systemImage: "sun.max")
+                        .accessibilityLabel("今日标签页")
+                        .accessibilityIdentifier("tab.today")
+                }
+                .tag(AppTab.today)
+
+                NavigationStack {
+                    TaskListView()
+                }
+                .tabItem {
+                    Label("任务", systemImage: "checklist")
+                        .accessibilityLabel("任务标签页")
+                        .accessibilityIdentifier("tab.tasks")
+                }
+                .tag(AppTab.tasks)
+
+                NavigationStack {
+                    MistakeSurgeryView()
+                }
+                .tabItem {
+                    Label("错题", systemImage: "cross.case")
+                        .accessibilityLabel("错题标签页")
+                        .accessibilityIdentifier("tab.mistakes")
+                }
+                .tag(AppTab.mistakes)
+
+                NavigationStack {
+                    PromptLibraryView()
+                }
+                .tabItem {
+                    Label("提示词", systemImage: "text.bubble")
+                        .accessibilityLabel("提示词标签页")
+                        .accessibilityIdentifier("tab.prompts")
+                }
+                .tag(AppTab.prompts)
+
+                NavigationStack {
+                    ReviewView()
+                }
+                .tabItem {
+                    Label("复盘", systemImage: "chart.line.uptrend.xyaxis")
+                        .accessibilityLabel("复盘标签页")
+                        .accessibilityIdentifier("tab.reviews")
+                }
+                .tag(AppTab.reviews)
+            }
+            .accessibilityIdentifier("main.tab.view")
+            .safeAreaInset(edge: .top) {
+                if let startupWarning {
+                    Text(startupWarning)
+                        .font(.footnote)
+                        .foregroundStyle(.orange)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .padding(.horizontal)
+                        .padding(.vertical, 8)
+                        .background(.background)
+                        .accessibilityLabel("启动警告")
                 }
             }
-            .tabItem {
-                Label("今日", systemImage: "sun.max")
-                    .accessibilityLabel("今日标签页")
-                    .accessibilityIdentifier("tab.today")
-            }
-            .tag(AppTab.today)
 
-            NavigationStack {
-                TaskListView()
-            }
-            .tabItem {
-                Label("任务", systemImage: "checklist")
-                    .accessibilityLabel("任务标签页")
-                    .accessibilityIdentifier("tab.tasks")
-            }
-            .tag(AppTab.tasks)
-
-            NavigationStack {
-                MistakeSurgeryView()
-            }
-            .tabItem {
-                Label("错题", systemImage: "cross.case")
-                    .accessibilityLabel("错题标签页")
-                    .accessibilityIdentifier("tab.mistakes")
-            }
-            .tag(AppTab.mistakes)
-
-            NavigationStack {
-                PromptLibraryView()
-            }
-            .tabItem {
-                Label("Prompt", systemImage: "text.bubble")
-                    .accessibilityLabel("Prompt 标签页")
-                    .accessibilityIdentifier("tab.prompts")
-            }
-            .tag(AppTab.prompts)
-
-            NavigationStack {
-                ReviewView()
-            }
-            .tabItem {
-                Label("复盘", systemImage: "chart.line.uptrend.xyaxis")
-                    .accessibilityLabel("复盘标签页")
-                    .accessibilityIdentifier("tab.reviews")
-            }
-            .tag(AppTab.reviews)
+            ToastOverlay()
         }
-        .accessibilityIdentifier("main.tab.view")
     }
 }
 
@@ -105,5 +127,8 @@ struct StagePlaceholderView: View {
 }
 
 #Preview {
-    AppRootView()
+    let container = try! AppModelContainerFactory.make(inMemory: true)
+
+    return AppRootView()
+        .modelContainer(container)
 }

@@ -8,6 +8,14 @@
 
 /* Begin PBXBuildFile section */
 		A00000000000000000000101 /* GaokaoCockpitApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000201 /* GaokaoCockpitApp.swift */; };
+		A0000000000000000000635736 /* TodayCockpitModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0000000000000000000F15E2C /* TodayCockpitModel.swift */; };
+		A00000000000000000006A129C /* TaskListModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000F7F2A /* TaskListModel.swift */; };
+		A000000000000000000066BFAF /* MistakeSurgeryModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A000000000000000000032F06D /* MistakeSurgeryModel.swift */; };
+		A00000000000000000006111C8 /* ReviewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0000000000000000000622DB3 /* ReviewModel.swift */; };
+		A00000000000000000003EF7DA /* PromptLibraryModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0000000000000000000BB58CD /* PromptLibraryModel.swift */; };
+		A000000000000000000000DCE7 /* HapticFeedback.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0000000000000000000A8B3CA /* HapticFeedback.swift */; };
+		A0000000000000000000D708D5 /* ToastManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0000000000000000000D05B61 /* ToastManager.swift */; };
+		A0000000000000000000D33812 /* ToastOverlay.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0000000000000000000F2E113 /* ToastOverlay.swift */; };
 		A00000000000000000000102 /* AppRootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000202 /* AppRootView.swift */; };
 		A00000000000000000000103 /* TodayCockpitPlaceholderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000203 /* TodayCockpitPlaceholderView.swift */; };
 		A00000000000000000000104 /* TaskListPlaceholderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000204 /* TaskListPlaceholderView.swift */; };
@@ -88,10 +96,33 @@
 		A00000000000000000000178 /* PromptVariableInputSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000709 /* PromptVariableInputSection.swift */; };
 		A00000000000000000000179 /* PromptPreviewSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000710 /* PromptPreviewSection.swift */; };
 		A00000000000000000000180 /* RecentPromptStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0000000000000000000711 /* RecentPromptStore.swift */; };
+		B00000000000000000000101 /* PlanTaskParserTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B00000000000000000000201 /* PlanTaskParserTests.swift */; };
+		B00000000000000000000102 /* DateKeyTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B00000000000000000000202 /* DateKeyTests.swift */; };
+		B00000000000000000000103 /* PromptRendererTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B00000000000000000000203 /* PromptRendererTests.swift */; };
+		B00000000000000000000104 /* BackupValidationStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B00000000000000000000204 /* BackupValidationStoreTests.swift */; };
+		B00000000000000000000105 /* StudyTaskStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B00000000000000000000205 /* StudyTaskStoreTests.swift */; };
 /* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		B00000000000000000000902 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = A00000000000000000000500 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = A00000000000000000000501;
+			remoteInfo = GaokaoCockpit;
+		};
+/* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
 		A00000000000000000000201 /* GaokaoCockpitApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GaokaoCockpitApp.swift; sourceTree = "<group>"; };
+		A0000000000000000000F15E2C /* TodayCockpitModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodayCockpitModel.swift; sourceTree = "<group>"; };
+		A00000000000000000000F7F2A /* TaskListModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskListModel.swift; sourceTree = "<group>"; };
+		A000000000000000000032F06D /* MistakeSurgeryModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MistakeSurgeryModel.swift; sourceTree = "<group>"; };
+		A0000000000000000000622DB3 /* ReviewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReviewModel.swift; sourceTree = "<group>"; };
+		A0000000000000000000BB58CD /* PromptLibraryModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PromptLibraryModel.swift; sourceTree = "<group>"; };
+		A0000000000000000000A8B3CA /* HapticFeedback.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HapticFeedback.swift; sourceTree = "<group>"; };
+		A0000000000000000000D05B61 /* ToastManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToastManager.swift; sourceTree = "<group>"; };
+		A0000000000000000000F2E113 /* ToastOverlay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToastOverlay.swift; sourceTree = "<group>"; };
 		A00000000000000000000202 /* AppRootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppRootView.swift; sourceTree = "<group>"; };
 		A00000000000000000000203 /* TodayCockpitPlaceholderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodayCockpitPlaceholderView.swift; sourceTree = "<group>"; };
 		A00000000000000000000204 /* TaskListPlaceholderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskListPlaceholderView.swift; sourceTree = "<group>"; };
@@ -182,10 +213,23 @@
 		A00000000000000000000709 /* PromptVariableInputSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PromptVariableInputSection.swift; sourceTree = "<group>"; };
 		A00000000000000000000710 /* PromptPreviewSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PromptPreviewSection.swift; sourceTree = "<group>"; };
 		A0000000000000000000711 /* RecentPromptStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecentPromptStore.swift; sourceTree = "<group>"; };
+		B00000000000000000000201 /* PlanTaskParserTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlanTaskParserTests.swift; sourceTree = "<group>"; };
+		B00000000000000000000202 /* DateKeyTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DateKeyTests.swift; sourceTree = "<group>"; };
+		B00000000000000000000203 /* PromptRendererTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PromptRendererTests.swift; sourceTree = "<group>"; };
+		B00000000000000000000204 /* BackupValidationStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackupValidationStoreTests.swift; sourceTree = "<group>"; };
+		B00000000000000000000205 /* StudyTaskStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StudyTaskStoreTests.swift; sourceTree = "<group>"; };
+		B00000000000000000000230 /* GaokaoCockpitTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = GaokaoCockpitTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
 		A00000000000000000000301 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		B00000000000000000000301 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -199,6 +243,7 @@
 			isa = PBXGroup;
 			children = (
 				A00000000000000000000402 /* GaokaoCockpit */,
+				B00000000000000000000440 /* GaokaoCockpitTests */,
 				A00000000000000000000420 /* docs */,
 				A00000000000000000000220 /* README.md */,
 				A00000000000000000000430 /* Products */,
@@ -247,7 +292,8 @@
 			children = (
 				A00000000000000000000277 /* ShareSheet.swift */,
 				A00000000000000000000281 /* DocumentPicker.swift */,
-			);
+			
+				A0000000000000000000F2E113 /* ToastOverlay.swift */,);
 			path = Shared;
 			sourceTree = "<group>";
 		};
@@ -359,7 +405,9 @@
 				A00000000000000000000268 /* WeeklyReviewStore.swift */,
 				A00000000000000000000269 /* ReviewAggregationStore.swift */,
 				A00000000000000000000210 /* README.md */,
-			);
+			
+				A0000000000000000000297AAA /* ViewModels */,
+				A0000000000000000000B7374E /* Feedback */,);
 			path = Stores;
 			sourceTree = "<group>";
 		};
@@ -388,8 +436,21 @@
 			isa = PBXGroup;
 			children = (
 				A00000000000000000000230 /* GaokaoCockpit.app */,
+				B00000000000000000000230 /* GaokaoCockpitTests.xctest */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		B00000000000000000000440 /* GaokaoCockpitTests */ = {
+			isa = PBXGroup;
+			children = (
+				B00000000000000000000201 /* PlanTaskParserTests.swift */,
+				B00000000000000000000202 /* DateKeyTests.swift */,
+				B00000000000000000000203 /* PromptRendererTests.swift */,
+				B00000000000000000000204 /* BackupValidationStoreTests.swift */,
+				B00000000000000000000205 /* StudyTaskStoreTests.swift */,
+			);
+			path = GaokaoCockpitTests;
 			sourceTree = "<group>";
 		};
 		A00000000000000000000415 /* Components */ = {
@@ -460,6 +521,27 @@
 			path = Components;
 			sourceTree = "<group>";
 		};
+		A0000000000000000000297AAA /* ViewModels */ = {
+			isa = PBXGroup;
+			children = (
+				A0000000000000000000F15E2C /* TodayCockpitModel.swift */,
+				A00000000000000000000F7F2A /* TaskListModel.swift */,
+				A000000000000000000032F06D /* MistakeSurgeryModel.swift */,
+				A0000000000000000000622DB3 /* ReviewModel.swift */,
+				A0000000000000000000BB58CD /* PromptLibraryModel.swift */,
+			);
+			path = ViewModels;
+			sourceTree = "<group>";
+		};
+		A0000000000000000000B7374E /* Feedback */ = {
+			isa = PBXGroup;
+			children = (
+				A0000000000000000000A8B3CA /* HapticFeedback.swift */,
+				A0000000000000000000D05B61 /* ToastManager.swift */,
+			);
+			path = Feedback;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -480,6 +562,24 @@
 			productReference = A00000000000000000000230 /* GaokaoCockpit.app */;
 			productType = "com.apple.product-type.application";
 		};
+		B00000000000000000000501 /* GaokaoCockpitTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = B00000000000000000000610 /* Build configuration list for PBXNativeTarget "GaokaoCockpitTests" */;
+			buildPhases = (
+				B00000000000000000000310 /* Sources */,
+				B00000000000000000000301 /* Frameworks */,
+				B00000000000000000000320 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				B00000000000000000000901 /* PBXTargetDependency */,
+			);
+			name = GaokaoCockpitTests;
+			productName = GaokaoCockpitTests;
+			productReference = B00000000000000000000230 /* GaokaoCockpitTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -492,6 +592,10 @@
 				TargetAttributes = {
 					A00000000000000000000501 = {
 						CreatedOnToolsVersion = 26.3;
+					};
+					B00000000000000000000501 = {
+						CreatedOnToolsVersion = 26.3;
+						TestTargetID = A00000000000000000000501;
 					};
 				};
 			};
@@ -509,6 +613,7 @@
 			projectRoot = "";
 			targets = (
 				A00000000000000000000501 /* GaokaoCockpit */,
+				B00000000000000000000501 /* GaokaoCockpitTests */,
 			);
 		};
 /* End PBXProject section */
@@ -519,6 +624,13 @@
 			buildActionMask = 2147483647;
 			files = (
 				A00000000000000000000140 /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		B00000000000000000000320 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -609,10 +721,38 @@
 				A00000000000000000000125 /* DailyReviewStore.swift in Sources */,
 				A00000000000000000000137 /* WeeklyReviewStore.swift in Sources */,
 				A00000000000000000000138 /* ReviewAggregationStore.swift in Sources */,
+			
+				A0000000000000000000635736 /* TodayCockpitModel.swift in Sources */,
+				A00000000000000000006A129C /* TaskListModel.swift in Sources */,
+				A000000000000000000066BFAF /* MistakeSurgeryModel.swift in Sources */,
+				A00000000000000000006111C8 /* ReviewModel.swift in Sources */,
+				A00000000000000000003EF7DA /* PromptLibraryModel.swift in Sources */,
+				A000000000000000000000DCE7 /* HapticFeedback.swift in Sources */,
+				A0000000000000000000D708D5 /* ToastManager.swift in Sources */,
+				A0000000000000000000D33812 /* ToastOverlay.swift in Sources */,);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		B00000000000000000000310 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				B00000000000000000000101 /* PlanTaskParserTests.swift in Sources */,
+				B00000000000000000000102 /* DateKeyTests.swift in Sources */,
+				B00000000000000000000103 /* PromptRendererTests.swift in Sources */,
+				B00000000000000000000104 /* BackupValidationStoreTests.swift in Sources */,
+				B00000000000000000000105 /* StudyTaskStoreTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		B00000000000000000000901 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = A00000000000000000000501 /* GaokaoCockpit */;
+			targetProxy = B00000000000000000000902 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
 		A00000000000000000000601 /* Debug */ = {
@@ -799,6 +939,60 @@
 			};
 			name = Release;
 		};
+		B00000000000000000000611 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = P56JXVRJM2;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.shennaitong.GaokaoCockpitTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/GaokaoCockpit.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/GaokaoCockpit";
+				TEST_TARGET_NAME = GaokaoCockpit;
+			};
+			name = Debug;
+		};
+		B00000000000000000000612 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = P56JXVRJM2;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.shennaitong.GaokaoCockpitTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/GaokaoCockpit.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/GaokaoCockpit";
+				TEST_TARGET_NAME = GaokaoCockpit;
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -816,6 +1010,15 @@
 			buildConfigurations = (
 				A00000000000000000000611 /* Debug */,
 				A00000000000000000000612 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		B00000000000000000000610 /* Build configuration list for PBXNativeTarget "GaokaoCockpitTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				B00000000000000000000611 /* Debug */,
+				B00000000000000000000612 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

@@ -56,6 +56,9 @@ struct MistakeEditorView: View {
     @State private var showingDeleteImageConfirmation = false
     @State private var showingDeleteConfirmation = false
     @State private var activeImagePreview: MistakeImagePreviewItem?
+    @State private var currentQuestionImage: UIImage?
+    @State private var isLoadingQuestionImage = false
+    @State private var isSavingImage = false
     @State private var pendingImagePathsToDelete: Set<String> = []
     @State private var didCommitImageChanges = false
 
@@ -158,6 +161,10 @@ struct MistakeEditorView: View {
                             }
                             .buttonStyle(.plain)
                             .accessibilityLabel("打开题图预览")
+                        } else if hasQuestionImagePath && isLoadingQuestionImage {
+                            ProgressView("正在读取题图")
+                                .frame(maxWidth: .infinity)
+                                .padding(.vertical, 24)
                         } else if hasQuestionImagePath {
                             ContentUnavailableView {
                                 Label("题图暂时无法读取", systemImage: "photo.badge.exclamationmark")
@@ -205,6 +212,11 @@ struct MistakeEditorView: View {
                             } label: {
                                 Label("删除图片", systemImage: "trash")
                             }
+                        }
+
+                        if isSavingImage {
+                            ProgressView("正在处理图片")
+                                .font(.footnote)
                         }
                     }
                 }
@@ -292,7 +304,7 @@ struct MistakeEditorView: View {
                     Button("保存") {
                         saveMistake()
                     }
-                    .disabled(subject.storageValue.isEmpty)
+                    .disabled(subject.storageValue.isEmpty || isSavingImage)
                 }
             }
             .confirmationDialog(
@@ -323,7 +335,9 @@ struct MistakeEditorView: View {
             }
             .sheet(isPresented: $showingCameraPicker) {
                 CameraImagePicker { image in
-                    savePickedImage(image)
+                    Task {
+                        await savePickedImage(image)
+                    }
                 }
             }
             .sheet(item: $activeImagePreview) { item in
@@ -341,6 +355,9 @@ struct MistakeEditorView: View {
             .onDisappear {
                 cleanupUncommittedDraftImage()
             }
+            .task(id: questionImagePath) {
+                await refreshCurrentQuestionImage()
+            }
         }
     }
 
@@ -352,10 +369,6 @@ struct MistakeEditorView: View {
         !clean(questionImagePath).isEmpty
     }
 
-    private var currentQuestionImage: UIImage? {
-        MistakeImageStore.loadImage(path: questionImagePath)
-    }
-
     @MainActor
     private func loadSelectedPhoto(_ item: PhotosPickerItem) async {
         do {
@@ -365,13 +378,7 @@ struct MistakeEditorView: View {
                 return
             }
 
-            guard let image = UIImage(data: data) else {
-                errorMessage = "相册图片格式无法读取。"
-                selectedPhotoItem = nil
-                return
-            }
-
-            savePickedImage(image)
+            try await savePickedImageData(data)
             selectedPhotoItem = nil
         } catch {
             errorMessage = "读取相册图片失败：\(error.localizedDescription)"
@@ -379,16 +386,55 @@ struct MistakeEditorView: View {
         }
     }
 
-    private func savePickedImage(_ image: UIImage) {
+    @MainActor
+    private func refreshCurrentQuestionImage() async {
+        let path = clean(questionImagePath)
+        guard !path.isEmpty else {
+            currentQuestionImage = nil
+            isLoadingQuestionImage = false
+            return
+        }
+
+        isLoadingQuestionImage = true
+        let image = await MistakeImageStore.loadImageInBackground(path: path)
+        guard path == clean(questionImagePath) else {
+            return
+        }
+
+        currentQuestionImage = image
+        isLoadingQuestionImage = false
+    }
+
+    @MainActor
+    private func savePickedImage(_ image: UIImage) async {
+        isSavingImage = true
+        defer {
+            isSavingImage = false
+        }
+
         do {
             let previousPath = clean(questionImagePath)
-            let savedPath = try MistakeImageStore.saveImage(image, mistakeId: draftMistakeID)
+            let savedPath = try await MistakeImageStore.saveImageInBackground(image, mistakeId: draftMistakeID)
             stageReplacementImage(previousPath: previousPath, newPath: savedPath)
             questionImagePath = savedPath
             errorMessage = nil
         } catch {
             errorMessage = "保存图片失败：\(error.localizedDescription)"
         }
+    }
+
+    @MainActor
+    private func savePickedImageData(_ data: Data) async throws {
+        isSavingImage = true
+        defer {
+            isSavingImage = false
+        }
+
+        let previousPath = clean(questionImagePath)
+        let savedPath = try await MistakeImageStore.saveImageDataInBackground(data, mistakeId: draftMistakeID)
+        stageReplacementImage(previousPath: previousPath, newPath: savedPath)
+        questionImagePath = savedPath
+        errorMessage = nil
     }
 
     private func stageReplacementImage(previousPath: String, newPath: String) {

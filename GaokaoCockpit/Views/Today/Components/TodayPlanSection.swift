@@ -62,7 +62,9 @@ struct PlanToTaskActionCard: View {
                         .frame(maxWidth: .infinity)
                 }
                 .buttonStyle(.borderedProminent)
+                .accessibilityLabel("把计划加入任务页")
                 .accessibilityHint("把上方每一行计划变成今日任务")
+                .accessibilityAddTraits(.isButton)
 
                 if let message {
                     Label(message, systemImage: "exclamationmark.circle")

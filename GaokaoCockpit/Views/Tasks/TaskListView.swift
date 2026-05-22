@@ -3,48 +3,33 @@ import SwiftUI
 
 struct TaskListView: View {
     @Environment(\.modelContext) private var modelContext
-
-    @State private var todayKey = DateKey.todayKey()
-    @State private var todayDate = Date()
-    @State private var dayPlan: DayPlan?
-    @State private var tasks: [StudyTask] = []
-    @State private var selectedFilter: TaskFilter = .all
-    @State private var totalTaskCount = 0
-    @State private var completedTaskCount = 0
-    @State private var skippedTaskCount = 0
-    @State private var isLoading = true
-    @State private var statusMessage: String?
-    @State private var activeEditor: TaskEditorMode?
-
-    private var unfinishedTaskCount: Int {
-        max(totalTaskCount - completedTaskCount - skippedTaskCount, 0)
-    }
+    @State private var model = TaskListModel()
 
     var body: some View {
         ScrollView {
-            VStack(alignment: .leading, spacing: 14) {
-                TaskListHeaderView(date: todayDate, dayKey: todayKey)
+            LazyVStack(alignment: .leading, spacing: 14) {
+                TaskListHeaderView(date: model.todayDate, dayKey: model.todayKey)
 
                 TaskSummaryCard(
-                    totalTaskCount: totalTaskCount,
-                    completedTaskCount: completedTaskCount,
-                    unfinishedTaskCount: unfinishedTaskCount
+                    totalTaskCount: model.totalTaskCount,
+                    completedTaskCount: model.completedTaskCount,
+                    unfinishedTaskCount: model.unfinishedTaskCount
                 )
 
-                TaskFilterBar(selectedFilter: $selectedFilter)
+                TaskFilterBar(selectedFilter: $model.selectedFilter)
 
-                if isLoading {
+                if model.isLoading {
                     ProgressView("正在加载今日任务")
                         .frame(maxWidth: .infinity, alignment: .center)
                         .padding(.vertical, 28)
-                } else if tasks.isEmpty {
+                } else if model.tasks.isEmpty {
                     ContentUnavailableView {
-                        Label(selectedFilter.emptyTitle, systemImage: selectedFilter.emptySystemImage)
+                        Label(model.selectedFilter.emptyTitle, systemImage: model.selectedFilter.emptySystemImage)
                     } description: {
-                        Text(selectedFilter.emptyMessage)
+                        Text(model.selectedFilter.emptyMessage)
                     } actions: {
                         Button {
-                            activeEditor = .add
+                            model.activeEditor = .add
                         } label: {
                             Label("新增任务", systemImage: "plus.circle.fill")
                         }
@@ -54,28 +39,30 @@ struct TaskListView: View {
                     }
                     .padding(.vertical, 12)
                 } else {
-                    VStack(spacing: 10) {
-                        ForEach(tasks, id: \.id) { task in
+                    LazyVStack(spacing: 10) {
+                        ForEach(model.tasks, id: \.id) { task in
                             TaskRowView(
                                 task: task,
                                 onTap: {
-                                    activeEditor = .edit(task)
+                                    model.activeEditor = .edit(task)
                                 },
                                 onFocusFinished: {
-                                    refreshTaskData()
-                                    statusMessage = "已保存专注记录。"
+                                    model.refreshTaskData(in: modelContext)
+                                    model.statusMessage = "已保存专注记录。"
+                                    HapticFeedback.success()
+                                    ToastManager.shared.show(message: "已保存专注记录", style: .success)
                                 },
                                 onChangeStatus: { status in
-                                    updateTaskStatus(task, to: status)
+                                    model.updateTaskStatus(in: modelContext, task: task, to: status)
                                 }
                             )
                         }
                     }
                 }
 
-                if !isLoading && !tasks.isEmpty {
+                if !model.isLoading && !model.tasks.isEmpty {
                     Button {
-                        activeEditor = .add
+                        model.activeEditor = .add
                     } label: {
                         Label("新增任务", systemImage: "plus.circle.fill")
                             .frame(maxWidth: .infinity)
@@ -85,7 +72,7 @@ struct TaskListView: View {
                     .accessibilityHint("打开任务编辑表单")
                 }
 
-                if let statusMessage {
+                if let statusMessage = model.statusMessage {
                     Text(statusMessage)
                         .font(.footnote)
                         .foregroundStyle(.secondary)
@@ -98,98 +85,34 @@ struct TaskListView: View {
         .navigationTitle("任务")
         .navigationBarTitleDisplayMode(.inline)
         .task {
-            loadTodayTasks()
+            model.loadTodayTasks(in: modelContext)
         }
         .onAppear {
-            if !isLoading {
-                refreshTaskData()
+            if !model.isLoading {
+                model.refreshTaskData(in: modelContext)
             }
         }
         .onReceive(NotificationCenter.default.publisher(for: StudyTaskStore.didChangeNotification)) { notification in
-            handleTaskStoreDidChange(notification)
-        }
-        .onChange(of: selectedFilter) {
-            refreshTaskData()
-        }
-        .refreshable {
-            refreshTaskData()
-        }
-        .sheet(item: $activeEditor) { editor in
-            TaskEditorSheet(
-                mode: editor,
-                dayKey: todayKey,
-                dayPlanID: dayPlan?.id
-            ) { message in
-                refreshTaskData()
-                statusMessage = message
+            if model.handleTaskStoreDidChange(notification) {
+                model.refreshTaskData(in: modelContext)
             }
         }
-    }
-
-    private func loadTodayTasks() {
-        isLoading = true
-        statusMessage = nil
-
-        do {
-            let plan = try DayPlanStore.fetchOrCreateToday(in: modelContext)
-            dayPlan = plan
-            todayKey = plan.dayKey
-            todayDate = plan.date
-            try refreshTaskDataThrowing()
-            isLoading = false
-        } catch {
-            isLoading = false
-            statusMessage = "加载任务失败，请重试。"
+        .onChange(of: model.selectedFilter) {
+            model.refreshTaskData(in: modelContext)
         }
-    }
-
-    private func refreshTaskData() {
-        do {
-            try refreshTaskDataThrowing()
-        } catch {
-            statusMessage = "刷新任务失败，请重试。"
+        .refreshable {
+            model.refreshTaskData(in: modelContext)
         }
-    }
-
-    private func refreshTaskDataThrowing() throws {
-        let fetchedTasks = try StudyTaskStore.fetchTasks(
-            for: todayKey,
-            status: selectedFilter.status?.storageValue,
-            in: modelContext
-        )
-
-        tasks = selectedFilter == .unfinished
-            ? fetchedTasks.filter(\.isTaskListUnfinished)
-            : fetchedTasks
-        totalTaskCount = try StudyTaskStore.countTasks(for: todayKey, in: modelContext)
-        completedTaskCount = try StudyTaskStore.countCompletedTasks(for: todayKey, in: modelContext)
-        skippedTaskCount = try StudyTaskStore.countSkippedTasks(for: todayKey, in: modelContext)
-    }
-
-    private func updateTaskStatus(_ task: StudyTask, to status: StudyTaskStatus) {
-        guard StudyTaskStatus.from(task.status) != status else {
-            return
+        .sheet(item: $model.activeEditor) { editor in
+            TaskEditorSheet(
+                mode: editor,
+                dayKey: model.todayKey,
+                dayPlanID: model.dayPlan?.id
+            ) { message in
+                model.refreshTaskData(in: modelContext)
+                model.statusMessage = message
+            }
         }
-
-        do {
-            task.status = status.storageValue
-            StudyTaskStore.updateTaskTimestamp(task)
-            try modelContext.save()
-            StudyTaskStore.postDidChange(dayKey: task.dayKey)
-            try refreshTaskDataThrowing()
-            statusMessage = "已更新状态：\(status.displayName)。"
-        } catch {
-            statusMessage = "更新状态失败，请重试。"
-        }
-    }
-
-    private func handleTaskStoreDidChange(_ notification: Notification) {
-        let changedDayKey = notification.userInfo?[StudyTaskStore.dayKeyUserInfoKey] as? String
-        guard changedDayKey == nil || changedDayKey == todayKey else {
-            return
-        }
-
-        refreshTaskData()
     }
 }
 

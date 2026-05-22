@@ -30,6 +30,45 @@ enum DateKey {
         key(for: weekStart(for: date, calendar: calendar), calendar: calendar)...key(for: weekEnd(for: date, calendar: calendar), calendar: calendar)
     }
 
+    static func dateInterval(forKey key: String, calendar: Calendar = .current) -> DateInterval? {
+        let parts = key.split(separator: "-")
+        guard
+            parts.count == 3,
+            let year = Int(parts[0]),
+            let month = Int(parts[1]),
+            let day = Int(parts[2])
+        else {
+            return nil
+        }
+
+        var components = DateComponents()
+        components.year = year
+        components.month = month
+        components.day = day
+
+        guard
+            let start = calendar.date(from: components),
+            let end = calendar.date(byAdding: .day, value: 1, to: start)
+        else {
+            return nil
+        }
+
+        let resolvedComponents = calendar.dateComponents([.year, .month, .day], from: start)
+        guard
+            resolvedComponents.year == year,
+            resolvedComponents.month == month,
+            resolvedComponents.day == day
+        else {
+            return nil
+        }
+
+        return DateInterval(start: start, end: end)
+    }
+
+    static func exclusiveEnd(after inclusiveEnd: Date, calendar: Calendar = .current) -> Date {
+        calendar.date(byAdding: .second, value: 1, to: inclusiveEnd) ?? inclusiveEnd
+    }
+
     static func today(calendar: Calendar = .current) -> String {
         todayKey(calendar: calendar)
     }

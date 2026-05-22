@@ -20,12 +20,10 @@ struct MistakeImagePreviewView: View {
 
     let path: String
 
+    @State private var image: UIImage?
+    @State private var isLoading = true
     @State private var baseScale: CGFloat = 1
     @GestureState private var pinchScale: CGFloat = 1
-
-    private var image: UIImage? {
-        MistakeImageStore.loadImage(path: path)
-    }
 
     private var currentScale: CGFloat {
         min(max(baseScale * pinchScale, 1), 4)
@@ -60,6 +58,9 @@ struct MistakeImagePreviewView: View {
                             baseScale = baseScale > 1 ? 1 : 2
                         }
                     }
+                } else if isLoading {
+                    ProgressView("正在读取题图")
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
                 } else {
                     ContentUnavailableView {
                         Label("题图读取失败", systemImage: "photo.badge.exclamationmark")
@@ -78,6 +79,16 @@ struct MistakeImagePreviewView: View {
                     }
                 }
             }
+            .task(id: path) {
+                await loadImage()
+            }
         }
+    }
+
+    @MainActor
+    private func loadImage() async {
+        isLoading = true
+        image = await MistakeImageStore.loadImageInBackground(path: path)
+        isLoading = false
     }
 }

@@ -5,6 +5,7 @@ enum MistakeImageStore {
     private static let directoryName = "MistakeImages"
     private static let maxLongSide: CGFloat = 1600
     private static let jpegQuality: CGFloat = 0.82
+    private static let imageCache = NSCache<NSString, UIImage>()
 
     static func saveImage(_ image: UIImage, mistakeId: UUID) throws -> String {
         let directory = try imageDirectory()
@@ -18,7 +19,24 @@ enum MistakeImageStore {
         }
 
         try data.write(to: fileURL, options: [.atomic])
+        imageCache.setObject(preparedImage, forKey: filename as NSString)
         return "\(directoryName)/\(filename)"
+    }
+
+    static func saveImageInBackground(_ image: UIImage, mistakeId: UUID) async throws -> String {
+        try await Task.detached(priority: .utility) {
+            try saveImage(image, mistakeId: mistakeId)
+        }.value
+    }
+
+    static func saveImageDataInBackground(_ data: Data, mistakeId: UUID) async throws -> String {
+        try await Task.detached(priority: .utility) {
+            guard let image = UIImage(data: data) else {
+                throw MistakeImageStoreError.invalidImageData
+            }
+
+            return try saveImage(image, mistakeId: mistakeId)
+        }.value
     }
 
     static func loadImage(path: String) -> UIImage? {
@@ -26,7 +44,23 @@ enum MistakeImageStore {
             return nil
         }
 
-        return UIImage(contentsOfFile: url.path)
+        let cacheKey = url.lastPathComponent as NSString
+        if let cachedImage = imageCache.object(forKey: cacheKey) {
+            return cachedImage
+        }
+
+        guard let image = UIImage(contentsOfFile: url.path) else {
+            return nil
+        }
+
+        imageCache.setObject(image, forKey: cacheKey)
+        return image
+    }
+
+    static func loadImageInBackground(path: String) async -> UIImage? {
+        await Task.detached(priority: .utility) {
+            loadImage(path: path)
+        }.value
     }
 
     static func deleteImage(path: String) throws {
@@ -40,6 +74,7 @@ enum MistakeImageStore {
         }
 
         try fileManager.removeItem(at: url)
+        imageCache.removeObject(forKey: url.lastPathComponent as NSString)
     }
 
     static func imageURL(path: String) -> URL? {
@@ -77,12 +112,15 @@ enum MistakeImageStore {
 
 enum MistakeImageStoreError: LocalizedError {
     case applicationSupportUnavailable
+    case invalidImageData
     case encodingFailed
 
     var errorDescription: String? {
         switch self {
         case .applicationSupportUnavailable:
             return "无法访问 Application Support 目录。"
+        case .invalidImageData:
+            return "图片格式无法读取。"
         case .encodingFailed:
             return "图片压缩失败。"
         }

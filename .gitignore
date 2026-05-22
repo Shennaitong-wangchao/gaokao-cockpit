@@ -71,3 +71,8 @@ fastlane/test_output/
 !fixtures/
 !fixtures/backups/
 !fixtures/backups/*.json
+
+# Test artifacts
+test_report_*/
+test_screenshot_*.png
+测试报告_*.md

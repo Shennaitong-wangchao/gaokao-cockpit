@@ -52,6 +52,17 @@ struct TodayStartupCard: View {
                 }
                 .accessibilityLabel("状态评分")
                 .accessibilityValue("\(stateScore) 分")
+                .accessibilityHint("上滑或下滑调整 1 到 10 分")
+                .accessibilityAdjustableAction { direction in
+                    switch direction {
+                    case .increment:
+                        stateScore = min(stateScore + 1, 10)
+                    case .decrement:
+                        stateScore = max(stateScore - 1, 1)
+                    @unknown default:
+                        break
+                    }
+                }
 
                 VStack(alignment: .leading, spacing: 8) {
                     Text("主攻科目")
@@ -67,6 +78,7 @@ struct TodayStartupCard: View {
                     .accessibilityLabel("主攻科目")
                     .accessibilityValue(mainSubject.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? "未选择" : LearningSubject.from(mainSubject).displayName)
                     .accessibilityHint("选择今天主要投入的学科")
+                    .accessibilityAddTraits(.isButton)
                 }
             }
         }

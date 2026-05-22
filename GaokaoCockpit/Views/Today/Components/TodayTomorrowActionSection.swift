@@ -34,6 +34,9 @@ struct SavePlanCard: View {
                         .frame(maxWidth: .infinity)
                 }
                 .buttonStyle(.borderedProminent)
+                .accessibilityLabel("保存今日计划")
+                .accessibilityHint("将当前编辑内容写回今日计划")
+                .accessibilityAddTraits(.isButton)
 
                 if let saveMessage {
                     Label(saveMessage, systemImage: saveMessage.hasPrefix("保存失败") ? "exclamationmark.triangle" : "checkmark.circle.fill")

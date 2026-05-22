@@ -22,6 +22,7 @@ struct TodayTaskListCard: View {
                     .buttonStyle(.bordered)
                     .accessibilityLabel("快速新增任务")
                     .accessibilityHint("打开快速新增任务表单")
+                    .accessibilityAddTraits(.isButton)
                 }
 
                 if tasks.isEmpty {
@@ -78,6 +79,9 @@ struct PlanTaskGenerationResultView: View {
                     .frame(maxWidth: .infinity)
             }
             .buttonStyle(.bordered)
+            .accessibilityLabel("查看任务页")
+            .accessibilityHint("打开任务列表查看已生成任务")
+            .accessibilityAddTraits(.isButton)
         }
         .padding(10)
         .background(Color.green.opacity(0.1))
@@ -102,6 +106,9 @@ struct TodayTaskRowView: View {
             .buttonStyle(.plain)
             .disabled(!task.canToggleInStage3A)
             .accessibilityLabel(task.todayStatus == .done ? "撤回待做" : "标记完成")
+            .accessibilityValue(task.statusDisplayText)
+            .accessibilityHint(task.canToggleInStage3A ? "切换任务完成状态" : "请到任务页修改该状态")
+            .accessibilityAddTraits(.isButton)
 
             VStack(alignment: .leading, spacing: 7) {
                 Text(task.title.isEmpty ? "未命名任务" : task.title)
@@ -127,6 +134,7 @@ struct TodayTaskRowView: View {
         }
         .contentShape(Rectangle())
         .accessibilityElement(children: .contain)
+        .accessibilityLabel(task.accessibilitySummary)
     }
 }
 
@@ -179,5 +187,11 @@ extension StudyTask {
         category.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
             ? "未分类"
             : StudyTaskCategory.from(category).displayName
+    }
+
+    var accessibilitySummary: String {
+        let minutesText = estimatedMinutes.map { "，预计 \($0) 分钟" } ?? ""
+        let titleText = title.isEmpty ? "未命名任务" : title
+        return "\(titleText)，\(todaySubjectText)，\(todayCategoryText)，\(statusDisplayText)\(minutesText)"
     }
 }

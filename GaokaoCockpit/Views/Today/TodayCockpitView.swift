@@ -5,46 +5,15 @@ struct TodayCockpitView: View {
     @Environment(\.modelContext) private var modelContext
 
     private let onViewTasks: (() -> Void)?
-
-    @State private var loadState: LoadState = .loading
-    @State private var dayPlan: DayPlan?
-    @State private var todayKey = DateKey.todayKey()
-    @State private var todayDate = Date()
-
-    @State private var stateScore = 7
-    @State private var mainSubject = ""
-    @State private var topTasksText = ""
-    @State private var baselineTasksText = ""
-    @State private var bonusTasksText = ""
-    @State private var tomorrowFirstAction = ""
-
-    @State private var tasks: [StudyTask] = []
-    @State private var totalTaskCount = 0
-    @State private var completedTaskCount = 0
-    @State private var builtInPromptTemplateCount = 0
-
-    @State private var saveMessage: String?
-    @State private var taskMessage: String?
-    @State private var planTaskMessage: String?
-    @State private var planTaskGenerationResult: PlanTaskGenerationResult?
-    @State private var isShowingQuickAddTask = false
-    @State private var activePlanTaskGeneration: PlanTaskGenerationState?
+    @State private var model = TodayCockpitModel()
 
     init(onViewTasks: (() -> Void)? = nil) {
         self.onViewTasks = onViewTasks
     }
 
-    private var pendingTaskCount: Int {
-        max(totalTaskCount - completedTaskCount, 0)
-    }
-
-    private var isLowEnergyMode: Bool {
-        stateScore <= 4
-    }
-
     var body: some View {
         Group {
-            switch loadState {
+            switch model.loadState {
             case .loading:
                 ProgressView("正在加载今日驾驶舱")
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -56,79 +25,85 @@ struct TodayCockpitView: View {
                     Text(message)
                 } actions: {
                     Button("重新加载") {
-                        loadToday()
+                        model.loadToday(context: modelContext)
                     }
                     .buttonStyle(.borderedProminent)
                 }
 
             case .loaded:
-                if dayPlan == nil {
+                if model.dayPlan == nil {
                     ContentUnavailableView {
                         Label("今日计划为空", systemImage: "calendar.badge.exclamationmark")
                     } description: {
                         Text("没有找到今日 DayPlan。")
                     } actions: {
                         Button("创建今日计划") {
-                            loadToday()
+                            model.loadToday(context: modelContext)
                         }
                         .buttonStyle(.borderedProminent)
                     }
                 } else {
                     ScrollView {
                         VStack(alignment: .leading, spacing: 14) {
-                            TodayHeaderView(date: todayDate, dayKey: todayKey)
+                            TodayHeaderView(date: model.todayDate, dayKey: model.todayKey)
 
                             TodayStartupCard(
-                                stateScore: $stateScore,
-                                mainSubject: $mainSubject
+                                stateScore: $model.stateScore,
+                                mainSubject: $model.mainSubject
                             )
 
-                            if isLowEnergyMode {
+                            if model.isLowEnergyMode {
                                 LowEnergyModeCard()
                             }
 
                             TodayTaskSummaryCard(
-                                totalTaskCount: totalTaskCount,
-                                completedTaskCount: completedTaskCount,
-                                pendingTaskCount: pendingTaskCount,
-                                builtInPromptTemplateCount: builtInPromptTemplateCount
+                                totalTaskCount: model.totalTaskCount,
+                                completedTaskCount: model.completedTaskCount,
+                                pendingTaskCount: model.pendingTaskCount,
+                                builtInPromptTemplateCount: model.builtInPromptTemplateCount
                             )
 
                             TodayTaskListCard(
-                                tasks: tasks,
-                                taskMessage: taskMessage,
-                                planTaskGenerationResult: planTaskGenerationResult,
-                                onToggleStatus: toggleTaskStatus,
+                                tasks: model.tasks,
+                                taskMessage: model.taskMessage,
+                                planTaskGenerationResult: model.planTaskGenerationResult,
+                                onToggleStatus: { task in
+                                    model.toggleTaskStatus(in: modelContext, task: task)
+                                },
                                 onQuickAdd: {
-                                    isShowingQuickAddTask = true
+                                    model.isShowingQuickAddTask = true
                                 },
                                 onViewTasks: viewGeneratedTasks
                             )
 
                             TodayPlanTextCard(
-                                topTasksText: $topTasksText,
-                                baselineTasksText: $baselineTasksText,
-                                bonusTasksText: $bonusTasksText,
-                                isLowEnergyMode: isLowEnergyMode
+                                topTasksText: $model.topTasksText,
+                                baselineTasksText: $model.baselineTasksText,
+                                bonusTasksText: $model.bonusTasksText,
+                                isLowEnergyMode: model.isLowEnergyMode
                             )
 
                             PlanToTaskActionCard(
-                                message: planTaskMessage,
-                                onGenerate: preparePlanTaskGeneration
+                                message: model.planTaskMessage,
+                                onGenerate: {
+                                    model.preparePlanTaskGeneration(in: modelContext)
+                                }
                             )
 
-                            TomorrowFirstActionCard(text: $tomorrowFirstAction)
+                            TomorrowFirstActionCard(text: $model.tomorrowFirstAction)
 
                             SavePlanCard(
-                                saveMessage: saveMessage,
-                                onSave: saveTodayPlan
+                                saveMessage: model.saveMessage,
+                                onSave: {
+                                    model.saveTodayPlan(in: modelContext)
+                                }
                             )
                         }
                         .padding()
                         .frame(maxWidth: .infinity, alignment: .leading)
                     }
                     .refreshable {
-                        refreshTaskData()
+                        model.refreshTaskData(for: model.todayKey, in: modelContext)
                     }
                 }
             }
@@ -136,206 +111,48 @@ struct TodayCockpitView: View {
         .navigationTitle("今日")
         .navigationBarTitleDisplayMode(.inline)
         .task {
-            loadToday()
+            model.loadToday(context: modelContext)
         }
         .onAppear {
-            if loadState == .loaded {
-                refreshTaskData()
+            if model.loadState == .loaded {
+                model.refreshTaskData(for: model.todayKey, in: modelContext)
             }
         }
         .onReceive(NotificationCenter.default.publisher(for: StudyTaskStore.didChangeNotification)) { notification in
-            handleTaskStoreDidChange(notification)
+            if model.handleTaskStoreDidChange(notification) {
+                model.refreshTaskData(for: model.todayKey, in: modelContext)
+            }
         }
-        .sheet(isPresented: $isShowingQuickAddTask) {
+        .sheet(isPresented: $model.isShowingQuickAddTask) {
             TodayQuickAddTaskSheet(
-                dayKey: todayKey,
-                dayPlanID: dayPlan?.id,
-                defaultSubject: mainSubject.trimmingCharacters(in: .whitespacesAndNewlines)
+                dayKey: model.todayKey,
+                dayPlanID: model.dayPlan?.id,
+                defaultSubject: model.mainSubject.trimmingCharacters(in: .whitespacesAndNewlines)
             ) {
-                refreshTaskData()
-                planTaskGenerationResult = nil
-                taskMessage = "已新增今日任务。"
+                model.refreshTaskData(for: model.todayKey, in: modelContext)
+                model.planTaskGenerationResult = nil
+                model.taskMessage = "已新增今日任务。"
+                HapticFeedback.success()
+                ToastManager.shared.show(message: "已新增今日任务", style: .success)
             }
         }
-        .sheet(item: $activePlanTaskGeneration) { generation in
+        .sheet(item: $model.activePlanTaskGeneration) { generation in
             PlanTaskGenerationSheet(generation: generation) {
-                createTasksFromPlan(generation.parsedTasks)
+                model.createTasksFromPlan(in: modelContext, parsedTasks: generation.parsedTasks)
             }
-        }
-    }
-
-    private func loadToday() {
-        loadState = .loading
-        saveMessage = nil
-        taskMessage = nil
-        planTaskMessage = nil
-        planTaskGenerationResult = nil
-
-        do {
-            let plan = try DayPlanStore.fetchOrCreateToday(in: modelContext)
-            dayPlan = plan
-            todayKey = plan.dayKey
-            todayDate = plan.date
-            stateScore = plan.stateScore ?? 7
-            mainSubject = plan.mainSubject
-            topTasksText = plan.topTasksText
-            baselineTasksText = plan.baselineTasksText
-            bonusTasksText = plan.bonusTasksText
-
-            let reviewTomorrowFirstAction = try DailyReviewStore
-                .fetchDailyReview(for: plan.dayKey, in: modelContext)?
-                .tomorrowFirstAction
-                .trimmingCharacters(in: .whitespacesAndNewlines)
-            tomorrowFirstAction = reviewTomorrowFirstAction?.isEmpty == false
-                ? reviewTomorrowFirstAction ?? ""
-                : plan.tomorrowFirstAction
-
-            try refreshTaskDataThrowing(for: plan.dayKey)
-            loadState = .loaded
-        } catch {
-            loadState = .failed("无法读取或创建今日 DayPlan：\(error.localizedDescription)")
-        }
-    }
-
-    private func refreshTaskData() {
-        do {
-            try refreshTaskDataThrowing(for: todayKey)
-        } catch {
-            taskMessage = "刷新任务失败：\(error.localizedDescription)"
-        }
-    }
-
-    private func refreshTaskDataThrowing(for dayKey: String) throws {
-        tasks = try StudyTaskStore.fetchTasks(for: dayKey, in: modelContext)
-        totalTaskCount = try StudyTaskStore.countTasks(for: dayKey, in: modelContext)
-        completedTaskCount = try StudyTaskStore.countCompletedTasks(for: dayKey, in: modelContext)
-        builtInPromptTemplateCount = try PromptTemplateStore.countBuiltInTemplates(in: modelContext)
-    }
-
-    private func saveTodayPlan() {
-        guard let plan = dayPlan else {
-            saveMessage = "保存失败：今日计划尚未加载。"
-            return
-        }
-
-        do {
-            applyDraftPlanFields(to: plan)
-            try modelContext.save()
-            saveMessage = "今日计划已保存。"
-        } catch {
-            saveMessage = "保存失败：\(error.localizedDescription)"
-        }
-    }
-
-    private func preparePlanTaskGeneration() {
-        taskMessage = nil
-        planTaskMessage = nil
-        planTaskGenerationResult = nil
-
-        let parsedTasks = PlanTaskParser.parsePlanSections(
-            top: topTasksText,
-            baseline: baselineTasksText,
-            bonus: bonusTasksText
-        )
-
-        guard !parsedTasks.isEmpty else {
-            planTaskMessage = "先在重点 / 保底 / 加分任务里写至少一行计划。"
-            return
-        }
-
-        do {
-            let existingTitleKeys = Set(
-                try StudyTaskStore.fetchTasks(for: todayKey, in: modelContext).map {
-                    PlanTaskParser.normalizedTitleKey($0.title)
-                }
-            )
-            let items = parsedTasks.map { parsedTask in
-                PlanTaskConfirmationItem(
-                    parsedTask: parsedTask,
-                    alreadyExists: existingTitleKeys.contains(PlanTaskParser.normalizedTitleKey(parsedTask.title))
-                )
-            }
-
-            activePlanTaskGeneration = PlanTaskGenerationState(items: items)
-        } catch {
-            taskMessage = "读取今日任务失败：\(error.localizedDescription)"
-        }
-    }
-
-    private func createTasksFromPlan(_ parsedTasks: [ParsedPlanTask]) {
-        guard let plan = dayPlan else {
-            taskMessage = "生成失败：今日计划尚未加载。"
-            return
-        }
-
-        do {
-            applyDraftPlanFields(to: plan)
-            let result = try StudyTaskStore.createTasksFromPlan(
-                dayPlan: plan,
-                parsedTasks: parsedTasks,
-                in: modelContext
-            )
-            try refreshTaskDataThrowing(for: todayKey)
-            saveMessage = "已保存今日计划。"
-            planTaskGenerationResult = PlanTaskGenerationResult(created: result.created, skipped: result.skipped)
-            planTaskMessage = nil
-            taskMessage = nil
-        } catch {
-            taskMessage = "生成今日任务失败：\(error.localizedDescription)"
         }
     }
 
     private func viewGeneratedTasks() {
         guard let onViewTasks else {
-            taskMessage = "请进入 Tasks 页查看已生成任务。"
+            model.taskMessage = "请进入 Tasks 页查看已生成任务。"
             return
         }
-
         onViewTasks()
-    }
-
-    private func applyDraftPlanFields(to plan: DayPlan) {
-        plan.stateScore = stateScore
-        plan.mainSubject = mainSubject.trimmingCharacters(in: .whitespacesAndNewlines)
-        plan.topTasksText = topTasksText
-        plan.baselineTasksText = baselineTasksText
-        plan.bonusTasksText = bonusTasksText
-        plan.tomorrowFirstAction = tomorrowFirstAction.trimmingCharacters(in: .whitespacesAndNewlines)
-        DayPlanStore.updateDayPlanTimestamp(plan)
-    }
-
-    private func toggleTaskStatus(_ task: StudyTask) {
-        let currentStatus = StudyTaskStatus.from(task.status)
-        guard currentStatus == .pending || currentStatus == .done else {
-            taskMessage = "Today 只支持快速切换待做/完成；更多状态请到任务页处理。"
-            return
-        }
-
-        do {
-            task.status = currentStatus == .done
-                ? StudyTaskStatus.pending.storageValue
-                : StudyTaskStatus.done.storageValue
-            task.updatedAt = Date()
-            try modelContext.save()
-            StudyTaskStore.postDidChange(dayKey: task.dayKey)
-            try refreshTaskDataThrowing(for: todayKey)
-            taskMessage = StudyTaskStatus.from(task.status) == .done ? "已标记完成。" : "已撤回待做。"
-        } catch {
-            taskMessage = "更新任务失败：\(error.localizedDescription)"
-        }
-    }
-
-    private func handleTaskStoreDidChange(_ notification: Notification) {
-        let changedDayKey = notification.userInfo?[StudyTaskStore.dayKeyUserInfoKey] as? String
-        guard changedDayKey == nil || changedDayKey == todayKey else {
-            return
-        }
-
-        refreshTaskData()
     }
 }
 
-private enum LoadState: Equatable {
+enum LoadState: Equatable {
     case loading
     case loaded
     case failed(String)
