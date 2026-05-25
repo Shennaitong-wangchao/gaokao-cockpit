@@ -40,7 +40,7 @@ struct TaskListView: View {
                     .padding(.vertical, 12)
                 } else {
                     LazyVStack(spacing: 10) {
-                        ForEach(model.tasks, id: \.id) { task in
+                        ForEach(Array(model.tasks.enumerated()), id: \.element.id) { index, task in
                             TaskRowView(
                                 task: task,
                                 onTap: {
@@ -56,6 +56,7 @@ struct TaskListView: View {
                                     model.updateTaskStatus(in: modelContext, task: task, to: status)
                                 }
                             )
+                            .staggeredAppear(index: index)
                         }
                     }
                 }

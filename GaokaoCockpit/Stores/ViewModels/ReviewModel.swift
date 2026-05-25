@@ -317,6 +317,7 @@ final class ReviewModel {
     private static let dayFormatter: DateFormatter = {
         let formatter = DateFormatter()
         formatter.locale = Locale(identifier: "zh_CN")
+        formatter.timeZone = AppDateTime.timeZone
         formatter.dateFormat = "yyyy-MM-dd"
         return formatter
     }()
@@ -324,6 +325,7 @@ final class ReviewModel {
     private static let shortDateFormatter: DateFormatter = {
         let formatter = DateFormatter()
         formatter.locale = Locale(identifier: "zh_CN")
+        formatter.timeZone = AppDateTime.timeZone
         formatter.dateFormat = "M月d日"
         return formatter
     }()

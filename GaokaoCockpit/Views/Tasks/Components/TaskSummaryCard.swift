@@ -24,6 +24,7 @@ struct TaskListHeaderView: View {
     private static let dateFormatter: DateFormatter = {
         let formatter = DateFormatter()
         formatter.locale = Locale(identifier: "zh_CN")
+        formatter.timeZone = AppDateTime.timeZone
         formatter.dateFormat = "M月d日 EEEE"
         return formatter
     }()

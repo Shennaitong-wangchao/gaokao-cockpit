@@ -7,15 +7,20 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		A00000000000000000000101 /* GaokaoCockpitApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000201 /* GaokaoCockpitApp.swift */; };
-		A0000000000000000000635736 /* TodayCockpitModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0000000000000000000F15E2C /* TodayCockpitModel.swift */; };
-		A00000000000000000006A129C /* TaskListModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000F7F2A /* TaskListModel.swift */; };
-		A000000000000000000066BFAF /* MistakeSurgeryModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A000000000000000000032F06D /* MistakeSurgeryModel.swift */; };
-		A00000000000000000006111C8 /* ReviewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0000000000000000000622DB3 /* ReviewModel.swift */; };
-		A00000000000000000003EF7DA /* PromptLibraryModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0000000000000000000BB58CD /* PromptLibraryModel.swift */; };
+		99431A582FC416F6001ADEBF /* EncouragementSystem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 99431A552FC416F6001ADEBF /* EncouragementSystem.swift */; };
+		99431A592FC416F6001ADEBF /* DesignSystem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 99431A532FC416F6001ADEBF /* DesignSystem.swift */; };
+		99431A5A2FC416F6001ADEBF /* AnimationSystem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 99431A522FC416F6001ADEBF /* AnimationSystem.swift */; };
+		99431A5B2FC416F6001ADEBF /* DSComponents.swift in Sources */ = {isa = PBXBuildFile; fileRef = 99431A542FC416F6001ADEBF /* DSComponents.swift */; };
+		99431A5C2FC416F6001ADEBF /* ThemeManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 99431A562FC416F6001ADEBF /* ThemeManager.swift */; };
+		99431A6E2FC41794001ADEBF /* DSBarChart.swift in Sources */ = {isa = PBXBuildFile; fileRef = 99431A682FC41794001ADEBF /* DSBarChart.swift */; };
+		99431A6F2FC41794001ADEBF /* DSHeatMap.swift in Sources */ = {isa = PBXBuildFile; fileRef = 99431A692FC41794001ADEBF /* DSHeatMap.swift */; };
+		99431A702FC41794001ADEBF /* DSLineChart.swift in Sources */ = {isa = PBXBuildFile; fileRef = 99431A6A2FC41794001ADEBF /* DSLineChart.swift */; };
+		99431A712FC41794001ADEBF /* DSRingChart.swift in Sources */ = {isa = PBXBuildFile; fileRef = 99431A6C2FC41794001ADEBF /* DSRingChart.swift */; };
+		99431A722FC41794001ADEBF /* DSPieChart.swift in Sources */ = {isa = PBXBuildFile; fileRef = 99431A6B2FC41794001ADEBF /* DSPieChart.swift */; };
+		99431A742FC41856001ADEBF /* AchievementBadge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 99431A732FC41856001ADEBF /* AchievementBadge.swift */; };
+		99431A762FC4186D001ADEBF /* TodayAchievementCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 99431A752FC4186D001ADEBF /* TodayAchievementCard.swift */; };
 		A000000000000000000000DCE7 /* HapticFeedback.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0000000000000000000A8B3CA /* HapticFeedback.swift */; };
-		A0000000000000000000D708D5 /* ToastManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0000000000000000000D05B61 /* ToastManager.swift */; };
-		A0000000000000000000D33812 /* ToastOverlay.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0000000000000000000F2E113 /* ToastOverlay.swift */; };
+		A00000000000000000000101 /* GaokaoCockpitApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000201 /* GaokaoCockpitApp.swift */; };
 		A00000000000000000000102 /* AppRootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000202 /* AppRootView.swift */; };
 		A00000000000000000000103 /* TodayCockpitPlaceholderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000203 /* TodayCockpitPlaceholderView.swift */; };
 		A00000000000000000000104 /* TaskListPlaceholderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000204 /* TaskListPlaceholderView.swift */; };
@@ -24,7 +29,6 @@
 		A00000000000000000000107 /* PromptLibraryPlaceholderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000207 /* PromptLibraryPlaceholderView.swift */; };
 		A00000000000000000000108 /* ReviewPlaceholderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000208 /* ReviewPlaceholderView.swift */; };
 		A00000000000000000000109 /* ModelDefaults.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000240 /* ModelDefaults.swift */; };
-		A00000000000000000000153 /* ModelValueTypes.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000284 /* ModelValueTypes.swift */; };
 		A00000000000000000000110 /* DayPlan.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000241 /* DayPlan.swift */; };
 		A00000000000000000000111 /* StudyTask.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000242 /* StudyTask.swift */; };
 		A00000000000000000000112 /* FocusSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000243 /* FocusSession.swift */; };
@@ -52,7 +56,6 @@
 		A00000000000000000000134 /* PromptRenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000265 /* PromptRenderer.swift */; };
 		A00000000000000000000135 /* PromptLibraryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000266 /* PromptLibraryView.swift */; };
 		A00000000000000000000136 /* PromptTemplateDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000267 /* PromptTemplateDetailView.swift */; };
-		BE241703A3BF48AD8AAFCF08 /* PromptTemplateEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A9D66CB75FB43EA8DC8E240 /* PromptTemplateEditorView.swift */; };
 		A00000000000000000000137 /* WeeklyReviewStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000268 /* WeeklyReviewStore.swift */; };
 		A00000000000000000000138 /* ReviewAggregationStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000269 /* ReviewAggregationStore.swift */; };
 		A00000000000000000000139 /* ReviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000271 /* ReviewView.swift */; };
@@ -69,6 +72,7 @@
 		A00000000000000000000150 /* DocumentPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000281 /* DocumentPicker.swift */; };
 		A00000000000000000000151 /* BackupRestorePlan.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000282 /* BackupRestorePlan.swift */; };
 		A00000000000000000000152 /* BackupRestorePlanBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000283 /* BackupRestorePlanBuilder.swift */; };
+		A00000000000000000000153 /* ModelValueTypes.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000284 /* ModelValueTypes.swift */; };
 		A00000000000000000000154 /* TodayHeaderSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000285 /* TodayHeaderSection.swift */; };
 		A00000000000000000000155 /* TodayLowEnergyBanner.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000286 /* TodayLowEnergyBanner.swift */; };
 		A00000000000000000000156 /* TodayPlanSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000287 /* TodayPlanSection.swift */; };
@@ -96,11 +100,19 @@
 		A00000000000000000000178 /* PromptVariableInputSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000709 /* PromptVariableInputSection.swift */; };
 		A00000000000000000000179 /* PromptPreviewSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000710 /* PromptPreviewSection.swift */; };
 		A00000000000000000000180 /* RecentPromptStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0000000000000000000711 /* RecentPromptStore.swift */; };
+		A00000000000000000003EF7DA /* PromptLibraryModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0000000000000000000BB58CD /* PromptLibraryModel.swift */; };
+		A00000000000000000006111C8 /* ReviewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0000000000000000000622DB3 /* ReviewModel.swift */; };
+		A0000000000000000000635736 /* TodayCockpitModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0000000000000000000F15E2C /* TodayCockpitModel.swift */; };
+		A000000000000000000066BFAF /* MistakeSurgeryModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A000000000000000000032F06D /* MistakeSurgeryModel.swift */; };
+		A00000000000000000006A129C /* TaskListModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000F7F2A /* TaskListModel.swift */; };
+		A0000000000000000000D33812 /* ToastOverlay.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0000000000000000000F2E113 /* ToastOverlay.swift */; };
+		A0000000000000000000D708D5 /* ToastManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0000000000000000000D05B61 /* ToastManager.swift */; };
 		B00000000000000000000101 /* PlanTaskParserTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B00000000000000000000201 /* PlanTaskParserTests.swift */; };
 		B00000000000000000000102 /* DateKeyTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B00000000000000000000202 /* DateKeyTests.swift */; };
 		B00000000000000000000103 /* PromptRendererTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B00000000000000000000203 /* PromptRendererTests.swift */; };
 		B00000000000000000000104 /* BackupValidationStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B00000000000000000000204 /* BackupValidationStoreTests.swift */; };
 		B00000000000000000000105 /* StudyTaskStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B00000000000000000000205 /* StudyTaskStoreTests.swift */; };
+		BE241703A3BF48AD8AAFCF08 /* PromptTemplateEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A9D66CB75FB43EA8DC8E240 /* PromptTemplateEditorView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -114,15 +126,20 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		1A9D66CB75FB43EA8DC8E240 /* PromptTemplateEditorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PromptTemplateEditorView.swift; sourceTree = "<group>"; };
+		99431A522FC416F6001ADEBF /* AnimationSystem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimationSystem.swift; sourceTree = "<group>"; };
+		99431A532FC416F6001ADEBF /* DesignSystem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DesignSystem.swift; sourceTree = "<group>"; };
+		99431A542FC416F6001ADEBF /* DSComponents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DSComponents.swift; sourceTree = "<group>"; };
+		99431A552FC416F6001ADEBF /* EncouragementSystem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EncouragementSystem.swift; sourceTree = "<group>"; };
+		99431A562FC416F6001ADEBF /* ThemeManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThemeManager.swift; sourceTree = "<group>"; };
+		99431A682FC41794001ADEBF /* DSBarChart.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DSBarChart.swift; sourceTree = "<group>"; };
+		99431A692FC41794001ADEBF /* DSHeatMap.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DSHeatMap.swift; sourceTree = "<group>"; };
+		99431A6A2FC41794001ADEBF /* DSLineChart.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DSLineChart.swift; sourceTree = "<group>"; };
+		99431A6B2FC41794001ADEBF /* DSPieChart.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DSPieChart.swift; sourceTree = "<group>"; };
+		99431A6C2FC41794001ADEBF /* DSRingChart.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DSRingChart.swift; sourceTree = "<group>"; };
+		99431A732FC41856001ADEBF /* AchievementBadge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AchievementBadge.swift; sourceTree = "<group>"; };
+		99431A752FC4186D001ADEBF /* TodayAchievementCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodayAchievementCard.swift; sourceTree = "<group>"; };
 		A00000000000000000000201 /* GaokaoCockpitApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GaokaoCockpitApp.swift; sourceTree = "<group>"; };
-		A0000000000000000000F15E2C /* TodayCockpitModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodayCockpitModel.swift; sourceTree = "<group>"; };
-		A00000000000000000000F7F2A /* TaskListModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskListModel.swift; sourceTree = "<group>"; };
-		A000000000000000000032F06D /* MistakeSurgeryModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MistakeSurgeryModel.swift; sourceTree = "<group>"; };
-		A0000000000000000000622DB3 /* ReviewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReviewModel.swift; sourceTree = "<group>"; };
-		A0000000000000000000BB58CD /* PromptLibraryModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PromptLibraryModel.swift; sourceTree = "<group>"; };
-		A0000000000000000000A8B3CA /* HapticFeedback.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HapticFeedback.swift; sourceTree = "<group>"; };
-		A0000000000000000000D05B61 /* ToastManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToastManager.swift; sourceTree = "<group>"; };
-		A0000000000000000000F2E113 /* ToastOverlay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToastOverlay.swift; sourceTree = "<group>"; };
 		A00000000000000000000202 /* AppRootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppRootView.swift; sourceTree = "<group>"; };
 		A00000000000000000000203 /* TodayCockpitPlaceholderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodayCockpitPlaceholderView.swift; sourceTree = "<group>"; };
 		A00000000000000000000204 /* TaskListPlaceholderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskListPlaceholderView.swift; sourceTree = "<group>"; };
@@ -141,7 +158,6 @@
 		A00000000000000000000225 /* PROMPT_TEMPLATES.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = PROMPT_TEMPLATES.md; sourceTree = "<group>"; };
 		A00000000000000000000230 /* GaokaoCockpit.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = GaokaoCockpit.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A00000000000000000000240 /* ModelDefaults.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModelDefaults.swift; sourceTree = "<group>"; };
-		A00000000000000000000284 /* ModelValueTypes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModelValueTypes.swift; sourceTree = "<group>"; };
 		A00000000000000000000241 /* DayPlan.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DayPlan.swift; sourceTree = "<group>"; };
 		A00000000000000000000242 /* StudyTask.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StudyTask.swift; sourceTree = "<group>"; };
 		A00000000000000000000243 /* FocusSession.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FocusSession.swift; sourceTree = "<group>"; };
@@ -169,7 +185,6 @@
 		A00000000000000000000265 /* PromptRenderer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PromptRenderer.swift; sourceTree = "<group>"; };
 		A00000000000000000000266 /* PromptLibraryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PromptLibraryView.swift; sourceTree = "<group>"; };
 		A00000000000000000000267 /* PromptTemplateDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PromptTemplateDetailView.swift; sourceTree = "<group>"; };
-		1A9D66CB75FB43EA8DC8E240 /* PromptTemplateEditorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PromptTemplateEditorView.swift; sourceTree = "<group>"; };
 		A00000000000000000000268 /* WeeklyReviewStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeeklyReviewStore.swift; sourceTree = "<group>"; };
 		A00000000000000000000269 /* ReviewAggregationStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReviewAggregationStore.swift; sourceTree = "<group>"; };
 		A00000000000000000000270 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -186,6 +201,7 @@
 		A00000000000000000000281 /* DocumentPicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DocumentPicker.swift; sourceTree = "<group>"; };
 		A00000000000000000000282 /* BackupRestorePlan.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackupRestorePlan.swift; sourceTree = "<group>"; };
 		A00000000000000000000283 /* BackupRestorePlanBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackupRestorePlanBuilder.swift; sourceTree = "<group>"; };
+		A00000000000000000000284 /* ModelValueTypes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModelValueTypes.swift; sourceTree = "<group>"; };
 		A00000000000000000000285 /* TodayHeaderSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodayHeaderSection.swift; sourceTree = "<group>"; };
 		A00000000000000000000286 /* TodayLowEnergyBanner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodayLowEnergyBanner.swift; sourceTree = "<group>"; };
 		A00000000000000000000287 /* TodayPlanSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodayPlanSection.swift; sourceTree = "<group>"; };
@@ -212,7 +228,15 @@
 		A00000000000000000000708 /* BackupSummaryRows.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackupSummaryRows.swift; sourceTree = "<group>"; };
 		A00000000000000000000709 /* PromptVariableInputSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PromptVariableInputSection.swift; sourceTree = "<group>"; };
 		A00000000000000000000710 /* PromptPreviewSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PromptPreviewSection.swift; sourceTree = "<group>"; };
+		A00000000000000000000F7F2A /* TaskListModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskListModel.swift; sourceTree = "<group>"; };
+		A000000000000000000032F06D /* MistakeSurgeryModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MistakeSurgeryModel.swift; sourceTree = "<group>"; };
+		A0000000000000000000622DB3 /* ReviewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReviewModel.swift; sourceTree = "<group>"; };
 		A0000000000000000000711 /* RecentPromptStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecentPromptStore.swift; sourceTree = "<group>"; };
+		A0000000000000000000A8B3CA /* HapticFeedback.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HapticFeedback.swift; sourceTree = "<group>"; };
+		A0000000000000000000BB58CD /* PromptLibraryModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PromptLibraryModel.swift; sourceTree = "<group>"; };
+		A0000000000000000000D05B61 /* ToastManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToastManager.swift; sourceTree = "<group>"; };
+		A0000000000000000000F15E2C /* TodayCockpitModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodayCockpitModel.swift; sourceTree = "<group>"; };
+		A0000000000000000000F2E113 /* ToastOverlay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToastOverlay.swift; sourceTree = "<group>"; };
 		B00000000000000000000201 /* PlanTaskParserTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlanTaskParserTests.swift; sourceTree = "<group>"; };
 		B00000000000000000000202 /* DateKeyTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DateKeyTests.swift; sourceTree = "<group>"; };
 		B00000000000000000000203 /* PromptRendererTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PromptRendererTests.swift; sourceTree = "<group>"; };
@@ -239,14 +263,42 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		99431A572FC416F6001ADEBF /* DesignSystem */ = {
+			isa = PBXGroup;
+			children = (
+				99431A522FC416F6001ADEBF /* AnimationSystem.swift */,
+				99431A532FC416F6001ADEBF /* DesignSystem.swift */,
+				99431A542FC416F6001ADEBF /* DSComponents.swift */,
+				99431A552FC416F6001ADEBF /* EncouragementSystem.swift */,
+				99431A562FC416F6001ADEBF /* ThemeManager.swift */,
+			);
+			path = DesignSystem;
+			sourceTree = "<group>";
+		};
+		99431A6D2FC41794001ADEBF /* Charts */ = {
+			isa = PBXGroup;
+			children = (
+				99431A682FC41794001ADEBF /* DSBarChart.swift */,
+				99431A692FC41794001ADEBF /* DSHeatMap.swift */,
+				99431A6A2FC41794001ADEBF /* DSLineChart.swift */,
+				99431A6B2FC41794001ADEBF /* DSPieChart.swift */,
+				99431A6C2FC41794001ADEBF /* DSRingChart.swift */,
+			);
+			path = Charts;
+			sourceTree = "<group>";
+		};
 		A00000000000000000000401 = {
 			isa = PBXGroup;
 			children = (
+				99431A752FC4186D001ADEBF /* TodayAchievementCard.swift */,
+				99431A732FC41856001ADEBF /* AchievementBadge.swift */,
 				A00000000000000000000402 /* GaokaoCockpit */,
 				B00000000000000000000440 /* GaokaoCockpitTests */,
 				A00000000000000000000420 /* docs */,
 				A00000000000000000000220 /* README.md */,
 				A00000000000000000000430 /* Products */,
+				99431A6D2FC41794001ADEBF /* Charts */,
+				99431A572FC416F6001ADEBF /* DesignSystem */,
 			);
 			sourceTree = "<group>";
 		};
@@ -276,25 +328,6 @@
 				A00000000000000000000409 /* Reviews */,
 			);
 			path = Views;
-			sourceTree = "<group>";
-		};
-		A00000000000000000000413 /* Backup */ = {
-			isa = PBXGroup;
-			children = (
-				A00000000000000000000278 /* BackupExportView.swift */,
-				A00000000000000000000421 /* Components */,
-			);
-			path = Backup;
-			sourceTree = "<group>";
-		};
-		A00000000000000000000414 /* Shared */ = {
-			isa = PBXGroup;
-			children = (
-				A00000000000000000000277 /* ShareSheet.swift */,
-				A00000000000000000000281 /* DocumentPicker.swift */,
-			
-				A0000000000000000000F2E113 /* ToastOverlay.swift */,);
-			path = Shared;
 			sourceTree = "<group>";
 		};
 		A00000000000000000000404 /* Today */ = {
@@ -405,9 +438,9 @@
 				A00000000000000000000268 /* WeeklyReviewStore.swift */,
 				A00000000000000000000269 /* ReviewAggregationStore.swift */,
 				A00000000000000000000210 /* README.md */,
-			
 				A0000000000000000000297AAA /* ViewModels */,
-				A0000000000000000000B7374E /* Feedback */,);
+				A0000000000000000000B7374E /* Feedback */,
+			);
 			path = Stores;
 			sourceTree = "<group>";
 		};
@@ -420,37 +453,23 @@
 			path = Resources;
 			sourceTree = "<group>";
 		};
-		A00000000000000000000420 /* docs */ = {
+		A00000000000000000000413 /* Backup */ = {
 			isa = PBXGroup;
 			children = (
-				A00000000000000000000221 /* PRODUCT_SPEC.md */,
-				A00000000000000000000222 /* DATA_MODEL.md */,
-				A00000000000000000000223 /* UX_FLOW.md */,
-				A00000000000000000000224 /* ROADMAP.md */,
-				A00000000000000000000225 /* PROMPT_TEMPLATES.md */,
+				A00000000000000000000278 /* BackupExportView.swift */,
+				A00000000000000000000421 /* Components */,
 			);
-			path = docs;
+			path = Backup;
 			sourceTree = "<group>";
 		};
-		A00000000000000000000430 /* Products */ = {
+		A00000000000000000000414 /* Shared */ = {
 			isa = PBXGroup;
 			children = (
-				A00000000000000000000230 /* GaokaoCockpit.app */,
-				B00000000000000000000230 /* GaokaoCockpitTests.xctest */,
+				A00000000000000000000277 /* ShareSheet.swift */,
+				A00000000000000000000281 /* DocumentPicker.swift */,
+				A0000000000000000000F2E113 /* ToastOverlay.swift */,
 			);
-			name = Products;
-			sourceTree = "<group>";
-		};
-		B00000000000000000000440 /* GaokaoCockpitTests */ = {
-			isa = PBXGroup;
-			children = (
-				B00000000000000000000201 /* PlanTaskParserTests.swift */,
-				B00000000000000000000202 /* DateKeyTests.swift */,
-				B00000000000000000000203 /* PromptRendererTests.swift */,
-				B00000000000000000000204 /* BackupValidationStoreTests.swift */,
-				B00000000000000000000205 /* StudyTaskStoreTests.swift */,
-			);
-			path = GaokaoCockpitTests;
+			path = Shared;
 			sourceTree = "<group>";
 		};
 		A00000000000000000000415 /* Components */ = {
@@ -510,6 +529,18 @@
 			path = Components;
 			sourceTree = "<group>";
 		};
+		A00000000000000000000420 /* docs */ = {
+			isa = PBXGroup;
+			children = (
+				A00000000000000000000221 /* PRODUCT_SPEC.md */,
+				A00000000000000000000222 /* DATA_MODEL.md */,
+				A00000000000000000000223 /* UX_FLOW.md */,
+				A00000000000000000000224 /* ROADMAP.md */,
+				A00000000000000000000225 /* PROMPT_TEMPLATES.md */,
+			);
+			path = docs;
+			sourceTree = "<group>";
+		};
 		A00000000000000000000421 /* Components */ = {
 			isa = PBXGroup;
 			children = (
@@ -519,6 +550,15 @@
 				A00000000000000000000708 /* BackupSummaryRows.swift */,
 			);
 			path = Components;
+			sourceTree = "<group>";
+		};
+		A00000000000000000000430 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				A00000000000000000000230 /* GaokaoCockpit.app */,
+				B00000000000000000000230 /* GaokaoCockpitTests.xctest */,
+			);
+			name = Products;
 			sourceTree = "<group>";
 		};
 		A0000000000000000000297AAA /* ViewModels */ = {
@@ -540,6 +580,18 @@
 				A0000000000000000000D05B61 /* ToastManager.swift */,
 			);
 			path = Feedback;
+			sourceTree = "<group>";
+		};
+		B00000000000000000000440 /* GaokaoCockpitTests */ = {
+			isa = PBXGroup;
+			children = (
+				B00000000000000000000201 /* PlanTaskParserTests.swift */,
+				B00000000000000000000202 /* DateKeyTests.swift */,
+				B00000000000000000000203 /* PromptRendererTests.swift */,
+				B00000000000000000000204 /* BackupValidationStoreTests.swift */,
+				B00000000000000000000205 /* StudyTaskStoreTests.swift */,
+			);
+			path = GaokaoCockpitTests;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -674,6 +726,8 @@
 				A00000000000000000000178 /* PromptVariableInputSection.swift in Sources */,
 				A00000000000000000000179 /* PromptPreviewSection.swift in Sources */,
 				A00000000000000000000136 /* PromptTemplateDetailView.swift in Sources */,
+				99431A762FC4186D001ADEBF /* TodayAchievementCard.swift in Sources */,
+				99431A742FC41856001ADEBF /* AchievementBadge.swift in Sources */,
 				BE241703A3BF48AD8AAFCF08 /* PromptTemplateEditorView.swift in Sources */,
 				A00000000000000000000107 /* PromptLibraryPlaceholderView.swift in Sources */,
 				A00000000000000000000139 /* ReviewView.swift in Sources */,
@@ -707,6 +761,11 @@
 				A00000000000000000000122 /* DayPlanStore.swift in Sources */,
 				A00000000000000000000123 /* StudyTaskStore.swift in Sources */,
 				A00000000000000000000142 /* PlanTaskParser.swift in Sources */,
+				99431A6E2FC41794001ADEBF /* DSBarChart.swift in Sources */,
+				99431A6F2FC41794001ADEBF /* DSHeatMap.swift in Sources */,
+				99431A702FC41794001ADEBF /* DSLineChart.swift in Sources */,
+				99431A712FC41794001ADEBF /* DSRingChart.swift in Sources */,
+				99431A722FC41794001ADEBF /* DSPieChart.swift in Sources */,
 				A00000000000000000000128 /* FocusSessionStore.swift in Sources */,
 				A00000000000000000000131 /* MistakeRecordStore.swift in Sources */,
 				A00000000000000000000141 /* MistakeImageStore.swift in Sources */,
@@ -718,10 +777,14 @@
 				A00000000000000000000124 /* PromptTemplateStore.swift in Sources */,
 				A00000000000000000000180 /* RecentPromptStore.swift in Sources */,
 				A00000000000000000000134 /* PromptRenderer.swift in Sources */,
+				99431A582FC416F6001ADEBF /* EncouragementSystem.swift in Sources */,
+				99431A592FC416F6001ADEBF /* DesignSystem.swift in Sources */,
+				99431A5A2FC416F6001ADEBF /* AnimationSystem.swift in Sources */,
+				99431A5B2FC416F6001ADEBF /* DSComponents.swift in Sources */,
+				99431A5C2FC416F6001ADEBF /* ThemeManager.swift in Sources */,
 				A00000000000000000000125 /* DailyReviewStore.swift in Sources */,
 				A00000000000000000000137 /* WeeklyReviewStore.swift in Sources */,
 				A00000000000000000000138 /* ReviewAggregationStore.swift in Sources */,
-			
 				A0000000000000000000635736 /* TodayCockpitModel.swift in Sources */,
 				A00000000000000000006A129C /* TaskListModel.swift in Sources */,
 				A000000000000000000066BFAF /* MistakeSurgeryModel.swift in Sources */,
@@ -729,7 +792,8 @@
 				A00000000000000000003EF7DA /* PromptLibraryModel.swift in Sources */,
 				A000000000000000000000DCE7 /* HapticFeedback.swift in Sources */,
 				A0000000000000000000D708D5 /* ToastManager.swift in Sources */,
-				A0000000000000000000D33812 /* ToastOverlay.swift in Sources */,);
+				A0000000000000000000D33812 /* ToastOverlay.swift in Sources */,
+			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		B00000000000000000000310 /* Sources */ = {

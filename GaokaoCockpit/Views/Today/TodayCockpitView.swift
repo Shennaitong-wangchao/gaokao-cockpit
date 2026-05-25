@@ -3,6 +3,7 @@ import SwiftUI
 
 struct TodayCockpitView: View {
     @Environment(\.modelContext) private var modelContext
+    @Environment(ThemeManager.self) private var themeManager
 
     private let onViewTasks: (() -> Void)?
     @State private var model = TodayCockpitModel()
@@ -46,14 +47,17 @@ struct TodayCockpitView: View {
                     ScrollView {
                         VStack(alignment: .leading, spacing: 14) {
                             TodayHeaderView(date: model.todayDate, dayKey: model.todayKey)
+                                .cardAppear(delay: 0)
 
                             TodayStartupCard(
                                 stateScore: $model.stateScore,
                                 mainSubject: $model.mainSubject
                             )
+                            .cardAppear(delay: 0.1)
 
                             if model.isLowEnergyMode {
                                 LowEnergyModeCard()
+                                    .cardAppear(delay: 0.2)
                             }
 
                             TodayTaskSummaryCard(
@@ -62,6 +66,7 @@ struct TodayCockpitView: View {
                                 pendingTaskCount: model.pendingTaskCount,
                                 builtInPromptTemplateCount: model.builtInPromptTemplateCount
                             )
+                            .cardAppear(delay: model.isLowEnergyMode ? 0.3 : 0.2)
 
                             TodayTaskListCard(
                                 tasks: model.tasks,
@@ -117,6 +122,8 @@ struct TodayCockpitView: View {
             if model.loadState == .loaded {
                 model.refreshTaskData(for: model.todayKey, in: modelContext)
             }
+            // 更新动态主题
+            updateTheme()
         }
         .onReceive(NotificationCenter.default.publisher(for: StudyTaskStore.didChangeNotification)) { notification in
             if model.handleTaskStoreDidChange(notification) {
@@ -149,6 +156,16 @@ struct TodayCockpitView: View {
             return
         }
         onViewTasks()
+    }
+
+    private func updateTheme() {
+        let isGoalAchieved = model.totalTaskCount > 0 && model.completedTaskCount == model.totalTaskCount
+        themeManager.updateTheme(
+            basedOn: Date(),
+            stateScore: model.stateScore,
+            isGoalAchieved: isGoalAchieved,
+            isLowEnergyMode: model.isLowEnergyMode
+        )
     }
 }
 

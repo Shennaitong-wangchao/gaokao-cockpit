@@ -300,6 +300,7 @@ extension MistakeRecord {
     private static let shortDateFormatter: DateFormatter = {
         let formatter = DateFormatter()
         formatter.locale = Locale(identifier: "zh_CN")
+        formatter.timeZone = AppDateTime.timeZone
         formatter.dateFormat = "M/d"
         return formatter
     }()

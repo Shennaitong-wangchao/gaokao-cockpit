@@ -4,6 +4,8 @@ struct AppRootView: View {
     let startupWarning: String?
 
     @State private var selectedTab: AppTab = .today
+    @State private var themeManager = ThemeManager.shared
+    @State private var animationTrigger = AnimationTrigger()
 
     init(startupWarning: String? = nil) {
         self.startupWarning = startupWarning
@@ -79,7 +81,11 @@ struct AppRootView: View {
             }
 
             ToastOverlay()
+
+            AnimationOverlay()
         }
+        .environment(themeManager)
+        .environment(animationTrigger)
     }
 }
 

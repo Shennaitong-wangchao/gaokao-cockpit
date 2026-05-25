@@ -469,6 +469,7 @@ private struct PromptRecentSection: View {
             return "\(days) 天前"
         } else {
             let formatter = DateFormatter()
+            formatter.timeZone = AppDateTime.timeZone
             formatter.dateFormat = "MM-dd"
             return formatter.string(from: date)
         }

@@ -86,6 +86,7 @@ struct WeeklyReviewSection: View {
     private static let formatter: DateFormatter = {
         let formatter = DateFormatter()
         formatter.locale = Locale(identifier: "zh_CN")
+        formatter.timeZone = AppDateTime.timeZone
         formatter.dateFormat = "M月d日"
         return formatter
     }()

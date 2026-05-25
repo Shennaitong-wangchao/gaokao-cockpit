@@ -633,6 +633,7 @@ enum BackupExportStore {
     static func makeExportFileName(date: Date) -> String {
         let formatter = DateFormatter()
         formatter.locale = Locale(identifier: "en_US_POSIX")
+        formatter.timeZone = AppDateTime.timeZone
         formatter.dateFormat = "yyyyMMdd-HHmmss"
         return "gaokao-cockpit-backup-\(formatter.string(from: date)).json"
     }

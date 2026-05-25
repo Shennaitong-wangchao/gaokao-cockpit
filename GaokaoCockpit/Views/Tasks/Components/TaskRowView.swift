@@ -5,92 +5,140 @@ struct TaskRowView: View {
     let onTap: () -> Void
     let onFocusFinished: () -> Void
     let onChangeStatus: (StudyTaskStatus) -> Void
+    @Environment(ThemeManager.self) private var themeManager
+    @Environment(AnimationTrigger.self) private var animationTrigger
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            HStack(alignment: .top, spacing: 12) {
-                Button {
-                    onTap()
-                } label: {
-                    HStack(alignment: .top, spacing: 12) {
-                        Image(systemName: task.taskListStatusIconName)
-                            .font(.title3)
-                            .foregroundStyle(task.taskListStatusIconColor)
-                            .frame(width: 28, height: 28)
+        DSCard(
+            cornerRadius: DesignSystem.CornerRadius.medium,
+            shadow: DesignSystem.Shadow.small,
+            accentColor: task.taskListStatusIconColor,
+            backgroundColor: DesignSystem.NeutralColors.secondaryBackground
+        ) {
+            VStack(alignment: .leading, spacing: DesignSystem.Spacing.md) {
+                HStack(alignment: .top, spacing: DesignSystem.Spacing.md) {
+                    Button {
+                        onTap()
+                    } label: {
+                        HStack(alignment: .top, spacing: DesignSystem.Spacing.md) {
+                            // 状态图标
+                            ZStack {
+                                Circle()
+                                    .fill(task.taskListStatusIconColor.opacity(0.15))
+                                    .frame(width: 36, height: 36)
+
+                                Image(systemName: task.taskListStatusIconName)
+                                    .font(DesignSystem.Typography.title3)
+                                    .foregroundStyle(task.taskListStatusIconColor)
+                            }
                             .accessibilityHidden(true)
 
-                        VStack(alignment: .leading, spacing: 8) {
-                            Text(task.title.isEmpty ? "未命名任务" : task.title)
-                                .font(.headline)
-                                .foregroundStyle(task.taskListStatus == .done ? .secondary : .primary)
-                                .strikethrough(task.taskListStatus == .done)
-                                .lineLimit(2)
+                            // 任务信息
+                            VStack(alignment: .leading, spacing: DesignSystem.Spacing.sm) {
+                                Text(task.title.isEmpty ? "未命名任务" : task.title)
+                                    .font(DesignSystem.Typography.headline)
+                                    .foregroundStyle(task.taskListStatus == .done ? .secondary : .primary)
+                                    .strikethrough(task.taskListStatus == .done)
+                                    .lineLimit(2)
 
-                            HStack(spacing: 8) {
-                                TaskTag(text: task.taskListSubjectText)
-                                TaskTag(text: task.taskListCategoryText)
-                            }
+                                HStack(spacing: DesignSystem.Spacing.xs) {
+                                    DSTag(
+                                        text: task.taskListSubjectText,
+                                        style: .info,
+                                        size: .small
+                                    )
+                                    DSTag(
+                                        text: task.taskListCategoryText,
+                                        style: .neutral,
+                                        size: .small
+                                    )
+                                }
 
-                            Text(task.taskListMinutesText)
-                                .font(.caption)
+                                HStack(spacing: DesignSystem.Spacing.xs) {
+                                    Image(systemName: "clock")
+                                        .font(DesignSystem.Typography.caption)
+                                    Text(task.taskListMinutesText)
+                                        .font(DesignSystem.Typography.caption)
+                                }
                                 .foregroundStyle(.secondary)
 
-                            if !task.outputNote.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-                                Text(task.outputNote)
-                                    .font(.caption)
-                                    .foregroundStyle(.secondary)
-                                    .lineLimit(2)
+                                if !task.outputNote.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                                    Text(task.outputNote)
+                                        .font(DesignSystem.Typography.caption)
+                                        .foregroundStyle(.secondary)
+                                        .lineLimit(2)
+                                }
                             }
                         }
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .contentShape(Rectangle())
                     }
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .contentShape(Rectangle())
-                }
-                .buttonStyle(.plain)
-                .accessibilityLabel("编辑任务 \(task.title.isEmpty ? "未命名任务" : task.title)")
-                .accessibilityHint("打开任务详情编辑")
-                .accessibilityAddTraits(.isButton)
+                    .buttonStyle(.plain)
+                    .accessibilityLabel("编辑任务 \(task.title.isEmpty ? "未命名任务" : task.title)")
+                    .accessibilityHint("打开任务详情编辑")
+                    .accessibilityAddTraits(.isButton)
 
-                Menu {
-                    ForEach(TaskStatusOption.all) { option in
-                        Button {
-                            onChangeStatus(option.status)
-                        } label: {
-                            Label(option.title, systemImage: option.systemImage)
+                    // 状态切换菜单
+                    Menu {
+                        ForEach(TaskStatusOption.all) { option in
+                            Button {
+                                withAnimation(DesignSystem.Animation.spring) {
+                                    onChangeStatus(option.status)
+                                }
+                                // 触发完成动画
+                                if option.status == .done {
+                                    HapticFeedback.success()
+                                    animationTrigger.triggerCheckmark()
+                                }
+                            } label: {
+                                Label(option.title, systemImage: option.systemImage)
+                            }
                         }
+                    } label: {
+                        Label(task.taskListStatusTitle, systemImage: "chevron.down.circle")
+                            .labelStyle(.iconOnly)
+                            .font(DesignSystem.Typography.title3)
+                            .foregroundStyle(.secondary)
+                            .frame(width: 32, height: 32)
                     }
-                } label: {
-                    Label(task.taskListStatusTitle, systemImage: "chevron.down.circle")
-                        .labelStyle(.iconOnly)
-                        .font(.title3)
-                        .foregroundStyle(.secondary)
-                        .frame(width: 32, height: 32)
+                    .accessibilityLabel("切换任务状态")
+                    .accessibilityValue(task.taskListStatusTitle)
                 }
-                .accessibilityLabel("切换任务状态")
-                .accessibilityValue(task.taskListStatusTitle)
-            }
 
-            HStack(spacing: 10) {
-                NavigationLink {
-                    FocusSessionView(task: task, onFinished: onFocusFinished)
-                } label: {
-                    Label("开始专注", systemImage: "timer")
+                // 操作按钮
+                HStack(spacing: DesignSystem.Spacing.md) {
+                    NavigationLink {
+                        FocusSessionView(task: task, onFinished: onFocusFinished)
+                    } label: {
+                        HStack(spacing: DesignSystem.Spacing.xs) {
+                            Image(systemName: "timer")
+                            Text("开始专注")
+                        }
+                        .font(DesignSystem.Typography.headline)
+                        .foregroundStyle(.white)
                         .frame(maxWidth: .infinity)
-                }
-                .buttonStyle(.borderedProminent)
+                        .padding(.vertical, DesignSystem.Spacing.sm)
+                        .background(themeManager.themeColor)
+                        .clipShape(RoundedRectangle(cornerRadius: DesignSystem.CornerRadius.medium, style: .continuous))
+                    }
 
-                Button {
-                    onTap()
-                } label: {
-                    Label("编辑", systemImage: "pencil")
+                    Button {
+                        onTap()
+                    } label: {
+                        HStack(spacing: DesignSystem.Spacing.xs) {
+                            Image(systemName: "pencil")
+                            Text("编辑")
+                        }
+                        .font(DesignSystem.Typography.headline)
+                        .foregroundStyle(themeManager.themeColor)
                         .frame(maxWidth: .infinity)
+                        .padding(.vertical, DesignSystem.Spacing.sm)
+                        .background(themeManager.themeColor.opacity(0.1))
+                        .clipShape(RoundedRectangle(cornerRadius: DesignSystem.CornerRadius.medium, style: .continuous))
+                    }
                 }
-                .buttonStyle(.bordered)
             }
         }
-        .padding(14)
-        .background(Color(.secondarySystemBackground))
-        .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
     }
 }
 

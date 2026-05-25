@@ -9,6 +9,38 @@ final class DateKeyTests: XCTestCase {
         XCTAssertEqual(DateKey.key(for: date, calendar: calendar), "2026-05-22")
     }
 
+    func testDefaultKeyUsesAppUTC8Calendar() throws {
+        let date = try makeUTCDate("2026-05-24T16:30:00Z")
+
+        XCTAssertEqual(DateKey.key(for: date), "2026-05-25")
+    }
+
+    func testGreetingUsesCurrentInstantInAppUTC8Calendar() throws {
+        let beijingAfternoon = try makeUTCDate("2026-05-25T08:30:00Z")
+
+        XCTAssertEqual(EncouragementSystem.getGreeting(for: beijingAfternoon), "下午好！继续保持专注")
+    }
+
+    func testGreetingUsesExpectedUTC8TimeSegments() throws {
+        let cases = [
+            ("2026-05-24T16:30:00Z", "凌晨了，先放轻一点"),
+            ("2026-05-24T21:30:00Z", "早起好！新的一天开始了"),
+            ("2026-05-25T00:30:00Z", "上午好！学习的黄金时间"),
+            ("2026-05-25T04:30:00Z", "中午好！记得休息一下"),
+            ("2026-05-25T08:30:00Z", "下午好！继续保持专注"),
+            ("2026-05-25T10:30:00Z", "晚上好！稳稳收束今天"),
+            ("2026-05-25T14:30:00Z", "深夜了，注意休息")
+        ]
+
+        for (dateString, expectedGreeting) in cases {
+            XCTAssertEqual(
+                EncouragementSystem.getGreeting(for: try makeUTCDate(dateString)),
+                expectedGreeting,
+                dateString
+            )
+        }
+    }
+
     func testWeekKeyRangeCrossesYearBoundary() throws {
         var calendar = makeCalendar()
         calendar.firstWeekday = 2
@@ -56,5 +88,10 @@ final class DateKeyTests: XCTestCase {
         components.hour = hour
 
         return try XCTUnwrap(calendar.date(from: components))
+    }
+
+    private func makeUTCDate(_ value: String) throws -> Date {
+        let formatter = ISO8601DateFormatter()
+        return try XCTUnwrap(formatter.date(from: value))
     }
 }
