@@ -54,6 +54,7 @@ AuthKey_*.p8
 
 # Tooling caches
 .cache/
+.gradle/
 .codex/
 .claude/
 .vscode/
